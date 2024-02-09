@@ -15,7 +15,7 @@ import (
 const DefaultShutdownTimeout time.Duration = 10
 
 type server struct {
-	port            int
+	port            string
 	host            string
 	shutdownTimeout time.Duration
 
@@ -28,7 +28,7 @@ type server struct {
 type Option func(*server)
 
 // WithPort はポート番号を設定するオプションです。
-func WithPort(port int) Option {
+func WithPort(port string) Option {
 	return func(s *server) {
 		s.port = port
 	}
@@ -66,7 +66,7 @@ type Server interface {
 // New はサーバーを生成します。
 func New(handler http.Handler, opts ...Option) Server {
 	server := &server{
-		port:            8080,
+		port:            "8080",
 		host:            "localhost",
 		shutdownTimeout: DefaultShutdownTimeout,
 		l:               slog.New(slog.NewTextHandler(os.Stderr, nil)).WithGroup("server"),
@@ -77,7 +77,7 @@ func New(handler http.Handler, opts ...Option) Server {
 	}
 
 	server.srv = &http.Server{
-		Addr:    fmt.Sprintf("%s:%d", server.host, server.port),
+		Addr:    fmt.Sprintf("%s:%s", server.host, server.port),
 		Handler: handler,
 	}
 
@@ -108,7 +108,7 @@ func (s *server) RunWithGracefulShutdown() {
 	defer cancel()
 
 	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, os.Interrupt, os.Kill)
+	signal.Notify(quit, os.Interrupt)
 
 	<-quit
 	if err := s.Shutdown(ctx); err != nil {
