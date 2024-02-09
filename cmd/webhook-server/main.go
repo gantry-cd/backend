@@ -3,6 +3,9 @@ package main
 import (
 	"fmt"
 	"os"
+
+	"github.com/gantrycd/backend/internal/handler/webhook"
+	"github.com/gantrycd/backend/internal/server"
 )
 
 func main() {
@@ -12,5 +15,7 @@ func main() {
 }
 
 func run() error {
-	return nil
+	handler := webhook.New()
+	server := server.New(handler)
+	return server.Run()
 }
