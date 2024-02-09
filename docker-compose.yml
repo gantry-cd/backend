@@ -1,0 +1,24 @@
+version: "3"
+
+services:
+  keycloak:
+    build: keycloak/
+    container_name: keycloak
+    tty: true
+    stdin_open: true
+    ports:
+      - "8080:8080"
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+    volumes:
+      - ./keycloak/data:/opt/keycloak/data
+    command:
+      - start-dev
+    networks:
+      - gantry-dev-networks
+  
+networks:
+  gantry-dev-networks:
+    external:
+      true
