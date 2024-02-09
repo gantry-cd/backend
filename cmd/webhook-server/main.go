@@ -16,6 +16,11 @@ func main() {
 
 func run() error {
 	handler := webhook.New()
-	server := server.New(handler)
+	server := server.New(
+		handler,
+		server.WithPort(os.Getenv("PORT")),
+		server.WithHost(os.Getenv("HOST")),
+		server.WithShutdownTimeout(10),
+	)
 	return server.Run()
 }
