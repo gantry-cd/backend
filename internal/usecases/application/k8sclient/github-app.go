@@ -1,4 +1,4 @@
-package ghevent
+package k8sclient
 
 import (
 	"log/slog"
