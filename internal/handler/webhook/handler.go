@@ -50,25 +50,33 @@ func (h *handler) githubAppsHandler(w http.ResponseWriter, r *http.Request) {
 	// ここでeventを処理する
 	switch e := event.(type) {
 	case *github.InstallationEvent:
-		h.l.Info(fmt.Sprintf("installation event received: %v", e))
+		err = h.Installation(e)
 	case *github.InstallationRepositoriesEvent:
-		h.l.Info(fmt.Sprintf("installation repositories event received: %v", e))
+		err = h.InstallationRepositories(e)
 	case *github.MetaEvent:
-		h.l.Info(fmt.Sprintf("meta event received: %v", e))
+		err = h.Meta(e)
 	case *github.CreateEvent:
-		h.l.Info(fmt.Sprintf("create event received: %v", e))
+		err = h.Create(e)
 	case *github.DeleteEvent:
-		h.l.Info(fmt.Sprintf("delete event received: %v", e))
+		err = h.Delete(e)
 	case *github.PushEvent:
-		h.l.Info(fmt.Sprintf("push event received: %v", e))
+		err = h.Push(e)
 	case *github.PullRequestEvent:
-		h.l.Info(fmt.Sprintf("pull request event received: %v", e))
+		err = h.PullRequest(e)
 	case *github.RepositoryEvent:
-		h.l.Info(fmt.Sprintf("repository event received: %v", e))
+		err = h.Repository(e)
 	default:
 		h.l.Info(fmt.Sprintf("event not supported: %v", event))
 		http.Error(w, "event not supported", http.StatusBadRequest)
 	}
+
+	if err != nil {
+		h.l.Error("error processing event", "error", err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 }
 
 // parseWebhook はWebhookのペイロードをパースして任意のGithubイベントに変換します。
