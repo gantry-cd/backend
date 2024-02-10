@@ -6,52 +6,52 @@ package gantrycd.k8s_controller.v1;
 
 import "google/protobuf/empty.proto";
 
-option go_package = "github.com/gantrycd/backend/api/proto/k8s-controller/v1";
+option go_package = "github.com/gantrycd/backend/api/proto/pb/k8s-controller/v1";
 
 service K8sCustomController {
-    // Namespace Control
-    rpc CreateNamespace(CreateNamespaceRequest) returns(CreateNamespaceResponse);
-    rpc ListNamespaces(google.protobuf.Empty) returns(ListNamespacesResponse);
-    rpc DeleteNamespace(DeleteNamespaceRequest) returns(google.protobuf.Empty);
+  // Namespace Control
+  rpc CreateNamespace(CreateNamespaceRequest) returns(CreateNamespaceReply);
+  rpc ListNamespaces(google.protobuf.Empty) returns(ListNamespacesReply);
+  rpc DeleteNamespace(DeleteNamespaceRequest) returns(google.protobuf.Empty);
 
-    // Deployment Control
-    rpc ApplyDeployment(CreateDeploymentRequest) returns(CreateDeploymentResponse);
-    rpc DeleteDeployment(DeleteDeploymentRequest) returns(google.protobuf.Empty);
+  // Deployment Control
+  rpc ApplyDeployment(CreateDeploymentRequest) returns(CreateDeploymentReply);
+  rpc DeleteDeployment(DeleteDeploymentRequest) returns(google.protobuf.Empty);
 }
 
 message CreateNamespaceRequest {
-    string name = 1;
+  string name = 1;
 }
 
-message CreateNamespaceResponse {
-    string name = 1;
+message CreateNamespaceReply {
+  string name = 1;
 }
 
-message ListNamespacesResponse {
-    repeated string names = 1;
+message ListNamespacesReply {
+  repeated string names = 1;
 }
 
 message DeleteNamespaceRequest {
-    string name = 1;
+  string name = 1;
 }
 
 message CreateDeploymentRequest {
-    string namespace = 1;
-    string repository = 2;
-    string baseBranch = 3;
-    string image = 4;
-    string podName = 5;
-    string replicas = 6;
-    string containerPort = 7;
+  string namespace = 1;
+  string repository = 2;
+  string base_branch = 3;
+  string image = 4;
+  string pod_name = 5;
+  string replicas = 6;
+  string container_port = 7;
 }
 
-message CreateDeploymentResponse {
-    string namespace = 1;
-    string name = 2;
-    string version = 3;
+message CreateDeploymentReply {
+  string namespace = 1;
+  string name = 2;
+  string version = 3;
 }
 
 message DeleteDeploymentRequest {
-    string namespace = 1;
-    string podName = 2;
+  string namespace = 1;
+  string pod_name = 2;
 }
