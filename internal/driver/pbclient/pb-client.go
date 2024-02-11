@@ -1,12 +1,20 @@
 package pbclient
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 	"os"
 	"time"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+)
+
+var (
+	ErrFailedToConnect = fmt.Errorf("failed to connect")
+	ErrNoConnection    = fmt.Errorf("no connection")
+	ErrFailedToClose   = fmt.Errorf("failed to close connection")
 )
 
 type connCofnig struct {
@@ -24,17 +32,18 @@ type connCofnig struct {
 }
 
 type Conn interface {
-	Connect()
-	Close()
+	Connect() error
+	Close() error
+	Client() *grpc.ClientConn
 }
 
 // ConnOption は接続のオプションを設定するための関数です。
 type ConnOption func(*connCofnig)
 
 // WithOption は接続のオプションを設定するオプションです。
-func (c *connCofnig) WithOption(opts ...grpc.DialOption) ConnOption {
+func WithOption(opts ...grpc.DialOption) ConnOption {
 	return func(c *connCofnig) {
-		c.option = opts
+		c.option = append(c.option, opts...)
 	}
 }
 
@@ -72,10 +81,14 @@ func WithLogger(l *slog.Logger) ConnOption {
 }
 
 // NewConn は接続のタイムアウトを設定するオプションです。
-func NewConn(addr string, opts ...ConnOption) *connCofnig {
+func NewConn(addr string, opts ...ConnOption) Conn {
 	c := &connCofnig{
 		addr: addr,
 		l:    slog.New(slog.NewTextHandler(os.Stderr, nil)).WithGroup("pb-client"),
+		option: []grpc.DialOption{
+			grpc.WithBlock(),
+			grpc.WithTransportCredentials(insecure.NewCredentials()),
+		},
 	}
 
 	for _, opt := range opts {
@@ -98,31 +111,36 @@ func NewConn(addr string, opts ...ConnOption) *connCofnig {
 }
 
 // Connect は接続を行います。
-func (c *connCofnig) Connect() {
-
+func (c *connCofnig) Connect() error {
 	sleep := func() {
 		time.Sleep(time.Duration(c.connectBackoff) * time.Second)
 	}
 
+	var err error
 	for i := 0; i < c.connectAttempts; i++ {
 		c.l.Info(fmt.Sprintf("connect to %s", c.addr))
 
-		// connect to addr
-		conn, err := grpc.Dial(
-			c.addr,
-			c.option...,
-		)
+		func() {
+			ctx, cancel := context.WithTimeout(context.Background(), time.Duration(c.connectTimeout)*time.Second)
+			defer cancel()
+			// connect to addr
+			c.clinet, err = grpc.DialContext(
+				ctx,
+				c.addr,
+				c.option...,
+			)
+		}()
 
 		// 成功したら終了
 		if err == nil {
 			c.l.Info(fmt.Sprintf("connected to %s", c.addr))
-			c.clinet = conn
-			return
+			return nil
 		}
 
 		c.l.Error(fmt.Sprintf("failed to connect to %s: %s", c.addr, err))
 		sleep()
 	}
+	return err
 }
 
 func (c *connCofnig) Client() *grpc.ClientConn {
@@ -130,16 +148,17 @@ func (c *connCofnig) Client() *grpc.ClientConn {
 }
 
 // Close は接続を閉じます。
-func (c *connCofnig) Close() {
+func (c *connCofnig) Close() error {
 	if c.clinet == nil {
 		c.l.Error(fmt.Sprintf("connection to %s is not established", c.addr))
-		return
+		return ErrNoConnection
 	}
 
 	c.l.Info(fmt.Sprintf("close connection to %s", c.addr))
 	if err := c.clinet.Close(); err != nil {
 		c.l.Error(fmt.Sprintf("failed to close connection to %s: %s", c.addr, err))
-		return
+		return ErrFailedToClose
 	}
 	c.clinet = nil
+	return nil
 }
