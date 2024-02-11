@@ -52,7 +52,7 @@ message CreateDeploymentReply {
 }
 
 message DeleteDeploymentRequest {
-  string organization = 1;
+  string namespace = 1;
   string repository = 2;
   string base_branch = 3;
 }
