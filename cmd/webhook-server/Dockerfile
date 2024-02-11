@@ -11,4 +11,4 @@ WORKDIR /app
 
 COPY --from=builder /build/webhook-server /app/webhook-server
 
-CMD ["/app/webhook-server"]
+CMD ["./webhook-server"]
