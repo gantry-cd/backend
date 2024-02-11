@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"log"
 
 	v1 "github.com/gantrycd/backend/proto/k8s-controller"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -37,7 +38,20 @@ func (c *CustomController) CreateNamespace(ctx context.Context, in *v1.CreateNam
 }
 
 func (c *CustomController) ListNamespaces(context.Context, *emptypb.Empty) (*v1.ListNamespacesReply, error) {
-	panic("implement me")
+	ns, err := c.client.CoreV1().Namespaces().List(context.Background(), metav1.ListOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	var names []string
+	for _, n := range ns.Items {
+		log.Println(n.Name)
+		names = append(names, n.Name)
+	}
+
+	return &v1.ListNamespacesReply{
+		Names: names,
+	}, nil
 }
 
 func (c *CustomController) DeleteNamespace(context.Context, *v1.DeleteNamespaceRequest) (*emptypb.Empty, error) {
