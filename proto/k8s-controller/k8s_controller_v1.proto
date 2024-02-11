@@ -52,6 +52,7 @@ message CreateDeploymentReply {
 }
 
 message DeleteDeploymentRequest {
-  string namespace = 1;
-  string pod_name = 2;
+  string organization = 1;
+  string repository = 2;
+  string base_branch = 3;
 }
