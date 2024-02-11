@@ -30,8 +30,9 @@ func WithLogger(l *slog.Logger) Option {
 // New は新しいWebhookのハンドラーを作成します。
 func New(interactor githubapp.GithubAppEvents, opts ...Option) http.Handler {
 	handler := &handler{
-		mux: http.NewServeMux(),
-		l:   slog.New(slog.NewTextHandler(os.Stderr, nil)).WithGroup("handler"),
+		mux:        http.NewServeMux(),
+		l:          slog.New(slog.NewTextHandler(os.Stderr, nil)).WithGroup("handler"),
+		interactor: interactor,
 	}
 
 	for _, opt := range opts {
