@@ -18,6 +18,21 @@ services:
     networks:
       - gantry-dev-networks
   
+  webhook-service:
+    build: cmd/webhook-service/
+    container_name: webhook-service
+    tty: true
+    stdin_open: true
+    ports:
+      - "8081:8081"
+    environment:
+      - PORT=8081
+      - HOST=0.0.0.0
+    networks:
+      - gantry-dev-networks
+    depends_on:
+      - keycloak
+
 networks:
   gantry-dev-networks:
     external:
