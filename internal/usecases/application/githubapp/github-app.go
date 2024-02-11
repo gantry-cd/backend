@@ -10,10 +10,7 @@ import (
 	customController "github.com/gantrycd/backend/proto/k8s-controller"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-)
-
-const (
-	DefaultNamespacePrefix = "gantrycd"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type githubAppEvents struct {
@@ -26,6 +23,7 @@ type githubAppEvents struct {
 type GithubAppEvents interface {
 	CreateNameSpace(ctx context.Context, organization string) error
 	ListNameSpace(ctx context.Context, prefix string) ([]string, error)
+	DeleteNameSpace(ctx context.Context, name string) error
 }
 
 // Option はサーバーのオプションを設定するための関数です。
@@ -54,12 +52,9 @@ func New(customController customController.K8SCustomControllerClient, opts ...Op
 
 // CreateNameSpace はOrganization名を元にNamespaceを作成します。
 func (ge *githubAppEvents) CreateNameSpace(ctx context.Context, organization string) error {
-	// GitHubのOrganization名をRFC1123に基づいてNamespace名として利用する
-	// GitHubのOrganization名は大文字小文字が混在しているため、小文字に変換する。あとは基本的にRFC1123に基づいているため、そのまま利用する。
-	orgName := strings.ToLower(organization)
 
 	_, err := ge.customController.CreateNamespace(ctx, &customController.CreateNamespaceRequest{
-		Name: fmt.Sprintf("%s-%s", DefaultNamespacePrefix, orgName),
+		Name: organization,
 	})
 
 	status, _ := status.FromError(err)
@@ -74,7 +69,7 @@ func (ge *githubAppEvents) CreateNameSpace(ctx context.Context, organization str
 
 // ListNameSpace はNamespaceの一覧を取得します。
 func (ge *githubAppEvents) ListNameSpace(ctx context.Context, prefix string) ([]string, error) {
-	result, err := ge.customController.ListNamespaces(ctx, nil)
+	result, err := ge.customController.ListNamespaces(ctx, &emptypb.Empty{})
 	if err != nil {
 		ge.l.Error("error listing namespaces", "error", err.Error())
 		return nil, err
@@ -88,4 +83,13 @@ func (ge *githubAppEvents) ListNameSpace(ctx context.Context, prefix string) ([]
 	}
 
 	return namespaces, nil
+}
+
+func (ge *githubAppEvents) DeleteNameSpace(ctx context.Context, name string) error {
+	ge.l.Info(fmt.Sprintf("deleting namespace: %s", name))
+	_, err := ge.customController.DeleteNamespace(ctx, &customController.DeleteNamespaceRequest{
+		Name: name,
+	})
+
+	return err
 }
