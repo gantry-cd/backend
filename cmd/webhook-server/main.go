@@ -18,12 +18,16 @@ func main() {
 }
 
 func run() error {
-	client := pbclient.NewConn(os.Getenv("K8S_CONTROLLER_ADDR"))
-	defer client.Close()
+	pbc := pbclient.NewConn(os.Getenv("K8S_CONTROLLER_ADDR"))
+
+	if err := pbc.Connect(); err != nil {
+		return fmt.Errorf("failed to connect to k8s controller: %w", err)
+	}
+	defer pbc.Close()
 
 	handler := webhook.New(
 		githubapp.New(
-			v1.NewK8SCustomControllerClient(client.Client()),
+			v1.NewK8SCustomControllerClient(pbc.Client()),
 		),
 	)
 
