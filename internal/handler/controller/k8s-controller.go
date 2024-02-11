@@ -54,8 +54,8 @@ func (c *CustomController) ListNamespaces(context.Context, *emptypb.Empty) (*v1.
 	}, nil
 }
 
-func (c *CustomController) DeleteNamespace(context.Context, *v1.DeleteNamespaceRequest) (*emptypb.Empty, error) {
-	panic("implement me")
+func (c *CustomController) DeleteNamespace(ctx context.Context, in *v1.DeleteNamespaceRequest) (*emptypb.Empty, error) {
+	return &emptypb.Empty{}, c.client.CoreV1().Namespaces().Delete(ctx, in.Name, metav1.DeleteOptions{})
 }
 
 func (c *CustomController) ApplyDeployment(context.Context, *v1.CreateDeploymentRequest) (*v1.CreateDeploymentReply, error) {
