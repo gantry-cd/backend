@@ -61,13 +61,9 @@ message DeleteDeploymentRequest {
   string pr_number = 3;
 }
 
-message Repos {
-  repeated string repos = 1;
-}
-
 message OrgsAnsRepos {
   string orgs = 1;
-  repeated Repos repos = 2;
+  repeated string repos = 2;
 }
 
 message ListOrgsAnsReposReply {
