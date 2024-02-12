@@ -18,15 +18,32 @@ services:
     networks:
       - gantry-dev-networks
   
-  webhook-service:
-    build: cmd/webhook-service/
-    container_name: webhook-service
+  bff:
+    build: cmd/bff/
+    container_name: bff
     tty: true
     stdin_open: true
     ports:
       - "8081:8081"
     environment:
       - PORT=8081
+      - HOST=0.0.0.0
+      - K8S_CONTROLLER_ADDR=localhost:8082
+    networks:
+      - gantry-dev-networks
+    depends_on:
+      - controller
+      - keycloak
+  
+  controller:
+    build: cmd/controller/
+    container_name: controller
+    tty: true
+    stdin_open: true
+    ports:
+      - "8082:8082"
+    environment:
+      - PORT=8082
       - HOST=0.0.0.0
     networks:
       - gantry-dev-networks
