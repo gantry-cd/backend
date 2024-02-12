@@ -8,9 +8,11 @@ import (
 
 	v1 "github.com/gantrycd/backend/proto/k8s-controller"
 	"google.golang.org/protobuf/types/known/emptypb"
-	appv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	appsv1 "k8s.io/client-go/applyconfigurations/apps/v1"
+	applyCoreV1 "k8s.io/client-go/applyconfigurations/core/v1"
+	applyMetaV1 "k8s.io/client-go/applyconfigurations/meta/v1"
 	"k8s.io/client-go/kubernetes"
 )
 
@@ -73,44 +75,65 @@ func (c *CustomController) ApplyDeployment(ctx context.Context, in *v1.CreateDep
 		return nil, err
 	}
 
-	dep, err := c.client.AppsV1().Deployments(in.Namespace).Create(context.Background(), &appv1.Deployment{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: in.PodName[:63],
-			Labels: map[string]string{
-				"repository": in.Repository,
-				"pr-number":  in.PrNumber,
-				"created-by": in.CreatedBy,
-			},
-		},
-		Spec: appv1.DeploymentSpec{
+	// ObjectMeta: metav1.ObjectMeta{
+	// 	Name: in.PodName[:63],
+	// 	Labels: map[string]string{
+	// 		"repository": in.Repository,
+	// 		"pr-number":  in.PrNumber,
+	// 		"created-by": in.CreatedBy,
+	// 	},
+	// },
+	// Spec: appv1.DeploymentSpec{
+	// 	Replicas: ptrint(reps),
+	// 	Selector: &metav1.LabelSelector{
+	// 		MatchLabels: map[string]string{
+	// 			"repository": in.Repository,
+	// 			"pr-number":  in.PrNumber,
+	// 			"created-by": in.CreatedBy,
+	// 		},
+	// 	},
+	// 	Template: corev1.PodTemplateSpec{
+	// 		ObjectMeta: metav1.ObjectMeta{
+	// 			Name: in.PodName[:63],
+	// 			Labels: map[string]string{
+	// 				"repository": in.Repository,
+	// 				"pr-number":  in.PrNumber,
+	// 				"created-by": in.CreatedBy,
+	// 			},
+	// 		},
+	// 		Spec: corev1.PodSpec{
+	// 			Containers: []corev1.Container{
+	// 				{
+	// 					Name:  in.PodName[:63],
+	// 					Image: in.Image,
+	// 				},
+	// 			},
+	// 		},
+	// 	},
+	// },
+
+	dep, err := c.client.AppsV1().Deployments(in.Namespace).Apply(ctx, &appsv1.DeploymentApplyConfiguration{
+		Spec: &appsv1.DeploymentSpecApplyConfiguration{
 			Replicas: ptrint(reps),
-			Selector: &metav1.LabelSelector{
+			Selector: &applyMetaV1.LabelSelectorApplyConfiguration{
 				MatchLabels: map[string]string{
 					"repository": in.Repository,
 					"pr-number":  in.PrNumber,
 					"created-by": in.CreatedBy,
 				},
 			},
-			Template: corev1.PodTemplateSpec{
-				ObjectMeta: metav1.ObjectMeta{
-					Name: in.PodName[:63],
-					Labels: map[string]string{
-						"repository": in.Repository,
-						"pr-number":  in.PrNumber,
-						"created-by": in.CreatedBy,
-					},
-				},
-				Spec: corev1.PodSpec{
-					Containers: []corev1.Container{
+			Template: &applyCoreV1.PodTemplateSpecApplyConfiguration{
+				Spec: &applyCoreV1.PodSpecApplyConfiguration{
+					Containers: []applyCoreV1.ContainerApplyConfiguration{
 						{
-							Name:  in.PodName[:63],
-							Image: in.Image,
+							Name:  &in.PodName,
+							Image: &in.Image,
 						},
 					},
 				},
 			},
 		},
-	}, metav1.CreateOptions{})
+	}, metav1.ApplyOptions{})
 
 	if err != nil {
 		return nil, err

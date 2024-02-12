@@ -93,3 +93,5 @@ func (ge *githubAppEvents) DeleteNameSpace(ctx context.Context, name string) err
 
 	return err
 }
+
+func (ge *githubAppEvents) SyncDeployment(ctx context.Context, orgs, repo, branch, image string)

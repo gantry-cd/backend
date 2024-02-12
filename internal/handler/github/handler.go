@@ -1,4 +1,4 @@
-package webhook
+package github
 
 import (
 	"fmt"
@@ -11,8 +11,7 @@ import (
 )
 
 type handler struct {
-	mux *http.ServeMux
-	l   *slog.Logger
+	l *slog.Logger
 
 	interactor githubapp.GithubAppEvents
 }
@@ -28,9 +27,8 @@ func WithLogger(l *slog.Logger) Option {
 }
 
 // New は新しいWebhookのハンドラーを作成します。
-func New(interactor githubapp.GithubAppEvents, opts ...Option) http.Handler {
+func New(interactor githubapp.GithubAppEvents, opts ...Option) *handler {
 	handler := &handler{
-		mux:        http.NewServeMux(),
 		l:          slog.New(slog.NewTextHandler(os.Stderr, nil)).WithGroup("handler"),
 		interactor: interactor,
 	}
@@ -39,11 +37,10 @@ func New(interactor githubapp.GithubAppEvents, opts ...Option) http.Handler {
 		opt(handler)
 	}
 
-	handler.mux.Handle("POST /github/app/webhook", http.HandlerFunc(handler.githubAppsHandler))
-	return handler.mux
+	return handler
 }
 
-func (h *handler) githubAppsHandler(w http.ResponseWriter, r *http.Request) {
+func (h *handler) GithubAppsHandler(w http.ResponseWriter, r *http.Request) {
 	event, err := h.parseWebhook(r)
 	if err != nil {
 		h.l.Error("error parsing webhook", "error", err.Error())

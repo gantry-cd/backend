@@ -1,4 +1,4 @@
-package webhook
+package github
 
 const (
 	InstallationCreated = "created"
