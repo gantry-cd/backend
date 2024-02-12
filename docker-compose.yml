@@ -17,7 +17,37 @@ services:
       - start-dev
     networks:
       - gantry-dev-networks
-  
+
+  influx:
+    image: influxdb:latest
+    container_name: influx
+    tty: true
+    stdin_open: true
+    ports:
+      - "8086:8086"
+    environment:
+      - INFLUXDB_DB=gantry
+      - INFLUXDB_ADMIN_USER=admin
+      - INFLUXDB_ADMIN_PASSWORD=admin
+      - INFLUXDB_USER=gantry
+      - INFLUXDB_USER_PASSWORD=gantry
+    volumes:
+      - ./influx/data:/var/lib/influxdb
+    networks:
+      - gantry-dev-networks
+
+  harbor:
+    image: goharbor/harbor-registry:latest
+    container_name: harbor
+    tty: true
+    stdin_open: true
+    ports:
+      - "5000:5000"
+    environment:
+      - HARBOR_ADMIN_PASSWORD=admin
+    networks:
+      - gantry-dev-networks 
+    
   bff:
     build: cmd/bff/
     container_name: bff
