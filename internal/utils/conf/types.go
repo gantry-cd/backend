@@ -18,9 +18,6 @@ type config struct {
 		Password string `ini:"password"`
 	} `ini:"image_registry"`
 
-	Test struct {
-		test []string `ini:"test"`
-	} `ini:"test"`
 	path string
 	cfg  *ini.File
 }

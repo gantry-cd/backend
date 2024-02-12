@@ -32,8 +32,11 @@ func (c *config) GetKey(section, key string) *ini.Key {
 	return c.cfg.Section(section).Key(key)
 }
 
-func (c *config) SetKey(section, key, value string) error {
+func (c *config) Update(section, key, value string) error {
 	c.cfg.Section(section).Key(key).SetValue(value)
+	if err := c.cfg.MapTo(c); err != nil {
+		return err
+	}
 	return c.SaveTo()
 }
 
