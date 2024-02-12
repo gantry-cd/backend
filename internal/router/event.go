@@ -3,7 +3,7 @@ package router
 import (
 	"net/http"
 
-	"github.com/gantrycd/backend/internal/handler/github"
+	"github.com/gantrycd/backend/internal/handler/application/github"
 	"github.com/gantrycd/backend/internal/usecases/application/githubapp"
 )
 

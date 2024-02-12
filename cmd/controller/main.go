@@ -8,7 +8,7 @@ import (
 	"os/signal"
 
 	"github.com/gantrycd/backend/internal/driver/k8s"
-	"github.com/gantrycd/backend/internal/handler/controller"
+	"github.com/gantrycd/backend/internal/handler/core/controller"
 	v1 "github.com/gantrycd/backend/proto/k8s-controller"
 	"google.golang.org/grpc"
 )
