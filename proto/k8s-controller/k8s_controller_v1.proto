@@ -65,7 +65,11 @@ message Repos {
   repeated string repos = 1;
 }
 
-message ListOrgsAnsReposReply {
-  repeated string orgs = 1;
+message OrgsAnsRepos {
+  string orgs = 1;
   repeated Repos repos = 2;
+}
+
+message ListOrgsAnsReposReply {
+  repeated OrgsAnsRepos orgs_ans_repos = 1;
 }
