@@ -38,11 +38,12 @@ message DeleteNamespaceRequest {
 message CreateDeploymentRequest {
   string namespace = 1;
   string repository = 2;
-  string base_branch = 3;
+  string pr_number = 3;
   string image = 4;
   string pod_name = 5;
   string replicas = 6;
   string container_port = 7;
+  string created_by = 8;
 }
 
 message CreateDeploymentReply {
@@ -53,5 +54,6 @@ message CreateDeploymentReply {
 
 message DeleteDeploymentRequest {
   string namespace = 1;
-  string pod_name = 2;
+  string repository = 2;
+  string pr_number = 3;
 }

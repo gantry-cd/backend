@@ -5,9 +5,8 @@ import (
 	"os"
 
 	"github.com/gantrycd/backend/internal/driver/pbclient"
-	"github.com/gantrycd/backend/internal/handler/webhook"
+	"github.com/gantrycd/backend/internal/router"
 	"github.com/gantrycd/backend/internal/server/http"
-	"github.com/gantrycd/backend/internal/usecases/application/githubapp"
 	v1 "github.com/gantrycd/backend/proto/k8s-controller"
 )
 
@@ -25,10 +24,8 @@ func run() error {
 	}
 	defer pbc.Close()
 
-	handler := webhook.New(
-		githubapp.New(
-			v1.NewK8SCustomControllerClient(pbc.Client()),
-		),
+	handler := router.NewRouter(
+		v1.NewK8SCustomControllerClient(pbc.Client()),
 	)
 
 	server := http.New(
