@@ -43,6 +43,7 @@ message CreateDeploymentRequest {
   string pod_name = 5;
   string replicas = 6;
   string container_port = 7;
+  string created_by = 8;
 }
 
 message CreateDeploymentReply {
