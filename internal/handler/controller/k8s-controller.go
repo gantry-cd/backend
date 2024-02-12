@@ -75,32 +75,35 @@ func (c *CustomController) ApplyDeployment(ctx context.Context, in *v1.CreateDep
 
 	dep, err := c.client.AppsV1().Deployments(in.Namespace).Create(context.Background(), &appv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
-			GenerateName: "gantrycd-",
+			Name: in.PodName[:63],
 			Labels: map[string]string{
-				"repository":  in.Repository,
-				"base-branch": in.BaseBranch,
+				"repository": in.Repository,
+				"pr-number":  in.PrNumber,
+				"created-by": in.CreatedBy,
 			},
 		},
 		Spec: appv1.DeploymentSpec{
 			Replicas: ptrint(reps),
 			Selector: &metav1.LabelSelector{
 				MatchLabels: map[string]string{
-					"repository":  in.Repository,
-					"base-branch": in.BaseBranch,
+					"repository": in.Repository,
+					"pr-number":  in.PrNumber,
+					"created-by": in.CreatedBy,
 				},
 			},
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
-					GenerateName: "gantrycd-",
+					Name: in.PodName[:63],
 					Labels: map[string]string{
-						"repository":  in.Repository,
-						"base-branch": in.BaseBranch,
+						"repository": in.Repository,
+						"pr-number":  in.PrNumber,
+						"created-by": in.CreatedBy,
 					},
 				},
 				Spec: corev1.PodSpec{
 					Containers: []corev1.Container{
 						{
-							Name:  in.PodName,
+							Name:  in.PodName[:63],
 							Image: in.Image,
 						},
 					},
@@ -120,7 +123,7 @@ func (c *CustomController) ApplyDeployment(ctx context.Context, in *v1.CreateDep
 
 func (c *CustomController) DeleteDeployment(ctx context.Context, in *v1.DeleteDeploymentRequest) (*emptypb.Empty, error) {
 	deps, err := c.client.AppsV1().Deployments(in.Namespace).List(ctx, metav1.ListOptions{
-		LabelSelector: fmt.Sprintf("repository=%s,base-branch=%s", in.Repository, in.BaseBranch),
+		LabelSelector: fmt.Sprintf("repository=%s,pr-number=%s", in.Repository, in.PrNumber),
 	})
 
 	if err != nil {
