@@ -11,6 +11,7 @@ import (
 	"github.com/gantrycd/backend/internal/handler/core/controller"
 	v1 "github.com/gantrycd/backend/proto/k8s-controller"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 func main() {
@@ -37,7 +38,9 @@ func run() error {
 	}
 
 	// TODO: Implement the server
-	v1.RegisterK8SCustomControllerServer(grpcServer, controller.NewCustomController(client))
+	v1.RegisterK8SCustomControllerServer(grpcServer, controller.NewController(client))
+
+	reflection.Register(grpcServer)
 
 	go func() {
 		l.Info("server is running at :8080")

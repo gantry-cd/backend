@@ -17,6 +17,9 @@ service K8sCustomController {
   // Deployment Control
   rpc ApplyDeployment(CreateDeploymentRequest) returns(CreateDeploymentReply);
   rpc DeleteDeployment(DeleteDeploymentRequest) returns(google.protobuf.Empty);
+
+
+  rpc ListOrgsAnsRepos(google.protobuf.Empty) returns(ListOrgsAnsReposReply);
 }
 
 message CreateNamespaceRequest {
@@ -56,4 +59,13 @@ message DeleteDeploymentRequest {
   string namespace = 1;
   string repository = 2;
   string pr_number = 3;
+}
+
+message OrgsAnsRepos {
+  string orgs = 1;
+  repeated string repos = 2;
+}
+
+message ListOrgsAnsReposReply {
+  repeated OrgsAnsRepos orgs_ans_repos = 1;
 }
