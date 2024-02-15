@@ -6,8 +6,9 @@ import (
 
 	coreErr "github.com/gantrycd/backend/internal/error"
 	"github.com/gantrycd/backend/internal/usecases/core/k8sclient"
-	"github.com/gantrycd/backend/internal/utils"
 	v1 "github.com/gantrycd/backend/proto/k8s-controller"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"k8s.io/client-go/kubernetes"
 )
@@ -99,44 +100,42 @@ func (c *controller) DeleteDeployment(ctx context.Context, in *v1.DeleteDeployme
 	return &emptypb.Empty{}, c.interactor.DeleteDeployment(ctx, in.Namespace, in.Repository, in.PrNumber)
 }
 
-func (c *controller) ListOrgsAnsRepos(ctx context.Context, in *emptypb.Empty) (*v1.ListOrgsAnsReposReply, error) {
-	ns, err := c.interactor.ListNamespaces(ctx, k8sclient.WithCreatedByLabel(Identity))
+func (c *controller) GetOrgRepos(ctx context.Context, in *v1.GetOrgRepoRequest) (*v1.GetOrgReposReply, error) {
+	deployments, err := c.interactor.ListDeployments(ctx, in.GetOrganization())
 	if err != nil {
-		return nil, err
+		return nil, status.Errorf(codes.Internal, "failed to list deployments: %v", err)
 	}
-	// n + 1?
 
-	var orgsAndRepos []*v1.OrgsAnsRepos
-	for _, n := range ns.Items {
+	var (
+		repos []*v1.Repo
+		apps  []*v1.App
+	)
 
-		deps, err := c.interactor.ListDeployments(ctx, n.Name, k8sclient.WithCreatedByLabel(Identity))
-		if err != nil {
-			return nil, err
+	for _, d := range deployments.Items {
+		prNumber, prOk := d.Labels[k8sclient.PrIDLabel]
+		branch, brOk := d.Labels[k8sclient.BaseBranchLabel]
+		// PR番号とブランチ名が両方ともない場合はAppとして扱う
+		if !prOk && !brOk {
+			apps = append(apps, &v1.App{
+				AppName: d.Name,
+				Version: d.ResourceVersion,
+				Image:   d.Spec.Template.Spec.Containers[0].Image,
+				Age:     d.CreationTimestamp.String(),
+			})
+			continue
 		}
 
-		var repos []string
-		for _, dep := range deps.Items {
-			repo, repoOk := dep.Labels[k8sclient.RepositryLabel]
-			// もし、RepoではなくAppの場合は、AppをRepoとして扱う
-			// これは、GantryのUI上から, Postgresのようなアプリケーションをデプロイした場合もスコープに入れるため
-			if app, appOk := dep.Labels[k8sclient.AppLabel]; appOk {
-				repo = app
-			}
-
-			if !repoOk {
-				continue
-			}
-
-			repos = append(repos, repo)
-		}
-
-		orgsAndRepos = append(orgsAndRepos, &v1.OrgsAnsRepos{
-			Orgs:  n.Name,
-			Repos: utils.RemoveDuplocate(repos),
+		// PR番号かブランチ名のどちらかが場合はRepoとして扱う
+		repos = append(repos, &v1.Repo{
+			RepositryName: d.Labels[k8sclient.RepositryLabel],
+			PrNumber:      prNumber,
+			Branch:        branch,
 		})
-
 	}
-	return &v1.ListOrgsAnsReposReply{
-		OrgsAnsRepos: orgsAndRepos,
+
+	return &v1.GetOrgReposReply{
+		Organization: in.GetOrganization(),
+		Repos:        repos,
+		Apps:         apps,
 	}, nil
 }
