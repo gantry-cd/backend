@@ -11,8 +11,8 @@ var (
 
 const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
-// BcRandString はbcriptを使用して安全なランダムな文字列を生成します
-func BcRandString(length int) (string, error) {
+// RandomString はbcriptを使用して安全なランダムな文字列を生成します
+func RandomString(length int) (string, error) {
 
 	// 乱数を生成
 	b := make([]byte, length)
