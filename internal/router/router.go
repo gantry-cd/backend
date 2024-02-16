@@ -24,8 +24,11 @@ func NewRouter(
 	r := &router{
 		mux:            http.NewServeMux(),
 		l:              slog.New(slog.NewTextHandler(os.Stdout, nil)).WithGroup("router"),
+		middleware:     middleware.NewMiddleware(),
 		controllerConn: controllerConn,
 	}
+	r.GitHubEvent()
+	r.health()
 
 	return r.mux
 }
