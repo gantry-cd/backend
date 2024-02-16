@@ -28,6 +28,7 @@ func NewRouter(
 		controllerConn: controllerConn,
 	}
 	r.GitHubEvent()
+	r.health()
 
 	return r.mux
 }
