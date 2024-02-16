@@ -27,6 +27,7 @@ const (
 	K8SCustomController_DeleteNamespace_FullMethodName  = "/gantrycd.k8s_controller.v1.K8sCustomController/DeleteNamespace"
 	K8SCustomController_ApplyDeployment_FullMethodName  = "/gantrycd.k8s_controller.v1.K8sCustomController/ApplyDeployment"
 	K8SCustomController_DeleteDeployment_FullMethodName = "/gantrycd.k8s_controller.v1.K8sCustomController/DeleteDeployment"
+	K8SCustomController_ListOrgsAnsRepos_FullMethodName = "/gantrycd.k8s_controller.v1.K8sCustomController/ListOrgsAnsRepos"
 )
 
 // K8SCustomControllerClient is the client API for K8SCustomController service.
@@ -40,6 +41,7 @@ type K8SCustomControllerClient interface {
 	// Deployment Control
 	ApplyDeployment(ctx context.Context, in *CreateDeploymentRequest, opts ...grpc.CallOption) (*CreateDeploymentReply, error)
 	DeleteDeployment(ctx context.Context, in *DeleteDeploymentRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	ListOrgsAnsRepos(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListOrgsAnsReposReply, error)
 }
 
 type k8SCustomControllerClient struct {
@@ -95,6 +97,15 @@ func (c *k8SCustomControllerClient) DeleteDeployment(ctx context.Context, in *De
 	return out, nil
 }
 
+func (c *k8SCustomControllerClient) ListOrgsAnsRepos(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListOrgsAnsReposReply, error) {
+	out := new(ListOrgsAnsReposReply)
+	err := c.cc.Invoke(ctx, K8SCustomController_ListOrgsAnsRepos_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // K8SCustomControllerServer is the server API for K8SCustomController service.
 // All implementations must embed UnimplementedK8SCustomControllerServer
 // for forward compatibility
@@ -106,6 +117,7 @@ type K8SCustomControllerServer interface {
 	// Deployment Control
 	ApplyDeployment(context.Context, *CreateDeploymentRequest) (*CreateDeploymentReply, error)
 	DeleteDeployment(context.Context, *DeleteDeploymentRequest) (*emptypb.Empty, error)
+	ListOrgsAnsRepos(context.Context, *emptypb.Empty) (*ListOrgsAnsReposReply, error)
 	mustEmbedUnimplementedK8SCustomControllerServer()
 }
 
@@ -127,6 +139,9 @@ func (UnimplementedK8SCustomControllerServer) ApplyDeployment(context.Context, *
 }
 func (UnimplementedK8SCustomControllerServer) DeleteDeployment(context.Context, *DeleteDeploymentRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteDeployment not implemented")
+}
+func (UnimplementedK8SCustomControllerServer) ListOrgsAnsRepos(context.Context, *emptypb.Empty) (*ListOrgsAnsReposReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListOrgsAnsRepos not implemented")
 }
 func (UnimplementedK8SCustomControllerServer) mustEmbedUnimplementedK8SCustomControllerServer() {}
 
@@ -231,6 +246,24 @@ func _K8SCustomController_DeleteDeployment_Handler(srv interface{}, ctx context.
 	return interceptor(ctx, in, info, handler)
 }
 
+func _K8SCustomController_ListOrgsAnsRepos_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(K8SCustomControllerServer).ListOrgsAnsRepos(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: K8SCustomController_ListOrgsAnsRepos_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(K8SCustomControllerServer).ListOrgsAnsRepos(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // K8SCustomController_ServiceDesc is the grpc.ServiceDesc for K8SCustomController service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -257,6 +290,10 @@ var K8SCustomController_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteDeployment",
 			Handler:    _K8SCustomController_DeleteDeployment_Handler,
+		},
+		{
+			MethodName: "ListOrgsAnsRepos",
+			Handler:    _K8SCustomController_ListOrgsAnsRepos_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
