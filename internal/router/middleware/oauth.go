@@ -1,20 +1,22 @@
 package middleware
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
-	"net/url"
 	"strings"
+
+	"github.com/Nerzal/gocloak/v13"
 )
 
 // envに起こそう
 var (
-	keycloakDomain       = "your-keycloak-domain"
-	keycloakRealm        = "your-keycloak-realm"
-	keycloakClientID     = "your-client-id"
-	keycloakClientSecret = "your-client-secret"
-	keycloakRequestURL   = fmt.Sprintf("http://%s/auth/realms/%s/protocol/openid-connect/token/introspect", keycloakDomain, keycloakRealm)
+	keycloakDomain       = "http://10.10.10.40:8080"
+	keycloakRealm        = "test"
+	keycloakClientID     = "test-client"
+	keycloakClientSecret = "LntMHtmL5Ef2KXtIy0u1TNG8AJBgRVW0"
+	keycloakRequestURL   = fmt.Sprintf("%s/realms/%s/protocol/openid-connect/token/introspect", keycloakDomain, keycloakRealm)
 )
 
 const (
@@ -22,9 +24,12 @@ const (
 	AuthorizationType      = "Bearer"
 )
 
-func (m *middleware) KeyCloakOAuth() http.HandlerFunc {
+func (m *middleware) KeyCloakOAuth(h http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		client := gocloak.NewClient(keycloakDomain)
+		ctx := context.Background()
 		auth := r.Header.Get(AuthorizationHeaderKey)
+
 		if auth == "" {
 			log.Println("Authorization header is not found")
 			w.WriteHeader(http.StatusUnauthorized)
@@ -44,19 +49,23 @@ func (m *middleware) KeyCloakOAuth() http.HandlerFunc {
 			return
 		}
 
-		params := url.Values{}
-		token := authParts[1]
-		params.Set("token", token)
-		params.Set("token_hint", "access_token")
-		params.Set("client_id", keycloakClientID)
-		params.Set("client_secret", keycloakClientSecret)
-		_, err := http.NewRequest("POST", keycloakRequestURL, nil)
+		rptResult, err := client.RetrospectToken(ctx, auth, keycloakClientID, keycloakClientSecret, keycloakRealm)
 		if err != nil {
-			log.Println("Failed to create request to Keycloak", err)
+			log.Println("Failed to introspect token", err)
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
-
+		if !*rptResult.Active {
+			log.Println("Token is not active")
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+		// role, err := client.GetRoleMappingByUserID(ctx, token.AccessToken, keycloakRealm, keycloakClientID)
+		// if err != nil {
+		// 	log.Println("Failed to get role mapping", err)
+		// 	w.WriteHeader(http.StatusUnauthorized)
+		// 	return
+		// }
 	})
 
 }
