@@ -30,8 +30,6 @@ type K8SClient interface {
 	GetDeployment(ctx context.Context, namespace, repository, prID string) (*appsv1.Deployment, error)
 	ListDeployments(ctx context.Context, namespace string, opts ...Option) (*appsv1.DeploymentList, error)
 	DeleteDeployment(ctx context.Context, namespace, repository, prID string) error
-
-	//
 }
 
 func New(client *kubernetes.Clientset) K8SClient {
