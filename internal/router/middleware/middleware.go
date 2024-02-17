@@ -13,7 +13,7 @@ func NewMiddleware() Middleware {
 }
 
 func BuildChain(h http.Handler, m ...func(http.Handler) http.Handler) http.Handler {
-	if m != nil {
+	if len(m) == 0 {
 		return h
 	}
 

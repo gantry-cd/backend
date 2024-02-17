@@ -27,5 +27,6 @@ func NewRouter(
 		controllerConn: controllerConn,
 	}
 
+	r.Usage()
 	return r.mux
 }
