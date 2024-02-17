@@ -10,7 +10,7 @@ import (
 
 func (r *router) Usage() {
 	uc := controller.New(
-		resource.New(r.resourceConn),
+		resource.New(r.controllerConn),
 	)
 
 	r.mux.Handle("/usage", middleware.BuildChain(http.HandlerFunc(uc.Usage)))

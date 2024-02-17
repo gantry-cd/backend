@@ -10,14 +10,14 @@ import (
 )
 
 type resrouceInteractor struct {
-	resource v1.ResourceWatcherClient
+	resource v1.K8SCustomControllerClient
 }
 
 type ResrouceInteractor interface {
 	GetResourceSSE(ctx context.Context, w http.ResponseWriter, request models.UsageRequest) error
 }
 
-func New(resource v1.ResourceWatcherClient) ResrouceInteractor {
+func New(resource v1.K8SCustomControllerClient) ResrouceInteractor {
 	return &resrouceInteractor{
 		resource: resource,
 	}

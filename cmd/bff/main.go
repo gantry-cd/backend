@@ -24,15 +24,8 @@ func run() error {
 	}
 	defer controllerPbc.Close()
 
-	resourcePbc := pbclient.NewConn(os.Getenv("RESOURCE_ADDR"))
-	if err := resourcePbc.Connect(); err != nil {
-		return fmt.Errorf("failed to connect to k8s controller: %w", err)
-	}
-	defer resourcePbc.Close()
-
 	handler := router.NewRouter(
 		v1.NewK8SCustomControllerClient(controllerPbc.Client()),
-		v1.NewResourceWatcherClient(resourcePbc.Client()),
 	)
 
 	server := http.New(

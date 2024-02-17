@@ -16,18 +16,15 @@ type router struct {
 	l *slog.Logger
 
 	controllerConn v1.K8SCustomControllerClient
-	resourceConn   v1.ResourceWatcherClient
 }
 
 func NewRouter(
 	controllerConn v1.K8SCustomControllerClient,
-	resourceConn v1.ResourceWatcherClient,
 ) http.Handler {
 	r := &router{
 		mux:            http.NewServeMux(),
 		l:              slog.New(slog.NewTextHandler(os.Stdout, nil)).WithGroup("router"),
 		controllerConn: controllerConn,
-		resourceConn:   resourceConn,
 	}
 
 	return r.mux

@@ -6,6 +6,7 @@ import (
 
 	coreErr "github.com/gantrycd/backend/internal/error"
 	"github.com/gantrycd/backend/internal/usecases/core/k8sclient"
+	"github.com/gantrycd/backend/internal/usecases/core/resource"
 	v1 "github.com/gantrycd/backend/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -21,19 +22,24 @@ const (
 
 type controller struct {
 	v1.UnimplementedK8SCustomControllerServer
-	client     *kubernetes.Clientset
-	interactor k8sclient.K8SClient
+	client  *kubernetes.Clientset
+	control k8sclient.K8SClient
+	metric  resource.Resource
 }
 
-func NewController(client *kubernetes.Clientset) v1.K8SCustomControllerServer {
+func NewController(
+	client *kubernetes.Clientset,
+	metric resource.Resource,
+) v1.K8SCustomControllerServer {
 	return &controller{
-		client:     client,
-		interactor: k8sclient.New(client),
+		client:  client,
+		control: k8sclient.New(client),
+		metric:  metric,
 	}
 }
 
 func (c *controller) CreateNamespace(ctx context.Context, in *v1.CreateNamespaceRequest) (*v1.CreateNamespaceReply, error) {
-	ns, err := c.interactor.CreateNamespace(ctx, in.Name)
+	ns, err := c.control.CreateNamespace(ctx, in.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +50,7 @@ func (c *controller) CreateNamespace(ctx context.Context, in *v1.CreateNamespace
 }
 
 func (c *controller) ListNamespaces(context.Context, *emptypb.Empty) (*v1.ListNamespacesReply, error) {
-	ns, err := c.interactor.ListNamespaces(context.Background(), k8sclient.WithCreatedByLabel(Identity))
+	ns, err := c.control.ListNamespaces(context.Background(), k8sclient.WithCreatedByLabel(Identity))
 	if err != nil {
 		return nil, err
 	}
@@ -61,11 +67,11 @@ func (c *controller) ListNamespaces(context.Context, *emptypb.Empty) (*v1.ListNa
 }
 
 func (c *controller) DeleteNamespace(ctx context.Context, in *v1.DeleteNamespaceRequest) (*emptypb.Empty, error) {
-	return &emptypb.Empty{}, c.interactor.DeleteNamespace(ctx, in.Name)
+	return &emptypb.Empty{}, c.control.DeleteNamespace(ctx, in.Name)
 }
 
 func (c *controller) ApplyDeployment(ctx context.Context, in *v1.CreateDeploymentRequest) (*v1.CreateDeploymentReply, error) {
-	dep, err := c.interactor.GetDeployment(ctx, in.Namespace, in.Repository, in.PrNumber)
+	dep, err := c.control.GetDeployment(ctx, in.Namespace, in.Repository, in.PrNumber)
 	if err != nil && err != coreErr.ErrDeploymentsNotFound {
 		return nil, err
 	}
@@ -80,7 +86,7 @@ func (c *controller) ApplyDeployment(ctx context.Context, in *v1.CreateDeploymen
 	}
 
 	// リソースが存在しない場合は、新規作成する
-	dep, err = c.interactor.CreateDeployment(ctx, in.Namespace, in.PodName, in.Image,
+	dep, err = c.control.CreateDeployment(ctx, in.Namespace, in.PodName, in.Image,
 		k8sclient.WithRepositoryLabel(in.Repository),
 		k8sclient.WithPrIDLabel(in.PrNumber),
 		k8sclient.WithEnvirionmentLabel(k8sclient.EnvPreview),
@@ -97,11 +103,11 @@ func (c *controller) ApplyDeployment(ctx context.Context, in *v1.CreateDeploymen
 }
 
 func (c *controller) DeleteDeployment(ctx context.Context, in *v1.DeleteDeploymentRequest) (*emptypb.Empty, error) {
-	return &emptypb.Empty{}, c.interactor.DeleteDeployment(ctx, in.Namespace, in.Repository, in.PrNumber)
+	return &emptypb.Empty{}, c.control.DeleteDeployment(ctx, in.Namespace, in.Repository, in.PrNumber)
 }
 
 func (c *controller) GetOrgRepos(ctx context.Context, in *v1.GetOrgRepoRequest) (*v1.GetOrgReposReply, error) {
-	deployments, err := c.interactor.ListDeployments(ctx, in.GetOrganization())
+	deployments, err := c.control.ListDeployments(ctx, in.GetOrganization())
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to list deployments: %v", err)
 	}
@@ -137,5 +143,20 @@ func (c *controller) GetOrgRepos(ctx context.Context, in *v1.GetOrgRepoRequest) 
 		Organization: in.GetOrganization(),
 		Repos:        repos,
 		Apps:         apps,
+	}, nil
+}
+
+func (c *controller) GetResource(ctx context.Context, in *v1.GetResourceRequest) (*v1.GetResourceReply, error) {
+	resource, err := c.metric.GetLoads(ctx, in.GetOrganization(), in.GetRepository())
+	if err != nil {
+		return &v1.GetResourceReply{
+			Resources: resource,
+			IsDisable: false,
+		}, nil
+	}
+
+	return &v1.GetResourceReply{
+		Resources: resource,
+		IsDisable: true,
 	}, nil
 }
