@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package gantrycd.resource_v1;
+
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/gantrycd/backend/api/proto/pb/k8s-controller/v1";
+
+service ResourceWatcher {
+    rpc GetResource(google.protobuf.Empty) returns (GetResourceReply);
+};
+
+message Usage {
+    string container_name = 1;
+    string cpu = 2;
+    string mem = 3;
+    string storage =4;
+};
+
+message Resource {
+    string namespace = 1;
+    string repository = 2;
+    string pr_number = 3;
+    string base_branch = 4;
+    repeated Usage usages = 5;
+};
+
+message GetResourceReply {
+    repeated Resource resources = 1;
+    bool is_disable = 2;
+};

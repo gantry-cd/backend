@@ -22,9 +22,6 @@ func New(metrics *metrics.Clientset) Resource {
 	}
 }
 
-type PodResouce struct {
-}
-
 func (r *k8sResource) GetLoads(ctx context.Context, namespace string) error {
 	metrics, err := r.metrics.MetricsV1beta1().PodMetricses(namespace).List(ctx, v1.ListOptions{})
 	if err != nil {
