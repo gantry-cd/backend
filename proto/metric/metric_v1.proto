@@ -2,12 +2,15 @@ syntax = "proto3";
 
 package gantrycd.resource_v1;
 
-import "google/protobuf/empty.proto";
-
 option go_package = "github.com/gantrycd/backend/api/proto/pb/k8s-controller/v1";
 
 service ResourceWatcher {
-    rpc GetResource(google.protobuf.Empty) returns (GetResourceReply);
+    rpc GetResource(GetResourceRequest) returns (GetResourceReply);
+};
+
+message GetResourceRequest {
+    string organization = 1;
+    string repository = 2;
 };
 
 message Usage {

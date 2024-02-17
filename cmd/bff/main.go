@@ -7,7 +7,8 @@ import (
 	"github.com/gantrycd/backend/internal/driver/pbclient"
 	"github.com/gantrycd/backend/internal/router"
 	"github.com/gantrycd/backend/internal/server/http"
-	v1 "github.com/gantrycd/backend/proto/k8s-controller"
+	controllerV1 "github.com/gantrycd/backend/proto/k8s-controller"
+	resourceV1 "github.com/gantrycd/backend/proto/metric"
 )
 
 func main() {
@@ -17,15 +18,22 @@ func main() {
 }
 
 func run() error {
-	pbc := pbclient.NewConn(os.Getenv("K8S_CONTROLLER_ADDR"))
+	controllerPbc := pbclient.NewConn(os.Getenv("K8S_CONTROLLER_ADDR"))
 
-	if err := pbc.Connect(); err != nil {
+	if err := controllerPbc.Connect(); err != nil {
 		return fmt.Errorf("failed to connect to k8s controller: %w", err)
 	}
-	defer pbc.Close()
+	defer controllerPbc.Close()
+
+	resourcePbc := pbclient.NewConn(os.Getenv("RESOURCE_ADDR"))
+	if err := resourcePbc.Connect(); err != nil {
+		return fmt.Errorf("failed to connect to k8s controller: %w", err)
+	}
+	defer resourcePbc.Close()
 
 	handler := router.NewRouter(
-		v1.NewK8SCustomControllerClient(pbc.Client()),
+		controllerV1.NewK8SCustomControllerClient(controllerPbc.Client()),
+		resourceV1.NewResourceWatcherClient(resourcePbc.Client()),
 	)
 
 	server := http.New(
