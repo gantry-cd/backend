@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v4.25.2
-// source: proto/metric/metric_v1.proto
+// source: proto/metric_v1.proto
 
 package v1
 
@@ -11,7 +11,6 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -23,7 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ResourceWatcherClient interface {
-	GetResource(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetResourceReply, error)
+	GetResource(ctx context.Context, in *GetResourceRequest, opts ...grpc.CallOption) (*GetResourceReply, error)
 }
 
 type resourceWatcherClient struct {
@@ -34,7 +33,7 @@ func NewResourceWatcherClient(cc grpc.ClientConnInterface) ResourceWatcherClient
 	return &resourceWatcherClient{cc}
 }
 
-func (c *resourceWatcherClient) GetResource(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetResourceReply, error) {
+func (c *resourceWatcherClient) GetResource(ctx context.Context, in *GetResourceRequest, opts ...grpc.CallOption) (*GetResourceReply, error) {
 	out := new(GetResourceReply)
 	err := c.cc.Invoke(ctx, "/gantrycd.resource_v1.ResourceWatcher/GetResource", in, out, opts...)
 	if err != nil {
@@ -47,7 +46,7 @@ func (c *resourceWatcherClient) GetResource(ctx context.Context, in *emptypb.Emp
 // All implementations must embed UnimplementedResourceWatcherServer
 // for forward compatibility
 type ResourceWatcherServer interface {
-	GetResource(context.Context, *emptypb.Empty) (*GetResourceReply, error)
+	GetResource(context.Context, *GetResourceRequest) (*GetResourceReply, error)
 	mustEmbedUnimplementedResourceWatcherServer()
 }
 
@@ -55,7 +54,7 @@ type ResourceWatcherServer interface {
 type UnimplementedResourceWatcherServer struct {
 }
 
-func (UnimplementedResourceWatcherServer) GetResource(context.Context, *emptypb.Empty) (*GetResourceReply, error) {
+func (UnimplementedResourceWatcherServer) GetResource(context.Context, *GetResourceRequest) (*GetResourceReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetResource not implemented")
 }
 func (UnimplementedResourceWatcherServer) mustEmbedUnimplementedResourceWatcherServer() {}
@@ -72,7 +71,7 @@ func RegisterResourceWatcherServer(s grpc.ServiceRegistrar, srv ResourceWatcherS
 }
 
 func _ResourceWatcher_GetResource_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
+	in := new(GetResourceRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -84,7 +83,7 @@ func _ResourceWatcher_GetResource_Handler(srv interface{}, ctx context.Context, 
 		FullMethod: "/gantrycd.resource_v1.ResourceWatcher/GetResource",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ResourceWatcherServer).GetResource(ctx, req.(*emptypb.Empty))
+		return srv.(ResourceWatcherServer).GetResource(ctx, req.(*GetResourceRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -102,5 +101,5 @@ var ResourceWatcher_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "proto/metric/metric_v1.proto",
+	Metadata: "proto/metric_v1.proto",
 }

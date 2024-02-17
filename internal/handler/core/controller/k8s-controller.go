@@ -6,7 +6,7 @@ import (
 
 	coreErr "github.com/gantrycd/backend/internal/error"
 	"github.com/gantrycd/backend/internal/usecases/core/k8sclient"
-	v1 "github.com/gantrycd/backend/proto/k8s-controller"
+	v1 "github.com/gantrycd/backend/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"

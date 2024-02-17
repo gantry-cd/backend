@@ -6,8 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gantrycd/backend/internal/models"
-	v1 "github.com/gantrycd/backend/proto/metric"
-	"google.golang.org/protobuf/types/known/emptypb"
+	v1 "github.com/gantrycd/backend/proto"
 )
 
 type resrouceInteractor struct {
@@ -15,6 +14,7 @@ type resrouceInteractor struct {
 }
 
 type ResrouceInteractor interface {
+	GetResourceSSE(ctx context.Context, w http.ResponseWriter, request models.UsageRequest) error
 }
 
 func New(resource v1.ResourceWatcherClient) ResrouceInteractor {
@@ -35,10 +35,14 @@ func (r *resrouceInteractor) GetResourceSSE(ctx context.Context, w http.Response
 			var resp models.UsageResponse
 			var usages []models.Usage
 
-			result, err := r.resource.GetResource(ctx, &emptypb.Empty{})
+			result, err := r.resource.GetResource(ctx, &v1.GetResourceRequest{
+				Organization: request.Organization,
+				Repository:   request.Repository,
+			})
 			if err != nil {
 				continue
 			}
+
 			// Prometheusとかない場合
 			if result.IsDisable {
 				resp.IsDisable = true
@@ -46,8 +50,25 @@ func (r *resrouceInteractor) GetResourceSSE(ctx context.Context, w http.Response
 
 			resources := result.GetResources()
 			for _, resource := range resources {
+				var usage models.Usage
+				usage.PodName = resource.GetPodName()
 
+				for _, metric := range resource.Usages {
+					usage = models.Usage{
+						CPU:     usage.CPU + int64(metric.Cpu),
+						MEM:     usage.MEM + int64(metric.Mem),
+						Storage: usage.Storage + int64(metric.Storage),
+					}
+				}
+
+				usages = append(usages, models.Usage{
+					CPU:     usage.CPU / int64(len(resources)),
+					MEM:     usage.MEM / int64(len(resources)),
+					Storage: usage.Storage / int64(len(resources)),
+				})
 			}
+
+			resp.Usages = usages
 
 			if err := json.NewEncoder(w).Encode(resp); err != nil {
 				continue

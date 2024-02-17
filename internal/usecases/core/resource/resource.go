@@ -4,7 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/gantrycd/backend/internal/usecases/core/k8sclient"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	metrics "k8s.io/metrics/pkg/client/clientset/versioned"
 )
 
@@ -13,7 +15,7 @@ type k8sResource struct {
 }
 
 type Resource interface {
-	GetLoads(ctx context.Context, namespace string) error
+	GetLoads(ctx context.Context, namespace, repository string) error
 }
 
 func New(metrics *metrics.Clientset) Resource {
@@ -22,8 +24,12 @@ func New(metrics *metrics.Clientset) Resource {
 	}
 }
 
-func (r *k8sResource) GetLoads(ctx context.Context, namespace string) error {
-	metrics, err := r.metrics.MetricsV1beta1().PodMetricses(namespace).List(ctx, v1.ListOptions{})
+func (r *k8sResource) GetLoads(ctx context.Context, namespace, repository string) error {
+	metrics, err := r.metrics.MetricsV1beta1().PodMetricses(namespace).List(ctx, v1.ListOptions{
+		LabelSelector: labels.Set(map[string]string{
+			k8sclient.RepositryLabel: repository,
+		}).String(),
+	})
 	if err != nil {
 		return err
 	}

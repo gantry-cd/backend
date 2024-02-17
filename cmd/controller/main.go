@@ -9,7 +9,7 @@ import (
 
 	"github.com/gantrycd/backend/internal/driver/k8s"
 	"github.com/gantrycd/backend/internal/handler/core/controller"
-	v1 "github.com/gantrycd/backend/proto/k8s-controller"
+	v1 "github.com/gantrycd/backend/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )

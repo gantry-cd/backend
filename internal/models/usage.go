@@ -1,5 +1,11 @@
 package models
 
+const (
+	QueryOrganization string = "organization"
+	QueryRepository   string = "repository"
+	QuerySpan         string = "span"
+)
+
 type UsageRequest struct {
 	Organization string `json:"organization"`
 	Repository   string `json:"repository"`
@@ -13,7 +19,7 @@ type UsageResponse struct {
 
 type Usage struct {
 	PodName string `json:"podName"`
-	CPU     string `json:"cpu"`
-	MEM     string `json:"memory"`
-	Storage string `json:"storage"`
+	CPU     int64  `json:"cpu"`
+	MEM     int64  `json:"memory"`
+	Storage int64  `json:"storage"`
 }

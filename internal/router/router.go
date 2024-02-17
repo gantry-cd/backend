@@ -6,8 +6,7 @@ import (
 	"os"
 
 	"github.com/gantrycd/backend/internal/router/middleware"
-	controllerV1 "github.com/gantrycd/backend/proto/k8s-controller"
-	resourceV1 "github.com/gantrycd/backend/proto/metric"
+	v1 "github.com/gantrycd/backend/proto"
 )
 
 type router struct {
@@ -16,13 +15,13 @@ type router struct {
 
 	l *slog.Logger
 
-	controllerConn controllerV1.K8SCustomControllerClient
-	resourceConn   resourceV1.ResourceWatcherClient
+	controllerConn v1.K8SCustomControllerClient
+	resourceConn   v1.ResourceWatcherClient
 }
 
 func NewRouter(
-	controllerConn controllerV1.K8SCustomControllerClient,
-	resourceConn resourceV1.ResourceWatcherClient,
+	controllerConn v1.K8SCustomControllerClient,
+	resourceConn v1.ResourceWatcherClient,
 ) http.Handler {
 	r := &router{
 		mux:            http.NewServeMux(),
