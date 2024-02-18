@@ -7,6 +7,7 @@ import (
 	coreErr "github.com/gantrycd/backend/internal/error"
 	"github.com/gantrycd/backend/internal/usecases/core/k8sclient"
 	"github.com/gantrycd/backend/internal/usecases/core/resource"
+	"github.com/gantrycd/backend/internal/utils/branch"
 	v1 "github.com/gantrycd/backend/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -86,10 +87,11 @@ func (c *controller) ApplyDeployment(ctx context.Context, in *v1.CreateDeploymen
 	}
 
 	// リソースが存在しない場合は、新規作成する
-	dep, err = c.control.CreateDeployment(ctx, in.Namespace, in.PodName, in.Image,
+	dep, err = c.control.CreateDeployment(ctx, in.Namespace, in.AppName, in.Image,
 		k8sclient.WithRepositoryLabel(in.Repository),
 		k8sclient.WithPrIDLabel(in.PrNumber),
 		k8sclient.WithEnvirionmentLabel(k8sclient.EnvPreview),
+		k8sclient.WithBaseBranchLabel(branch.Transpile1123(in.Branch)),
 	)
 	if err != nil {
 		return nil, err

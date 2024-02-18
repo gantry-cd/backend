@@ -46,9 +46,9 @@ message CreateDeploymentRequest {
   string repository = 2;
   string pr_number = 3;
   string image = 4;
-  string pod_name = 5;
-  string replicas = 6;
-  string container_port = 7;
+  string branch = 5;
+  string app_name = 6;
+  string replicas = 7;
   string created_by = 8;
 }
 
