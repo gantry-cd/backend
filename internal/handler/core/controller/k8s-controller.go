@@ -140,7 +140,44 @@ func (c *controller) DeleteDeployment(ctx context.Context, in *v1.DeleteDeployme
 }
 
 func (c *controller) GetOrgRepos(ctx context.Context, in *v1.GetOrgRepoRequest) (*v1.GetOrgReposReply, error) {
-	deployments, err := c.control.ListDeployments(ctx, in.GetOrganization())
+	return c.getOrgRepos(ctx, in.Organization)
+}
+
+func (c *controller) GetResource(ctx context.Context, in *v1.GetResourceRequest) (*v1.GetResourceReply, error) {
+	resource, err := c.metric.GetLoads(ctx, in.GetOrganization(), in.GetRepository())
+	if err != nil {
+		return &v1.GetResourceReply{
+			Resources: resource,
+			IsDisable: false,
+		}, nil
+	}
+
+	return &v1.GetResourceReply{
+		Resources: resource,
+		IsDisable: true,
+	}, nil
+}
+
+func (c *controller) GetAlls(context.Context, *emptypb.Empty) (*v1.GetAllsReply, error) {
+	namespaces, err := c.control.ListNamespaces(context.Background(), k8sclient.WithCreatedByLabel(Identity))
+	if err != nil {
+		return nil, err
+	}
+	var response *v1.GetAllsReply
+	for _, ns := range namespaces.Items {
+		deployments, err := c.getOrgRepos(context.Background(), ns.Name)
+		if err != nil {
+			return nil, err
+		}
+
+		response.OrgRepos = append(response.OrgRepos, deployments)
+	}
+
+	return response, nil
+}
+
+func (c *controller) getOrgRepos(ctx context.Context, organization string) (*v1.GetOrgReposReply, error) {
+	deployments, err := c.control.ListDeployments(ctx, organization)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to list deployments: %v", err)
 	}
@@ -173,46 +210,8 @@ func (c *controller) GetOrgRepos(ctx context.Context, in *v1.GetOrgRepoRequest) 
 	}
 
 	return &v1.GetOrgReposReply{
-		Organization: in.GetOrganization(),
+		Organization: organization,
 		Repos:        repos,
 		Apps:         apps,
 	}, nil
-}
-
-func (c *controller) GetResource(ctx context.Context, in *v1.GetResourceRequest) (*v1.GetResourceReply, error) {
-	resource, err := c.metric.GetLoads(ctx, in.GetOrganization(), in.GetRepository())
-	if err != nil {
-		return &v1.GetResourceReply{
-			Resources: resource,
-			IsDisable: false,
-		}, nil
-	}
-
-	return &v1.GetResourceReply{
-		Resources: resource,
-		IsDisable: true,
-	}, nil
-}
-
-func (c *controller) GetAlls(context.Context, *emptypb.Empty) (*v1.GetAllsReply, error) {
-	namespaces, err := c.control.ListNamespaces(context.Background(), k8sclient.WithCreatedByLabel(Identity))
-	if err != nil {
-		return nil, err
-	}
-	var getOrgRepoRequest *v1.GetAllsReply
-	for _, ns := range namespaces.Items {
-		deployments, err := c.control.ListDeployments(context.Background(), ns.Name)
-		if err != nil {
-			return nil, err
-		}
-
-		for _, dep := range deployments.Items {
-			fmt.Println(dep.Name)
-		}
-		getOrgRepoRequest.OrgRepos = append(getOrgRepoRequest.OrgRepos, &v1.GetOrgRepoRequest{
-			Organization: ns.Name,
-		})
-	}
-
-	return &v1.GetAllsReply{}, nil
 }
