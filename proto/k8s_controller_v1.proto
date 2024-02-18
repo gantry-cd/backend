@@ -103,7 +103,8 @@ message Usage {
 message Resource {
   string app_name = 1;
   string pod_name = 2;
-  repeated Usage usages = 3;
+  string branch = 3;
+  repeated Usage usages = 4;
 };
 
 message GetResourceReply {

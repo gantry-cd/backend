@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 
@@ -23,6 +24,7 @@ func (uc *UsageController) Usage(w http.ResponseWriter, r *http.Request) {
 
 	span, err := strconv.Atoi(queries.Get(models.QuerySpan))
 	if err != nil {
+		log.Println("test")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}

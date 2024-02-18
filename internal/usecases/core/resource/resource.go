@@ -25,10 +25,12 @@ func New(metrics *metrics.Clientset) Resource {
 }
 
 func (r *k8sResource) GetLoads(ctx context.Context, namespace, repository string) ([]*v1.Resource, error) {
+	label := map[string]string{}
+	if len(repository) != 0 {
+		label[k8sclient.RepositryLabel] = repository
+	}
 	metrics, err := r.metrics.MetricsV1beta1().PodMetricses(namespace).List(ctx, metaV1.ListOptions{
-		LabelSelector: labels.Set(map[string]string{
-			k8sclient.RepositryLabel: repository,
-		}).String(),
+		LabelSelector: labels.Set(label).String(),
 	})
 	if err != nil {
 		return nil, err
@@ -38,7 +40,7 @@ func (r *k8sResource) GetLoads(ctx context.Context, namespace, repository string
 	for _, metric := range metrics.Items {
 		var usages []*v1.Usage
 		for _, container := range metric.Containers {
-			cpu, _ := container.Usage.Cpu().AsInt64()
+			cpu := container.Usage.Cpu().MilliValue()
 			mem, _ := container.Usage.Memory().AsInt64()
 			storage, _ := container.Usage.Storage().AsInt64()
 
@@ -49,7 +51,6 @@ func (r *k8sResource) GetLoads(ctx context.Context, namespace, repository string
 				Storage:       storage,
 			})
 		}
-
 		resources = append(resources, &v1.Resource{
 			AppName: metric.Labels[k8sclient.AppLabel],
 			PodName: metric.Name,
