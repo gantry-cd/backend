@@ -289,6 +289,46 @@ func (c *controller) CreatePreview(ctx context.Context, in *v1.CreatePreviewRequ
 	}, nil
 }
 
+func (c *controller) UpdatePreview(ctx context.Context, in *v1.CreatePreviewRequest) (*v1.CreatePreviewReply, error) {
+	branchName := branch.Transpile1123(in.Branch)
+	dep, err := c.control.GetDeployment(ctx,
+		k8sclient.GetDeploymentParams{
+			Namespace:     in.Organization,
+			Repository:    in.Repository,
+			PullRequestID: in.PullRequestId,
+			Branch:        branchName,
+		})
+	if err != nil && !errors.Is(err, coreErr.ErrDeploymentsNotFound) {
+		return nil, err
+	}
+
+	if dep == nil {
+		return nil, status.Errorf(codes.NotFound, "deployment not found")
+	}
+
+	dep, err = c.control.UpdateDeployment(ctx,
+		k8sclient.UpdateDeploymentParams{
+			Namespace: in.Organization,
+			AppName:   in.Repository,
+			Image:     in.Image,
+		},
+		k8sclient.WithRepositoryLabel(in.Repository),
+		k8sclient.WithPrIDLabel(in.PullRequestId),
+		k8sclient.WithEnvirionmentLabel(k8sclient.EnvPreview),
+		k8sclient.WithBaseBranchLabel(branchName),
+		k8sclient.WithCreatedByLabel(k8sclient.AppIdentifier),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &v1.CreatePreviewReply{
+		Name:      dep.Name,
+		Namespace: dep.Namespace,
+		Version:   dep.ResourceVersion,
+	}, nil
+}
+
 func (c *controller) DeletePreview(ctx context.Context, in *v1.DeletePreviewRequest) (*emptypb.Empty, error) {
 	branchName := branch.Transpile1123(in.Branch)
 	if err := c.control.DeleteDeployment(ctx,
