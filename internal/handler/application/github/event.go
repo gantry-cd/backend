@@ -103,6 +103,15 @@ func (ge *handler) Push(e *github.PushEvent) error {
 
 func (ge *handler) PullRequest(e *github.PullRequestEvent) error {
 	ge.l.Info(fmt.Sprintf("pull request event received: %v", e))
+
+	switch *e.Action {
+	case "opened":
+		ge.l.Info(fmt.Sprintf("pull request opened: %v", e))
+	case "closed":
+		ge.l.Info(fmt.Sprintf("pull request closed: %v", e))
+	default:
+		ge.l.Info(fmt.Sprintf("pull request event action not supported: %v", *e.Action))
+	}
 	return nil
 }
 
