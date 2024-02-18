@@ -19,6 +19,8 @@ type UsageResponse struct {
 
 type Usage struct {
 	PodName string `json:"podName"`
+	Branch  string `json:"branch"`
+	PrID    string `json:"pullRequestID"`
 	CPU     int64  `json:"cpu"`
 	MEM     int64  `json:"memory"`
 	Storage int64  `json:"storage"`

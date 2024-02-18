@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/gantrycd/backend/internal/usecases/core/k8sclient"
+	"github.com/gantrycd/backend/internal/utils/branch"
 	v1 "github.com/gantrycd/backend/proto"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -51,10 +52,23 @@ func (r *k8sResource) GetLoads(ctx context.Context, namespace, repository string
 				Storage:       storage,
 			})
 		}
+		branchName, ok := metric.Labels[k8sclient.BaseBranchLabel]
+		if !ok {
+			branchName = ""
+		}
+
+		branchName, _ = branch.TranspileBranchName(branchName)
+
+		prNumber, ok := metric.Labels[k8sclient.PrIDLabel]
+		if !ok {
+			prNumber = ""
+		}
 		resources = append(resources, &v1.Resource{
-			AppName: metric.Labels[k8sclient.AppLabel],
-			PodName: metric.Name,
-			Usages:  usages,
+			AppName:  metric.Labels[k8sclient.AppLabel],
+			PodName:  metric.Name,
+			Branch:   branchName,
+			PrNumber: prNumber,
+			Usages:   usages,
 		})
 	}
 

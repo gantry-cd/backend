@@ -2,20 +2,12 @@ package main
 
 import (
 	"fmt"
-	"os"
 
-	"github.com/peterhellberg/sseclient"
+	"github.com/gantrycd/backend/internal/utils/branch"
 )
 
 func main() {
+	sample := "feature/#1"
 
-	events, err := sseclient.OpenURL("http://localhost:8080/usage?organization=gantry-sample&span=10")
-	if err != nil {
-		fmt.Println("Error:", err)
-		os.Exit(1)
-	}
-
-	for event := range events {
-		fmt.Println(event.Name, event.Data)
-	}
+	fmt.Print("Transpile1123: ", branch.Transpile1123(sample))
 }
