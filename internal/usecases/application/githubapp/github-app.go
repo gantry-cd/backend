@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	customController "github.com/gantrycd/backend/proto/k8s-controller"
+	v1 "github.com/gantrycd/backend/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -16,7 +16,7 @@ import (
 type githubAppEvents struct {
 	l *slog.Logger
 
-	customController customController.K8SCustomControllerClient
+	customController v1.K8SCustomControllerClient
 }
 
 // githubAppEvents はGithubAppのインタラクターのインターフェースです。
@@ -37,7 +37,7 @@ func WithLogger(l *slog.Logger) Option {
 }
 
 // New は新しいGithubAppのインタラクターを作成します。
-func New(customController customController.K8SCustomControllerClient, opts ...Option) GithubAppEvents {
+func New(customController v1.K8SCustomControllerClient, opts ...Option) GithubAppEvents {
 	ge := &githubAppEvents{
 		customController: customController,
 		l:                slog.New(slog.NewTextHandler(os.Stderr, nil)).WithGroup("app-interactor"),
@@ -53,7 +53,7 @@ func New(customController customController.K8SCustomControllerClient, opts ...Op
 // CreateNameSpace はOrganization名を元にNamespaceを作成します。
 func (ge *githubAppEvents) CreateNameSpace(ctx context.Context, organization string) error {
 
-	_, err := ge.customController.CreateNamespace(ctx, &customController.CreateNamespaceRequest{
+	_, err := ge.customController.CreateNamespace(ctx, &v1.CreateNamespaceRequest{
 		Name: organization,
 	})
 
@@ -87,11 +87,9 @@ func (ge *githubAppEvents) ListNameSpace(ctx context.Context, prefix string) ([]
 
 func (ge *githubAppEvents) DeleteNameSpace(ctx context.Context, name string) error {
 	ge.l.Info(fmt.Sprintf("deleting namespace: %s", name))
-	_, err := ge.customController.DeleteNamespace(ctx, &customController.DeleteNamespaceRequest{
+	_, err := ge.customController.DeleteNamespace(ctx, &v1.DeleteNamespaceRequest{
 		Name: name,
 	})
 
 	return err
 }
-
-func (ge *githubAppEvents) SyncDeployment(ctx context.Context, orgs, repo, branch, image string)
