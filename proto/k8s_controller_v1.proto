@@ -18,7 +18,7 @@ service K8sCustomController {
   rpc ApplyDeployment(CreateDeploymentRequest) returns(CreateDeploymentReply);
   rpc DeleteDeployment(DeleteDeploymentRequest) returns(google.protobuf.Empty);
 
-
+  rpc GetAlls(google.protobuf.Empty) returns(GetAllsReply);
   rpc GetOrgRepos(GetOrgRepoRequest) returns(GetOrgReposReply);
 
 
@@ -87,6 +87,10 @@ message GetOrgReposReply {
   repeated repo repos = 2;
   repeated app apps = 3;
 }
+
+message GetAllsReply {
+  repeated GetOrgRepoRequest org_repos = 1;
+};
 
 message GetResourceRequest {
   string organization = 1;

@@ -30,6 +30,7 @@ type K8SCustomControllerClient interface {
 	// Deployment Control
 	ApplyDeployment(ctx context.Context, in *CreateDeploymentRequest, opts ...grpc.CallOption) (*CreateDeploymentReply, error)
 	DeleteDeployment(ctx context.Context, in *DeleteDeploymentRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	GetAlls(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetAllsReply, error)
 	GetOrgRepos(ctx context.Context, in *GetOrgRepoRequest, opts ...grpc.CallOption) (*GetOrgReposReply, error)
 	GetResource(ctx context.Context, in *GetResourceRequest, opts ...grpc.CallOption) (*GetResourceReply, error)
 }
@@ -87,6 +88,15 @@ func (c *k8SCustomControllerClient) DeleteDeployment(ctx context.Context, in *De
 	return out, nil
 }
 
+func (c *k8SCustomControllerClient) GetAlls(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetAllsReply, error) {
+	out := new(GetAllsReply)
+	err := c.cc.Invoke(ctx, "/gantrycd.k8s_controller.v1.K8sCustomController/GetAlls", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *k8SCustomControllerClient) GetOrgRepos(ctx context.Context, in *GetOrgRepoRequest, opts ...grpc.CallOption) (*GetOrgReposReply, error) {
 	out := new(GetOrgReposReply)
 	err := c.cc.Invoke(ctx, "/gantrycd.k8s_controller.v1.K8sCustomController/GetOrgRepos", in, out, opts...)
@@ -116,6 +126,7 @@ type K8SCustomControllerServer interface {
 	// Deployment Control
 	ApplyDeployment(context.Context, *CreateDeploymentRequest) (*CreateDeploymentReply, error)
 	DeleteDeployment(context.Context, *DeleteDeploymentRequest) (*emptypb.Empty, error)
+	GetAlls(context.Context, *emptypb.Empty) (*GetAllsReply, error)
 	GetOrgRepos(context.Context, *GetOrgRepoRequest) (*GetOrgReposReply, error)
 	GetResource(context.Context, *GetResourceRequest) (*GetResourceReply, error)
 	mustEmbedUnimplementedK8SCustomControllerServer()
@@ -139,6 +150,9 @@ func (UnimplementedK8SCustomControllerServer) ApplyDeployment(context.Context, *
 }
 func (UnimplementedK8SCustomControllerServer) DeleteDeployment(context.Context, *DeleteDeploymentRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteDeployment not implemented")
+}
+func (UnimplementedK8SCustomControllerServer) GetAlls(context.Context, *emptypb.Empty) (*GetAllsReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAlls not implemented")
 }
 func (UnimplementedK8SCustomControllerServer) GetOrgRepos(context.Context, *GetOrgRepoRequest) (*GetOrgReposReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetOrgRepos not implemented")
@@ -249,6 +263,24 @@ func _K8SCustomController_DeleteDeployment_Handler(srv interface{}, ctx context.
 	return interceptor(ctx, in, info, handler)
 }
 
+func _K8SCustomController_GetAlls_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(K8SCustomControllerServer).GetAlls(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gantrycd.k8s_controller.v1.K8sCustomController/GetAlls",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(K8SCustomControllerServer).GetAlls(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _K8SCustomController_GetOrgRepos_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetOrgRepoRequest)
 	if err := dec(in); err != nil {
@@ -311,6 +343,10 @@ var K8SCustomController_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteDeployment",
 			Handler:    _K8SCustomController_DeleteDeployment_Handler,
+		},
+		{
+			MethodName: "GetAlls",
+			Handler:    _K8SCustomController_GetAlls_Handler,
 		},
 		{
 			MethodName: "GetOrgRepos",
