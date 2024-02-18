@@ -74,7 +74,12 @@ func (c *controller) DeleteNamespace(ctx context.Context, in *v1.DeleteNamespace
 }
 
 func (c *controller) ApplyDeployment(ctx context.Context, in *v1.CreateDeploymentRequest) (*v1.CreateDeploymentReply, error) {
-	dep, err := c.control.GetDeployment(ctx, in.Namespace, in.Repository, in.PrNumber)
+	dep, err := c.control.GetDeployment(ctx, k8sclient.GetDeploymentParams{
+		Namespace:     in.Namespace,
+		Repository:    in.Repository,
+		PullRequestID: in.PrNumber,
+		Branch:        branch.Transpile1123(in.Branch),
+	})
 	if err != nil && !errors.Is(err, coreErr.ErrDeploymentsNotFound) {
 		return nil, err
 	}
@@ -90,7 +95,11 @@ func (c *controller) ApplyDeployment(ctx context.Context, in *v1.CreateDeploymen
 	}
 
 	// リソースが存在しない場合は、新規作成する
-	dep, err = c.control.CreateDeployment(ctx, in.Namespace, in.AppName, in.Image,
+	dep, err = c.control.CreateDeployment(ctx, k8sclient.CreateDeploymentParams{
+		Namespace: in.Namespace,
+		AppName:   in.AppName,
+		Image:     in.Image,
+	},
 		k8sclient.WithRepositoryLabel(in.Repository),
 		k8sclient.WithPrIDLabel(in.PrNumber),
 		k8sclient.WithEnvirionmentLabel(k8sclient.EnvPreview),
@@ -100,8 +109,11 @@ func (c *controller) ApplyDeployment(ctx context.Context, in *v1.CreateDeploymen
 		return nil, err
 	}
 
-	service, err := c.control.CreateNodePortService(ctx, in.Namespace, in.AppName, 80,
-		k8sclient.WithRepositoryLabel(in.Repository),
+	service, err := c.control.CreateNodePortService(ctx, k8sclient.CreateServiceNodePortParams{
+		Namespace:   in.Namespace,
+		ServiceName: in.AppName,
+		TargetPort:  80,
+	}, k8sclient.WithRepositoryLabel(in.Repository),
 		k8sclient.WithPrIDLabel(in.PrNumber),
 		k8sclient.WithEnvirionmentLabel(k8sclient.EnvPreview),
 		k8sclient.WithBaseBranchLabel(branch.Transpile1123(in.Branch)),
@@ -120,7 +132,11 @@ func (c *controller) ApplyDeployment(ctx context.Context, in *v1.CreateDeploymen
 }
 
 func (c *controller) DeleteDeployment(ctx context.Context, in *v1.DeleteDeploymentRequest) (*emptypb.Empty, error) {
-	return &emptypb.Empty{}, c.control.DeleteDeployment(ctx, in.Namespace, in.Repository, in.PrNumber)
+	return &emptypb.Empty{}, c.control.DeleteDeployment(ctx, in.Namespace,
+		k8sclient.WithRepositoryLabel(in.Repository),
+		k8sclient.WithPrIDLabel(in.PrNumber),
+		// k8sclient.WithBaseBranchLabel(branch.Transpile1123(in.Branch)),
+	)
 }
 
 func (c *controller) GetOrgRepos(ctx context.Context, in *v1.GetOrgRepoRequest) (*v1.GetOrgReposReply, error) {
@@ -135,7 +151,7 @@ func (c *controller) GetOrgRepos(ctx context.Context, in *v1.GetOrgRepoRequest) 
 	)
 
 	for _, d := range deployments.Items {
-		prNumber, prOk := d.Labels[k8sclient.PrIDLabel]
+		prNumber, prOk := d.Labels[k8sclient.PullRequestID]
 		branch, brOk := d.Labels[k8sclient.BaseBranchLabel]
 		// PR番号とブランチ名が両方ともない場合はAppとして扱う
 		if !prOk && !brOk {
@@ -150,7 +166,7 @@ func (c *controller) GetOrgRepos(ctx context.Context, in *v1.GetOrgRepoRequest) 
 
 		// PR番号かブランチ名のどちらかが場合はRepoとして扱う
 		repos = append(repos, &v1.Repo{
-			RepositryName: d.Labels[k8sclient.RepositryLabel],
+			RepositryName: d.Labels[k8sclient.RepositoryLabel],
 			PrNumber:      prNumber,
 			Branch:        branch,
 		})
