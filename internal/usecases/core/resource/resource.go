@@ -28,7 +28,7 @@ func New(metrics *metrics.Clientset) Resource {
 func (r *k8sResource) GetLoads(ctx context.Context, namespace, repository string) ([]*v1.Resource, error) {
 	label := map[string]string{}
 	if len(repository) != 0 {
-		label[k8sclient.RepositryLabel] = repository
+		label[k8sclient.RepositoryLabel] = repository
 	}
 	metrics, err := r.metrics.MetricsV1beta1().PodMetricses(namespace).List(ctx, metaV1.ListOptions{
 		LabelSelector: labels.Set(label).String(),
@@ -59,16 +59,16 @@ func (r *k8sResource) GetLoads(ctx context.Context, namespace, repository string
 
 		branchName, _ = branch.TranspileBranchName(branchName)
 
-		prNumber, ok := metric.Labels[k8sclient.PrIDLabel]
+		prNumber, ok := metric.Labels[k8sclient.PullRequestID]
 		if !ok {
 			prNumber = ""
 		}
 		resources = append(resources, &v1.Resource{
-			AppName:  metric.Labels[k8sclient.AppLabel],
-			PodName:  metric.Name,
-			Branch:   branchName,
-			PrNumber: prNumber,
-			Usages:   usages,
+			AppName:       metric.Labels[k8sclient.AppLabel],
+			PodName:       metric.Name,
+			Branch:        branchName,
+			PullRequestId: prNumber,
+			Usages:        usages,
 		})
 	}
 

@@ -5,16 +5,13 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/gantrycd/backend/internal/usecases/application/githubapp"
 	"github.com/google/go-github/v29/github"
 )
 
 const (
 	organization = iota
 	repository
-)
-
-const (
-	DefaultNamespacePrefix = "gantrycd"
 )
 
 func (ge *handler) Installation(e *github.InstallationEvent) error {
@@ -44,7 +41,7 @@ func (ge *handler) Installation(e *github.InstallationEvent) error {
 	switch *e.Action {
 	case InstallationCreated:
 		for _, org := range orgs {
-			orgname := fmt.Sprintf("%s-%s", DefaultNamespacePrefix, strings.ToLower(org))
+			orgname := strings.ToLower(org)
 			if !isInclude(nss, orgname) {
 				if err := ge.interactor.CreateNameSpace(ctx, org); err != nil {
 					ge.l.Error("error creating namespace", "error", err.Error())
@@ -53,7 +50,7 @@ func (ge *handler) Installation(e *github.InstallationEvent) error {
 		}
 	case InstallationDeleted:
 		for _, org := range orgs {
-			orgname := fmt.Sprintf("%s-%s", DefaultNamespacePrefix, strings.ToLower(org))
+			orgname := strings.ToLower(org)
 			if isInclude(nss, orgname) {
 				if err := ge.interactor.DeleteNameSpace(ctx, orgname); err != nil {
 					ge.l.Error("error deleting namespace", "error", err.Error())
@@ -103,6 +100,33 @@ func (ge *handler) Push(e *github.PushEvent) error {
 
 func (ge *handler) PullRequest(e *github.PullRequestEvent) error {
 	ge.l.Info(fmt.Sprintf("pull request event received: %v", e))
+	ctx := context.Background()
+
+	switch *e.Action {
+	case "opened":
+		ge.l.Info(fmt.Sprintf("pull request opened: %v", e.Organization.Login))
+
+		if err := ge.interactor.CreatePreviewEnvironment(ctx, githubapp.CreatePreviewEnvironmentPrarams{
+			Organization: *e.Organization.Login,
+			Repository:   *e.Repo.Name,
+			PrNumber:     fmt.Sprintf("%d", *e.Number),
+			Branch:       *e.PullRequest.Head.Ref,
+		}); err != nil {
+			ge.l.Error("error creating preview environment", "error", err.Error())
+		}
+	case "closed":
+		ge.l.Info(fmt.Sprintf("pull request closed: %v", e))
+		if err := ge.interactor.DeletePreviewEnvironment(ctx, githubapp.DeletePreviewEnvironmentParams{
+			Organization: *e.Organization.Login,
+			Repository:   *e.Repo.Name,
+			PrNumber:     fmt.Sprintf("%d", *e.Number),
+			Branch:       *e.PullRequest.Head.Ref,
+		}); err != nil {
+			ge.l.Error("error deleting preview environment", "error", err.Error())
+		}
+	default:
+		ge.l.Info(fmt.Sprintf("pull request event action not supported: %v", *e.Action))
+	}
 	return nil
 }
 

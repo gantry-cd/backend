@@ -24,6 +24,9 @@ type GithubAppEvents interface {
 	CreateNameSpace(ctx context.Context, organization string) error
 	ListNameSpace(ctx context.Context, prefix string) ([]string, error)
 	DeleteNameSpace(ctx context.Context, name string) error
+
+	CreatePreviewEnvironment(ctx context.Context, param CreatePreviewEnvironmentPrarams) error
+	DeletePreviewEnvironment(ctx context.Context, param DeletePreviewEnvironmentParams) error
 }
 
 // Option はサーバーのオプションを設定するための関数です。
@@ -89,6 +92,47 @@ func (ge *githubAppEvents) DeleteNameSpace(ctx context.Context, name string) err
 	ge.l.Info(fmt.Sprintf("deleting namespace: %s", name))
 	_, err := ge.customController.DeleteNamespace(ctx, &v1.DeleteNamespaceRequest{
 		Name: name,
+	})
+
+	return err
+}
+
+type CreatePreviewEnvironmentPrarams struct {
+	Organization string
+	Repository   string
+	PrNumber     string
+	Branch       string
+}
+
+func (ge *githubAppEvents) CreatePreviewEnvironment(ctx context.Context, param CreatePreviewEnvironmentPrarams) error {
+	// TODO: image buildする
+	image := "nginx:1.16"
+	// デプロイする
+	_, err := ge.customController.CreatePreview(ctx, &v1.CreatePreviewRequest{
+		Organization:  param.Organization,
+		Repository:    param.Repository,
+		PullRequestId: param.PrNumber,
+		Branch:        param.Branch,
+		Image:         image,
+		Replicas:      "1",
+	})
+
+	return err
+}
+
+type DeletePreviewEnvironmentParams struct {
+	Organization string
+	Repository   string
+	PrNumber     string
+	Branch       string
+}
+
+func (ge *githubAppEvents) DeletePreviewEnvironment(ctx context.Context, param DeletePreviewEnvironmentParams) error {
+	_, err := ge.customController.DeletePreview(ctx, &v1.DeletePreviewRequest{
+		Organization:  param.Organization,
+		Repository:    param.Repository,
+		PullRequestId: param.PrNumber,
+		Branch:        param.Branch,
 	})
 
 	return err

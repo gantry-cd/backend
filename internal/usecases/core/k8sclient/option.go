@@ -14,7 +14,7 @@ type containerOption struct {
 	imagePullPolicy corev1.PullPolicy
 }
 
-func newOption() *option {
+func newWithAppLabel() *option {
 	return &option{
 		labelSelector: map[string]string{
 			CreatedByLabel: AppIdentifier,
@@ -23,7 +23,20 @@ func newOption() *option {
 	}
 }
 
+func newOption() *option {
+	return &option{
+		labelSelector:   make(map[string]string),
+		containerOption: make(map[string]containerOption),
+	}
+}
+
 type Option func(*option)
+
+func WithAppLabel(appName string) Option {
+	return func(o *option) {
+		o.labelSelector[AppLabel] = appName
+	}
+}
 
 func WithLabelSelector(labelSelector map[string]string) Option {
 	return func(o *option) {
@@ -40,13 +53,13 @@ func WithCreatedByLabel(name string) Option {
 
 func WithRepositoryLabel(repository string) Option {
 	return func(o *option) {
-		o.labelSelector[RepositryLabel] = repository
+		o.labelSelector[RepositoryLabel] = repository
 	}
 }
 
 func WithPrIDLabel(prID string) Option {
 	return func(o *option) {
-		o.labelSelector[PrIDLabel] = prID
+		o.labelSelector[PullRequestID] = prID
 	}
 }
 
@@ -68,9 +81,9 @@ func WithReplica(replica int32) Option {
 	}
 }
 
-func WithImagePullPolicy(containerName, policy string) Option {
+func WithImagePullPolicy(image, policy string) Option {
 	return func(o *option) {
-		o.containerOption[containerName] = containerOption{
+		o.containerOption[image] = containerOption{
 			imagePullPolicy: corev1.PullPolicy(policy),
 		}
 	}
