@@ -40,13 +40,13 @@ func WithCreatedByLabel(name string) Option {
 
 func WithRepositoryLabel(repository string) Option {
 	return func(o *option) {
-		o.labelSelector[RepositryLabel] = repository
+		o.labelSelector[RepositoryLabel] = repository
 	}
 }
 
 func WithPrIDLabel(prID string) Option {
 	return func(o *option) {
-		o.labelSelector[PrIDLabel] = prID
+		o.labelSelector[PullRequestID] = prID
 	}
 }
 
@@ -68,9 +68,9 @@ func WithReplica(replica int32) Option {
 	}
 }
 
-func WithImagePullPolicy(containerName, policy string) Option {
+func WithImagePullPolicy(image, policy string) Option {
 	return func(o *option) {
-		o.containerOption[containerName] = containerOption{
+		o.containerOption[image] = containerOption{
 			imagePullPolicy: corev1.PullPolicy(policy),
 		}
 	}

@@ -9,10 +9,10 @@ const (
 	CreatedByLabel = "created"
 	// RepositoryLabel はリソースに付与するラベルのキー。
 	// このラベルが付与されたリソースはどのリポジトリに関連するかを示す
-	RepositryLabel = "repository"
+	RepositoryLabel = "repository"
 	// PrIDLabel はリソースに付与するラベルのキー。
 	// このラベルが付与されたリソースはどの PR に関連するかを示す
-	PrIDLabel = "pr-id"
+	PullRequestID = "pull-request-id"
 	// BaseBranchLabel はリソースに付与するラベルのキー。
 	// このラベルが付与されたリソースはどのブランチに関連するかを示す
 	BaseBranchLabel = "base-branch"
