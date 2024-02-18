@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v4.25.2
-// source: proto/k8s_controller_v1.proto
+// source: proto/k8s_controller_service_v1.proto
 
 package v1
 
@@ -468,5 +468,5 @@ var K8SCustomController_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "proto/k8s_controller_v1.proto",
+	Metadata: "proto/k8s_controller_service_v1.proto",
 }
