@@ -116,6 +116,14 @@ func (ge *handler) PullRequest(e *github.PullRequestEvent) error {
 		}
 	case "closed":
 		ge.l.Info(fmt.Sprintf("pull request closed: %v", e))
+		if err := ge.interactor.DeletePreviewEnvironment(ctx, githubapp.DeletePreviewEnvironmentParams{
+			Organization: *e.Organization.Login,
+			Repository:   *e.Repo.Name,
+			PrNumber:     fmt.Sprintf("%d", *e.Number),
+			Branch:       *e.PullRequest.Head.Ref,
+		}); err != nil {
+			ge.l.Error("error deleting preview environment", "error", err.Error())
+		}
 	default:
 		ge.l.Info(fmt.Sprintf("pull request event action not supported: %v", *e.Action))
 	}

@@ -12,7 +12,7 @@ const (
 	RepositoryLabel = "repository"
 	// PrIDLabel はリソースに付与するラベルのキー。
 	// このラベルが付与されたリソースはどの PR に関連するかを示す
-	PullRequestID = "pull-request-id"
+	PullRequestID = "pr-id"
 	// BaseBranchLabel はリソースに付与するラベルのキー。
 	// このラベルが付与されたリソースはどのブランチに関連するかを示す
 	BaseBranchLabel = "base-branch"

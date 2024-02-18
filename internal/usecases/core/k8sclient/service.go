@@ -2,6 +2,7 @@ package k8sclient
 
 import (
 	"context"
+	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -22,8 +23,8 @@ func (k *k8sClient) CreateNodePortService(ctx context.Context, param CreateServi
 
 	return k.client.CoreV1().Services(param.Namespace).Create(ctx, &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:   param.ServiceName,
-			Labels: o.labelSelector,
+			GenerateName: fmt.Sprintf("%s-", param.ServiceName),
+			Labels:       o.labelSelector,
 		},
 		Spec: corev1.ServiceSpec{
 			Ports: []corev1.ServicePort{

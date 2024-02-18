@@ -226,3 +226,94 @@ func (c *controller) getOrganization(ctx context.Context, organization string) (
 		Repositories: repos,
 	}, nil
 }
+
+func (c *controller) CreatePreview(ctx context.Context, in *v1.CreatePreviewRequest) (*v1.CreatePreviewReply, error) {
+	branchName := branch.Transpile1123(in.Branch)
+	dep, err := c.control.GetDeployment(ctx,
+		k8sclient.GetDeploymentParams{
+			Namespace:     in.Organization,
+			Repository:    in.Repository,
+			PullRequestID: in.PullRequestId,
+			Branch:        branchName,
+		})
+	if err != nil && !errors.Is(err, coreErr.ErrDeploymentsNotFound) {
+		return nil, err
+	}
+
+	if dep != nil {
+		return &v1.CreatePreviewReply{
+			Name:      dep.Name,
+			Namespace: dep.Namespace,
+			Version:   dep.ResourceVersion,
+		}, nil
+	}
+
+	dep, err = c.control.CreateDeployment(ctx,
+		k8sclient.CreateDeploymentParams{
+			Namespace: in.Organization,
+			AppName:   in.Repository,
+			Image:     in.Image,
+		},
+		k8sclient.WithRepositoryLabel(in.Repository),
+		k8sclient.WithPrIDLabel(in.PullRequestId),
+		k8sclient.WithEnvirionmentLabel(k8sclient.EnvPreview),
+		k8sclient.WithBaseBranchLabel(branchName),
+		k8sclient.WithCreatedByLabel(k8sclient.AppIdentifier),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	service, err := c.control.CreateNodePortService(ctx,
+		k8sclient.CreateServiceNodePortParams{
+			Namespace:   in.Organization,
+			ServiceName: in.Repository,
+			TargetPort:  80,
+		},
+		k8sclient.WithAppLabel(in.Repository),
+		k8sclient.WithRepositoryLabel(in.Repository),
+		k8sclient.WithPrIDLabel(in.PullRequestId),
+		k8sclient.WithEnvirionmentLabel(k8sclient.EnvPreview),
+		k8sclient.WithBaseBranchLabel(branchName),
+		k8sclient.WithCreatedByLabel(k8sclient.AppIdentifier),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &v1.CreatePreviewReply{
+		Name:      dep.Name,
+		Namespace: dep.Namespace,
+		Version:   dep.ResourceVersion,
+		NodePort:  fmt.Sprintf("%d", service.Spec.Ports[0].NodePort),
+	}, nil
+}
+
+func (c *controller) DeletePreview(ctx context.Context, in *v1.DeletePreviewRequest) (*emptypb.Empty, error) {
+	branchName := branch.Transpile1123(in.Branch)
+	if err := c.control.DeleteDeployment(ctx,
+		in.Organization,
+		k8sclient.WithAppLabel(in.Repository),
+		k8sclient.WithRepositoryLabel(in.Repository),
+		k8sclient.WithBaseBranchLabel(branchName),
+		k8sclient.WithPrIDLabel(in.PullRequestId),
+		k8sclient.WithCreatedByLabel(k8sclient.AppIdentifier),
+		k8sclient.WithEnvirionmentLabel(k8sclient.EnvPreview),
+	); err != nil {
+		return nil, err
+	}
+
+	if err := c.control.DeleteService(ctx,
+		in.Organization,
+		k8sclient.WithAppLabel(in.Repository),
+		k8sclient.WithRepositoryLabel(in.Repository),
+		k8sclient.WithBaseBranchLabel(branchName),
+		k8sclient.WithPrIDLabel(in.PullRequestId),
+		k8sclient.WithCreatedByLabel(k8sclient.AppIdentifier),
+		k8sclient.WithEnvirionmentLabel(k8sclient.EnvPreview),
+	); err != nil {
+		return nil, err
+	}
+
+	return new(emptypb.Empty), nil
+}

@@ -26,7 +26,7 @@ type K8SClient interface {
 	CreateDeployment(ctx context.Context, in CreateDeploymentParams, opts ...Option) (*appsv1.Deployment, error)
 	GetDeployment(ctx context.Context, param GetDeploymentParams) (*appsv1.Deployment, error)
 	ListDeployments(ctx context.Context, namespace string, opts ...Option) (*appsv1.DeploymentList, error)
-	DeleteDeployment(ctx context.Context, namespace string, opt ...Option) error
+	DeleteDeployment(ctx context.Context, namespace string, opts ...Option) error
 
 	// service
 	CreateNodePortService(ctx context.Context, param CreateServiceNodePortParams, opts ...Option) (*corev1.Service, error)

@@ -30,6 +30,7 @@ func (k *k8sClient) CreateDeployment(ctx context.Context, in CreateDeploymentPar
 	return k.client.AppsV1().Deployments(in.Namespace).Create(ctx, &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			GenerateName: fmt.Sprintf("%s-", in.AppName),
+			Labels:       o.labelSelector,
 		},
 		Spec: appsv1.DeploymentSpec{
 			Replicas: o.replica,
@@ -108,7 +109,6 @@ func (k *k8sClient) DeleteDeployment(ctx context.Context, namespace string, opt 
 	}
 
 	for _, dep := range deps.Items {
-		// delete deployment
 		err := k.client.AppsV1().Deployments(namespace).Delete(ctx, dep.Name, metav1.DeleteOptions{})
 		if err != nil {
 			return err

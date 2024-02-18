@@ -32,6 +32,12 @@ func newOption() *option {
 
 type Option func(*option)
 
+func WithAppLabel(appName string) Option {
+	return func(o *option) {
+		o.labelSelector[AppLabel] = appName
+	}
+}
+
 func WithLabelSelector(labelSelector map[string]string) Option {
 	return func(o *option) {
 		o.labelSelector = labelSelector
