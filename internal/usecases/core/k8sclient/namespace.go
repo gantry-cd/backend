@@ -9,7 +9,7 @@ import (
 )
 
 func (k *k8sClient) CreateNamespace(ctx context.Context, name string, opts ...Option) (*corev1.Namespace, error) {
-	o := newOption()
+	o := newWithAppLabel()
 	for _, opt := range opts {
 		opt(o)
 	}

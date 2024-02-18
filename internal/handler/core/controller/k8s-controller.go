@@ -4,7 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
+	"sort"
+	"time"
 
 	coreErr "github.com/gantrycd/backend/internal/error"
 	"github.com/gantrycd/backend/internal/usecases/core/k8sclient"
@@ -52,15 +53,14 @@ func (c *controller) CreateNamespace(ctx context.Context, in *v1.CreateNamespace
 	}, nil
 }
 
-func (c *controller) ListNamespaces(context.Context, *emptypb.Empty) (*v1.ListNamespacesReply, error) {
-	ns, err := c.control.ListNamespaces(context.Background(), k8sclient.WithCreatedByLabel(Identity))
+func (c *controller) ListNamespaces(ctx context.Context, in *emptypb.Empty) (*v1.ListNamespacesReply, error) {
+	ns, err := c.control.ListNamespaces(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	var names []string
 	for _, n := range ns.Items {
-		log.Println(n.Name)
 		names = append(names, n.Name)
 	}
 
@@ -140,7 +140,7 @@ func (c *controller) DeleteDeployment(ctx context.Context, in *v1.DeleteDeployme
 }
 
 func (c *controller) GetOrgRepos(ctx context.Context, in *v1.GetOrgRepoRequest) (*v1.GetOrgReposReply, error) {
-	return c.getOrgRepos(ctx, in.Organization)
+	return c.getOrganization(ctx, in.Organization)
 }
 
 func (c *controller) GetResource(ctx context.Context, in *v1.GetResourceRequest) (*v1.GetResourceReply, error) {
@@ -158,25 +158,29 @@ func (c *controller) GetResource(ctx context.Context, in *v1.GetResourceRequest)
 	}, nil
 }
 
-func (c *controller) GetAlls(context.Context, *emptypb.Empty) (*v1.GetAllsReply, error) {
-	namespaces, err := c.control.ListNamespaces(context.Background(), k8sclient.WithCreatedByLabel(Identity))
+func (c *controller) GetAlls(ctx context.Context, in *emptypb.Empty) (*v1.GetAllsReply, error) {
+	namespaces, err := c.control.ListNamespaces(ctx, k8sclient.WithCreatedByLabel(k8sclient.AppIdentifier))
 	if err != nil {
 		return nil, err
 	}
-	var response *v1.GetAllsReply
+
+	orgs := []*v1.GetOrgReposReply{}
+
 	for _, ns := range namespaces.Items {
-		deployments, err := c.getOrgRepos(context.Background(), ns.Name)
+		org, err := c.getOrganization(ctx, ns.Name)
 		if err != nil {
 			return nil, err
 		}
 
-		response.OrgRepos = append(response.OrgRepos, deployments)
+		orgs = append(orgs, org)
 	}
 
-	return response, nil
+	return &v1.GetAllsReply{
+		OrgRepos: orgs,
+	}, nil
 }
 
-func (c *controller) getOrgRepos(ctx context.Context, organization string) (*v1.GetOrgReposReply, error) {
+func (c *controller) getOrganization(ctx context.Context, organization string) (*v1.GetOrgReposReply, error) {
 	deployments, err := c.control.ListDeployments(ctx, organization)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to list deployments: %v", err)
@@ -188,30 +192,37 @@ func (c *controller) getOrgRepos(ctx context.Context, organization string) (*v1.
 	)
 
 	for _, d := range deployments.Items {
-		prNumber, prOk := d.Labels[k8sclient.PullRequestID]
-		branch, brOk := d.Labels[k8sclient.BaseBranchLabel]
+		pullRequestID, prOk := d.Labels[k8sclient.PullRequestID]
+		branchName, brOk := d.Labels[k8sclient.BaseBranchLabel]
 		// PR番号とブランチ名が両方ともない場合はAppとして扱う
+		sort.Slice(d.Status.Conditions, func(i, j int) bool {
+			return d.Status.Conditions[j].LastTransitionTime.Before(&d.Status.Conditions[i].LastTransitionTime)
+		})
+
 		if !prOk && !brOk {
 			apps = append(apps, &v1.App{
 				AppName: d.Name,
-				Version: d.ResourceVersion,
+				Status:  string(d.Status.Conditions[0].Type),
+				Version: d.Spec.Template.GetResourceVersion(),
 				Image:   d.Spec.Template.Spec.Containers[0].Image,
-				Age:     d.CreationTimestamp.String(),
+				Age:     d.CreationTimestamp.Format(time.DateTime),
 			})
 			continue
 		}
 
+		branchName, _ = branch.TranspileBranchName(branchName)
+
 		// PR番号かブランチ名のどちらかが場合はRepoとして扱う
 		repos = append(repos, &v1.Repo{
 			RepositoryName: d.Labels[k8sclient.RepositoryLabel],
-			PrNumber:       prNumber,
-			Branch:         branch,
+			PrNumber:       pullRequestID,
+			Branch:         branchName,
 		})
 	}
 
 	return &v1.GetOrgReposReply{
 		Organization: organization,
-		Repos:        repos,
 		Apps:         apps,
+		Repos:        repos,
 	}, nil
 }

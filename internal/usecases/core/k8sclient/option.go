@@ -14,11 +14,18 @@ type containerOption struct {
 	imagePullPolicy corev1.PullPolicy
 }
 
-func newOption() *option {
+func newWithAppLabel() *option {
 	return &option{
 		labelSelector: map[string]string{
 			CreatedByLabel: AppIdentifier,
 		},
+		containerOption: make(map[string]containerOption),
+	}
+}
+
+func newOption() *option {
+	return &option{
+		labelSelector:   make(map[string]string),
 		containerOption: make(map[string]containerOption),
 	}
 }
