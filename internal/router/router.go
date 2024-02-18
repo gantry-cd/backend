@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/gantrycd/backend/internal/router/middleware"
-	v1 "github.com/gantrycd/backend/proto/k8s-controller"
+	v1 "github.com/gantrycd/backend/proto"
 )
 
 type router struct {
@@ -30,5 +30,6 @@ func NewRouter(
 	r.GitHubEvent()
 	r.health()
 
+	r.Usage()
 	return r.mux
 }
