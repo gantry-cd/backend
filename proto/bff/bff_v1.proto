@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package gantrycd.bff.v1;
+
+import "google/protobuf/empty.proto";
+// import "google/api/annotations.Protobuf";
+// import "validate/validate.Protobuf";
+// import "Protobufc-gen-openapiv2/options/annotations.Protobuf";
+
+option go_package = "github.com/gantrycd/backend/api/proto/bff/v1";
+
+service BffService {
+  rpc GetOrg(google.protobuf.Empty) returns (GetOrgResponse);
+
+}
+
+message GetOrgResponse {
+  repeated string organization  = 1;
+  repeated string repository = 2;
+}
