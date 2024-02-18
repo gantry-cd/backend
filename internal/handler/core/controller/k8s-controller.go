@@ -203,9 +203,9 @@ func (c *controller) getOrgRepos(ctx context.Context, organization string) (*v1.
 
 		// PR番号かブランチ名のどちらかが場合はRepoとして扱う
 		repos = append(repos, &v1.Repo{
-			RepositryName: d.Labels[k8sclient.RepositoryLabel],
-			PrNumber:      prNumber,
-			Branch:        branch,
+			RepositoryName: d.Labels[k8sclient.RepositoryLabel],
+			PrNumber:       prNumber,
+			Branch:         branch,
 		})
 	}
 
