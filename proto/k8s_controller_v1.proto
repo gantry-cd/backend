@@ -19,8 +19,14 @@ service K8sCustomController {
   rpc DeleteDeployment(DeleteDeploymentRequest) returns(google.protobuf.Empty);
 
 
+
+  // Resource Control
+  rpc GetAlls(google.protobuf.Empty) returns(GetAllsReply);
   rpc GetOrgRepos(GetOrgRepoRequest) returns(GetOrgReposReply);
 
+  rpc CreatePreview(CreatePreviewRequest) returns(CreatePreviewReply);
+  rpc DeletePreview(DeletePreviewRequest) returns(google.protobuf.Empty);
+  
 
   rpc GetResource(GetResourceRequest) returns (GetResourceReply);
 }
@@ -46,9 +52,9 @@ message CreateDeploymentRequest {
   string repository = 2;
   string pr_number = 3;
   string image = 4;
-  string pod_name = 5;
-  string replicas = 6;
-  string container_port = 7;
+  string branch = 5;
+  string app_name = 6;
+  string replicas = 7;
   string created_by = 8;
 }
 
@@ -68,14 +74,14 @@ message GetOrgRepoRequest {
   string organization = 1;
 }
 
-message repo {
-  string repositry_name = 1;
-  string pr_number = 2;
+message repository {
+  string name = 1;
+  string pull_request_id = 2;
   string branch = 3;
 };
 
-message app {
-  string app_name = 1;
+message application {
+  string name = 1;
   string status = 2;
   string version = 3;
   string image = 4;
@@ -84,9 +90,13 @@ message app {
 
 message GetOrgReposReply {
   string organization = 1;
-  repeated repo repos = 2;
-  repeated app apps = 3;
+  repeated repository repositories = 2;
+  repeated application applications = 3;
 }
+
+message GetAllsReply {
+  repeated GetOrgReposReply organization_infos = 1;
+};
 
 message GetResourceRequest {
   string organization = 1;
@@ -103,8 +113,8 @@ message Usage {
 message Resource {
   string app_name = 1;
   string pod_name = 2;
-  string branch = 3;
-  string pr_number = 4;
+  string pull_request_id = 3;
+  string branch = 4;
   repeated Usage usages = 5;
 };
 
@@ -112,3 +122,27 @@ message GetResourceReply {
   repeated Resource resources = 1;
   bool is_disable = 2;
 };
+
+message DeletePreviewRequest {
+  string organization = 1;
+  string repository = 2;
+  string pull_request_id = 3;
+  string branch = 4;
+};
+
+message CreatePreviewRequest {
+  string organization = 1;
+  string repository = 2;
+  string pull_request_id = 3;
+  string branch = 4; 
+  string image = 5;
+  string image_pull_policy = 6;
+  string replicas = 7;
+};
+
+message CreatePreviewReply {
+  string namespace = 1;
+  string name = 2;
+  string version = 3;
+  string nodePort = 4;
+}

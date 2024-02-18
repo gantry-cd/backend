@@ -3,13 +3,11 @@ package models
 const (
 	QueryOrganization string = "organization"
 	QueryRepository   string = "repository"
-	QuerySpan         string = "span"
 )
 
 type UsageRequest struct {
 	Organization string `json:"organization"`
 	Repository   string `json:"repository"`
-	Span         int    `json:"span"`
 }
 
 type UsageResponse struct {
