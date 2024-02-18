@@ -14,10 +14,6 @@ const (
 	repository
 )
 
-const (
-	DefaultNamespacePrefix = "gantrycd"
-)
-
 func (ge *handler) Installation(e *github.InstallationEvent) error {
 	ge.l.Info(fmt.Sprintf("installation event received: %v", e))
 	ctx := context.Background()
@@ -45,7 +41,7 @@ func (ge *handler) Installation(e *github.InstallationEvent) error {
 	switch *e.Action {
 	case InstallationCreated:
 		for _, org := range orgs {
-			orgname := fmt.Sprintf("%s-%s", DefaultNamespacePrefix, strings.ToLower(org))
+			orgname := strings.ToLower(org)
 			if !isInclude(nss, orgname) {
 				if err := ge.interactor.CreateNameSpace(ctx, org); err != nil {
 					ge.l.Error("error creating namespace", "error", err.Error())
@@ -54,7 +50,7 @@ func (ge *handler) Installation(e *github.InstallationEvent) error {
 		}
 	case InstallationDeleted:
 		for _, org := range orgs {
-			orgname := fmt.Sprintf("%s-%s", DefaultNamespacePrefix, strings.ToLower(org))
+			orgname := strings.ToLower(org)
 			if isInclude(nss, orgname) {
 				if err := ge.interactor.DeleteNameSpace(ctx, orgname); err != nil {
 					ge.l.Error("error deleting namespace", "error", err.Error())

@@ -54,7 +54,7 @@ func (r *resrouceInteractor) GetResource(ctx context.Context, w http.ResponseWri
 		usages = append(usages, models.Usage{
 			PodName: resource.PodName,
 			Branch:  resource.Branch,
-			PrID:    resource.PrNumber,
+			PrID:    resource.PullRequestId,
 			CPU:     usage.CPU / int64(len(resources)),
 			MEM:     usage.MEM / int64(len(resources)),
 			Storage: usage.Storage / int64(len(resources)),

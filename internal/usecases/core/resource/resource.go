@@ -64,11 +64,11 @@ func (r *k8sResource) GetLoads(ctx context.Context, namespace, repository string
 			prNumber = ""
 		}
 		resources = append(resources, &v1.Resource{
-			AppName:  metric.Labels[k8sclient.AppLabel],
-			PodName:  metric.Name,
-			Branch:   branchName,
-			PrNumber: prNumber,
-			Usages:   usages,
+			AppName:       metric.Labels[k8sclient.AppLabel],
+			PodName:       metric.Name,
+			Branch:        branchName,
+			PullRequestId: prNumber,
+			Usages:        usages,
 		})
 	}
 

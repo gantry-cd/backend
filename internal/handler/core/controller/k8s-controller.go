@@ -176,7 +176,7 @@ func (c *controller) GetAlls(ctx context.Context, in *emptypb.Empty) (*v1.GetAll
 	}
 
 	return &v1.GetAllsReply{
-		OrgRepos: orgs,
+		OrganizationInfos: orgs,
 	}, nil
 }
 
@@ -187,8 +187,8 @@ func (c *controller) getOrganization(ctx context.Context, organization string) (
 	}
 
 	var (
-		repos []*v1.Repo
-		apps  []*v1.App
+		repos []*v1.Repository
+		apps  []*v1.Application
 	)
 
 	for _, d := range deployments.Items {
@@ -200,8 +200,8 @@ func (c *controller) getOrganization(ctx context.Context, organization string) (
 		})
 
 		if !prOk && !brOk {
-			apps = append(apps, &v1.App{
-				AppName: d.Name,
+			apps = append(apps, &v1.Application{
+				Name:    d.Name,
 				Status:  string(d.Status.Conditions[0].Type),
 				Version: d.Spec.Template.GetResourceVersion(),
 				Image:   d.Spec.Template.Spec.Containers[0].Image,
@@ -213,16 +213,16 @@ func (c *controller) getOrganization(ctx context.Context, organization string) (
 		branchName, _ = branch.TranspileBranchName(branchName)
 
 		// PR番号かブランチ名のどちらかが場合はRepoとして扱う
-		repos = append(repos, &v1.Repo{
-			RepositoryName: d.Labels[k8sclient.RepositoryLabel],
-			PrNumber:       pullRequestID,
-			Branch:         branchName,
+		repos = append(repos, &v1.Repository{
+			Name:          d.Labels[k8sclient.RepositoryLabel],
+			PullRequestId: pullRequestID,
+			Branch:        branchName,
 		})
 	}
 
 	return &v1.GetOrgReposReply{
 		Organization: organization,
-		Apps:         apps,
-		Repos:        repos,
+		Applications: apps,
+		Repositories: repos,
 	}, nil
 }
