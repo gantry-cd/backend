@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/gantrycd/backend/internal/usecases/application/githubapp"
 	"github.com/google/go-github/v29/github"
 )
 
@@ -103,10 +104,20 @@ func (ge *handler) Push(e *github.PushEvent) error {
 
 func (ge *handler) PullRequest(e *github.PullRequestEvent) error {
 	ge.l.Info(fmt.Sprintf("pull request event received: %v", e))
+	ctx := context.Background()
 
 	switch *e.Action {
 	case "opened":
-		ge.l.Info(fmt.Sprintf("pull request opened: %v", e))
+		ge.l.Info(fmt.Sprintf("pull request opened: %v", e.Organization.Login))
+
+		if err := ge.interactor.CreatePreviewEnvironment(ctx, githubapp.CreatePreviewEnvironmentPrarams{
+			Organization: *e.Organization.Login,
+			Repository:   *e.Repo.Name,
+			PrNumber:     fmt.Sprintf("%d", *e.Number),
+			Branch:       *e.PullRequest.Head.Ref,
+		}); err != nil {
+			ge.l.Error("error creating preview environment", "error", err.Error())
+		}
 	case "closed":
 		ge.l.Info(fmt.Sprintf("pull request closed: %v", e))
 	default:

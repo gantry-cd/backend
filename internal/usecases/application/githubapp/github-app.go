@@ -25,7 +25,7 @@ type GithubAppEvents interface {
 	ListNameSpace(ctx context.Context, prefix string) ([]string, error)
 	DeleteNameSpace(ctx context.Context, name string) error
 
-	CreatePreviewEnvironment(ctx context.Context, organization, repository, branch string) error
+	CreatePreviewEnvironment(ctx context.Context, param CreatePreviewEnvironmentPrarams) error
 }
 
 // Option はサーバーのオプションを設定するための関数です。
@@ -96,12 +96,25 @@ func (ge *githubAppEvents) DeleteNameSpace(ctx context.Context, name string) err
 	return err
 }
 
-func (ge *githubAppEvents) CreatePreviewEnvironment(ctx context.Context, organization, repository, prNumber, branch string) error {
+type CreatePreviewEnvironmentPrarams struct {
+	Organization string
+	Repository   string
+	PrNumber     string
+	Branch       string
+}
+
+func (ge *githubAppEvents) CreatePreviewEnvironment(ctx context.Context, param CreatePreviewEnvironmentPrarams) error {
+	// TODO: image buildする
+	image := "nginx:1.16"
+	// デプロイする
 	_, err := ge.customController.ApplyDeployment(ctx, &v1.CreateDeploymentRequest{
-		Namespace:  organization,
-		Repository: repository,
-		PrNumber:   prNumber,
+		Namespace:  param.Organization,
+		AppName:    param.Repository,
+		Repository: param.Repository,
+		PrNumber:   param.PrNumber,
+		Branch:     param.Branch,
+		Image:      image,
 	})
 
-	return
+	return err
 }

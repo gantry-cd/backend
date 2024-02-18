@@ -2,6 +2,8 @@ package controller
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"log"
 
 	coreErr "github.com/gantrycd/backend/internal/error"
@@ -73,9 +75,10 @@ func (c *controller) DeleteNamespace(ctx context.Context, in *v1.DeleteNamespace
 
 func (c *controller) ApplyDeployment(ctx context.Context, in *v1.CreateDeploymentRequest) (*v1.CreateDeploymentReply, error) {
 	dep, err := c.control.GetDeployment(ctx, in.Namespace, in.Repository, in.PrNumber)
-	if err != nil && err != coreErr.ErrDeploymentsNotFound {
+	if err != nil && !errors.Is(err, coreErr.ErrDeploymentsNotFound) {
 		return nil, err
 	}
+
 	// リソースが既に存在している場合は、更新する
 	if dep != nil {
 		// TODO: Apply Deployment
@@ -96,6 +99,18 @@ func (c *controller) ApplyDeployment(ctx context.Context, in *v1.CreateDeploymen
 	if err != nil {
 		return nil, err
 	}
+
+	service, err := c.control.CreateNodePortService(ctx, in.Namespace, in.AppName, 80,
+		k8sclient.WithRepositoryLabel(in.Repository),
+		k8sclient.WithPrIDLabel(in.PrNumber),
+		k8sclient.WithEnvirionmentLabel(k8sclient.EnvPreview),
+		k8sclient.WithBaseBranchLabel(branch.Transpile1123(in.Branch)),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Println(service)
 
 	return &v1.CreateDeploymentReply{
 		Name:      dep.Name,

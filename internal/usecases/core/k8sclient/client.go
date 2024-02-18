@@ -3,9 +3,11 @@ package k8sclient
 import (
 	"context"
 	"fmt"
+	"log"
 	"log/slog"
 	"os"
 
+	coreErr "github.com/gantrycd/backend/internal/error"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -30,6 +32,9 @@ type K8SClient interface {
 	GetDeployment(ctx context.Context, namespace, repository, prID string) (*appsv1.Deployment, error)
 	ListDeployments(ctx context.Context, namespace string, opts ...Option) (*appsv1.DeploymentList, error)
 	DeleteDeployment(ctx context.Context, namespace, repository, prID string) error
+
+	// service
+	CreateNodePortService(ctx context.Context, namespace, serviceName string, targetPort int32, opts ...Option) (*corev1.Service, error)
 }
 
 func New(client *kubernetes.Clientset) K8SClient {
@@ -78,7 +83,7 @@ func (k *k8sClient) CreateDeployment(ctx context.Context, namespace, podName, im
 
 	return k.client.AppsV1().Deployments(namespace).Create(ctx, &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: podName,
+			GenerateName: podName,
 		},
 		Spec: appsv1.DeploymentSpec{
 			Replicas: o.replica,
@@ -109,6 +114,7 @@ func (k *k8sClient) GetDeployment(ctx context.Context, namespace, repository, pr
 	})
 
 	if err != nil {
+		log.Println("here")
 		return nil, err
 	}
 
@@ -118,7 +124,7 @@ func (k *k8sClient) GetDeployment(ctx context.Context, namespace, repository, pr
 		}
 	}
 
-	return nil, fmt.Errorf("deployment not found")
+	return nil, coreErr.ErrDeploymentsNotFound
 }
 
 func (k *k8sClient) ListDeployments(ctx context.Context, namespace string, opts ...Option) (*appsv1.DeploymentList, error) {
@@ -148,4 +154,26 @@ func (k *k8sClient) DeleteDeployment(ctx context.Context, namespace, repository,
 	}
 
 	return nil
+}
+
+func (k *k8sClient) CreateNodePortService(ctx context.Context, namespace, serviceName string, targetPort int32, opts ...Option) (*corev1.Service, error) {
+	o := newOption()
+	for _, opt := range opts {
+		opt(o)
+	}
+
+	return k.client.CoreV1().Services(namespace).Create(ctx, &corev1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: serviceName,
+		},
+		Spec: corev1.ServiceSpec{
+			Ports: []corev1.ServicePort{
+				{
+					Port: targetPort,
+				},
+			},
+			Selector: o.labelSelector,
+			Type:     corev1.ServiceTypeNodePort,
+		},
+	}, metav1.CreateOptions{})
 }
