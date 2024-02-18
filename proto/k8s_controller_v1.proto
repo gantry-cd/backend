@@ -89,7 +89,7 @@ message GetOrgReposReply {
 }
 
 message GetAllsReply {
-  repeated GetOrgRepoRequest org_repos = 1;
+  repeated GetOrgReposReply org_repos = 1;
 };
 
 message GetResourceRequest {

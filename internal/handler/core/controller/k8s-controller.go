@@ -193,3 +193,26 @@ func (c *controller) GetResource(ctx context.Context, in *v1.GetResourceRequest)
 		IsDisable: true,
 	}, nil
 }
+
+func (c *controller) GetAlls(context.Context, *emptypb.Empty) (*v1.GetAllsReply, error) {
+	namespaces, err := c.control.ListNamespaces(context.Background(), k8sclient.WithCreatedByLabel(Identity))
+	if err != nil {
+		return nil, err
+	}
+	var getOrgRepoRequest *v1.GetAllsReply
+	for _, ns := range namespaces.Items {
+		deployments, err := c.control.ListDeployments(context.Background(), ns.Name)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, dep := range deployments.Items {
+			fmt.Println(dep.Name)
+		}
+		getOrgRepoRequest.OrgRepos = append(getOrgRepoRequest.OrgRepos, &v1.GetOrgRepoRequest{
+			Organization: ns.Name,
+		})
+	}
+
+	return &v1.GetAllsReply{}, nil
+}
