@@ -122,7 +122,8 @@ message GetResourceReply {
 };
 
 message DeletePreviewRequest {
-  string repository = 1;
-  string pull_request_id = 2;
-  string branch = 3;
+  string organization = 1;
+  string repository = 2;
+  string pull_request_id = 3;
+  string branch = 4;
 };
