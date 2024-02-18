@@ -33,6 +33,7 @@ type K8SCustomControllerClient interface {
 	// Resource Control
 	GetAlls(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetAllsReply, error)
 	GetOrgRepos(ctx context.Context, in *GetOrgRepoRequest, opts ...grpc.CallOption) (*GetOrgReposReply, error)
+	CreatePreview(ctx context.Context, in *CreatePreviewRequest, opts ...grpc.CallOption) (*CreatePreviewReply, error)
 	DeletePreview(ctx context.Context, in *DeletePreviewRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetResource(ctx context.Context, in *GetResourceRequest, opts ...grpc.CallOption) (*GetResourceReply, error)
 }
@@ -108,6 +109,15 @@ func (c *k8SCustomControllerClient) GetOrgRepos(ctx context.Context, in *GetOrgR
 	return out, nil
 }
 
+func (c *k8SCustomControllerClient) CreatePreview(ctx context.Context, in *CreatePreviewRequest, opts ...grpc.CallOption) (*CreatePreviewReply, error) {
+	out := new(CreatePreviewReply)
+	err := c.cc.Invoke(ctx, "/gantrycd.k8s_controller.v1.K8sCustomController/CreatePreview", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *k8SCustomControllerClient) DeletePreview(ctx context.Context, in *DeletePreviewRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/gantrycd.k8s_controller.v1.K8sCustomController/DeletePreview", in, out, opts...)
@@ -140,6 +150,7 @@ type K8SCustomControllerServer interface {
 	// Resource Control
 	GetAlls(context.Context, *emptypb.Empty) (*GetAllsReply, error)
 	GetOrgRepos(context.Context, *GetOrgRepoRequest) (*GetOrgReposReply, error)
+	CreatePreview(context.Context, *CreatePreviewRequest) (*CreatePreviewReply, error)
 	DeletePreview(context.Context, *DeletePreviewRequest) (*emptypb.Empty, error)
 	GetResource(context.Context, *GetResourceRequest) (*GetResourceReply, error)
 	mustEmbedUnimplementedK8SCustomControllerServer()
@@ -169,6 +180,9 @@ func (UnimplementedK8SCustomControllerServer) GetAlls(context.Context, *emptypb.
 }
 func (UnimplementedK8SCustomControllerServer) GetOrgRepos(context.Context, *GetOrgRepoRequest) (*GetOrgReposReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetOrgRepos not implemented")
+}
+func (UnimplementedK8SCustomControllerServer) CreatePreview(context.Context, *CreatePreviewRequest) (*CreatePreviewReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreatePreview not implemented")
 }
 func (UnimplementedK8SCustomControllerServer) DeletePreview(context.Context, *DeletePreviewRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeletePreview not implemented")
@@ -315,6 +329,24 @@ func _K8SCustomController_GetOrgRepos_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _K8SCustomController_CreatePreview_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreatePreviewRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(K8SCustomControllerServer).CreatePreview(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gantrycd.k8s_controller.v1.K8sCustomController/CreatePreview",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(K8SCustomControllerServer).CreatePreview(ctx, req.(*CreatePreviewRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _K8SCustomController_DeletePreview_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeletePreviewRequest)
 	if err := dec(in); err != nil {
@@ -385,6 +417,10 @@ var K8SCustomController_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetOrgRepos",
 			Handler:    _K8SCustomController_GetOrgRepos_Handler,
+		},
+		{
+			MethodName: "CreatePreview",
+			Handler:    _K8SCustomController_CreatePreview_Handler,
 		},
 		{
 			MethodName: "DeletePreview",

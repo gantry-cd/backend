@@ -23,6 +23,8 @@ service K8sCustomController {
   // Resource Control
   rpc GetAlls(google.protobuf.Empty) returns(GetAllsReply);
   rpc GetOrgRepos(GetOrgRepoRequest) returns(GetOrgReposReply);
+
+  rpc CreatePreview(CreatePreviewRequest) returns(CreatePreviewReply);
   rpc DeletePreview(DeletePreviewRequest) returns(google.protobuf.Empty);
   
 
@@ -127,3 +129,20 @@ message DeletePreviewRequest {
   string pull_request_id = 3;
   string branch = 4;
 };
+
+message CreatePreviewRequest {
+  string organization = 1;
+  string repository = 2;
+  string pull_request_id = 3;
+  string branch = 4; 
+  string image = 5;
+  string image_pull_policy = 6;
+  string replicas = 7;
+};
+
+message CreatePreviewReply {
+  string namespace = 1;
+  string name = 2;
+  string version = 3;
+  string nodePort = 4;
+}
