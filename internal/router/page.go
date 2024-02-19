@@ -12,6 +12,6 @@ func (r *router) page() {
 		bff.NewBff(r.controllerConn),
 	)
 
-	r.mux.Handle("GET /home", r.middleware.KeyCloakOAuth(http.HandlerFunc(bc.Home)))
+	r.mux.Handle("GET /home", http.HandlerFunc(bc.Home))
 
 }
