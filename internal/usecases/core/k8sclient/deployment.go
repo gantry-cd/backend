@@ -16,6 +16,7 @@ type CreateDeploymentParams struct {
 	Namespace string
 	AppName   string
 	Image     string
+	Replicas  int32
 	Config    []*pbv1.Config
 }
 
@@ -44,7 +45,7 @@ func (k *k8sClient) CreateDeployment(ctx context.Context, in CreateDeploymentPar
 			Labels:       o.labelSelector,
 		},
 		Spec: appsv1.DeploymentSpec{
-			Replicas: o.replica,
+			Replicas: &in.Replicas,
 			Selector: &metav1.LabelSelector{
 				MatchLabels: o.labelSelector,
 			},

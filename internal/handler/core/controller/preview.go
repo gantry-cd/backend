@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"errors"
+	"log"
 
 	coreErr "github.com/gantrycd/backend/internal/error"
 	"github.com/gantrycd/backend/internal/usecases/core/k8sclient"
@@ -11,6 +12,8 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
+	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
 )
 
 func (c *controller) CreatePreview(ctx context.Context, in *v1.CreatePreviewRequest) (*v1.CreatePreviewReply, error) {
@@ -34,12 +37,18 @@ func (c *controller) CreatePreview(ctx context.Context, in *v1.CreatePreviewRequ
 		}, nil
 	}
 
-	dep, err = c.control.CreateDeployment(ctx,
+	var (
+		service *corev1.Service
+		deps    *appsv1.Deployment
+	)
+
+	deps, err = c.control.CreateDeployment(ctx,
 		k8sclient.CreateDeploymentParams{
 			Namespace: in.Organization,
 			AppName:   in.Repository,
 			Image:     in.Image,
 			Config:    in.Configs,
+			Replicas:  in.Replicas,
 		},
 		k8sclient.WithRepositoryLabel(in.Repository),
 		k8sclient.WithPrIDLabel(in.PullRequestId),
@@ -51,7 +60,7 @@ func (c *controller) CreatePreview(ctx context.Context, in *v1.CreatePreviewRequ
 		return nil, err
 	}
 
-	service, err := c.control.CreateNodePortService(ctx,
+	service, err = c.control.CreateNodePortService(ctx,
 		k8sclient.CreateServiceNodePortParams{
 			Namespace:   in.Organization,
 			ServiceName: in.Repository,
@@ -64,9 +73,11 @@ func (c *controller) CreatePreview(ctx context.Context, in *v1.CreatePreviewRequ
 		k8sclient.WithBaseBranchLabel(branchName),
 		k8sclient.WithCreatedByLabel(k8sclient.AppIdentifier),
 	)
+	log.Printf("service: %v", err)
 	if err != nil {
 		return nil, err
 	}
+
 	var nodePorts []*v1.NodePort
 	for _, port := range service.Spec.Ports {
 		nodePorts = append(nodePorts, &v1.NodePort{
@@ -76,9 +87,9 @@ func (c *controller) CreatePreview(ctx context.Context, in *v1.CreatePreviewRequ
 	}
 
 	return &v1.CreatePreviewReply{
-		Name:      dep.Name,
-		Namespace: dep.Namespace,
-		Version:   dep.ResourceVersion,
+		Name:      deps.Name,
+		Namespace: deps.Namespace,
+		Version:   deps.ResourceVersion,
 		NodePorts: nodePorts,
 	}, nil
 }

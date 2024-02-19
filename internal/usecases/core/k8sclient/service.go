@@ -23,6 +23,10 @@ func (k *k8sClient) CreateNodePortService(ctx context.Context, param CreateServi
 
 	var expose []corev1.ServicePort
 	for _, port := range param.TargetPort {
+		if port == 0 {
+			continue
+		}
+		// rand, _ := random.RandomString(10)
 		expose = append(expose, corev1.ServicePort{
 			Port: port,
 		})

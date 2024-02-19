@@ -25,7 +25,7 @@ type GithubAppEvents interface {
 	ListNameSpace(ctx context.Context, prefix string) ([]string, error)
 	DeleteNameSpace(ctx context.Context, name string) error
 
-	CreatePreviewEnvironment(ctx context.Context, param CreatePreviewEnvironmentParams) (*v1.CreatePreviewReply, error)
+	CreatePreviewEnvironment(ctx context.Context, param CreatePreviewEnvironmentParams) error
 	DeletePreviewEnvironment(ctx context.Context, param DeletePreviewEnvironmentParams) error
 }
 

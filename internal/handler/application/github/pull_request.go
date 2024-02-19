@@ -10,6 +10,7 @@ import (
 	ghconn "github.com/gantrycd/backend/internal/driver/github"
 	"github.com/gantrycd/backend/internal/models"
 	"github.com/gantrycd/backend/internal/usecases/application/controller"
+	ghInteractor "github.com/gantrycd/backend/internal/usecases/application/github"
 	"github.com/gantrycd/backend/internal/utils/conf"
 	"github.com/google/go-github/v29/github"
 )
@@ -53,40 +54,30 @@ func (ge *handler) PullRequest(e *github.PullRequestEvent) error {
 
 func (ge *handler) pullRequestOpened(client *github.Client, e *github.PullRequestEvent) error {
 
-	config, err := parseConfig(*e.PullRequest.Body)
+	c, err := parseConfig(*e.PullRequest.Body)
 	if err != nil {
 		ge.l.Error("error parsing config", "error", err.Error())
 		return err
 	}
-	dep, err := ge.interactor.CreatePreviewEnvironment(context.Background(), controller.CreatePreviewEnvironmentParams{
-		Organization: *e.Organization.Login,
-		Repository:   *e.Repo.Name,
-		PrNumber:     fmt.Sprintf("%d", *e.Number),
-		Branch:       *e.PullRequest.Head.Ref,
-		Config:       *config,
-	})
-	if err != nil {
-		return fmt.Errorf("error creating preview environment: %w", err)
-	}
 
-	var message string
-	for _, np := range dep.NodePorts {
-		message += fmt.Sprintf("port %d: %d\n", np.Port, np.Target)
-	}
-
-	prReview, ghResp, err := client.PullRequests.CreateReview(context.Background(), *e.Organization.Login, *e.Repo.Name, *e.Number, &github.PullRequestReviewRequest{
-		Body:  github.String("deploy preview environment create successful! 🚀 \n " + message),
-		Event: github.String("APPROVE"),
-	})
+	ghClient, err := ghconn.GitHubConnection(
+		*e.Installation.AppID,
+		*e.Installation.ID,
+		config.Config.GitHub.CrtPath,
+	)
 	if err != nil {
-		ge.l.Error("error creating review", "error", err.Error())
+		ge.l.Error("error parsing config", "error", err.Error())
 		return err
 	}
 
-	ge.l.Info(fmt.Sprintf("pull request review created: %v", prReview))
-	ge.l.Info(fmt.Sprintf("github response: %v", ghResp))
-
-	return nil
+	return ge.interactor.CreatePreviewEnvironment(context.Background(), controller.CreatePreviewEnvironmentParams{
+		Organization: *e.Organization.Login,
+		Repository:   *e.Repo.Name,
+		PrNumber:     *e.Number,
+		Branch:       *e.PullRequest.Head.Ref,
+		Config:       *c,
+		GhClient:     ghInteractor.New(ghClient),
+	})
 }
 
 const (
