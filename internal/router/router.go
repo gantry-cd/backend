@@ -29,7 +29,7 @@ func NewRouter(
 	}
 	r.GitHubEvent()
 	r.health()
-
+	r.page()
 	r.Usage()
 	return r.mux
 }
