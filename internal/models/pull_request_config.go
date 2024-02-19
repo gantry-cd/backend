@@ -2,6 +2,7 @@ package models
 
 type PullRequestConfig struct {
 	BuildFilePath string      `json:"build_file_path" conf:"BUILD_FILE_PATH"`
+	Replicas      int32       `json:"replicas" conf:"REPLICAS"`
 	ExposePort    []int32     `json:"expose_port" conf:"EXPOSE_PORT"`
 	ConfigMaps    []ConfigMap `json:"config_map" conf:"[config-map]"`
 }

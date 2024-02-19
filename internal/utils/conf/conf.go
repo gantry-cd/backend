@@ -48,28 +48,17 @@ func LoadConf(conf string) (*models.PullRequestConfig, error) {
 func setValue(model *models.PullRequestConfig, prefix, key, value string) error {
 	configType := reflect.TypeOf(*model)
 	configValue := reflect.ValueOf(model)
+
 	for i := 0; i < configType.NumField(); i++ {
+		configField := configType.Field(i)
+		configValue := configValue.Elem().Field(i)
 		switch prefix {
 		case "":
 			if configType.Field(i).Tag.Get("conf") == key {
-				if configType.Field(i).Type.Kind() == reflect.Slice {
-					if configType.Field(i).Type.Elem().Kind() == reflect.Int32 {
-						v, err := strconv.Atoi(value)
-						if err != nil {
-							return err
-						}
-
-						configValue.Elem().Field(i).Set(reflect.Append(configValue.Elem().Field(i), reflect.ValueOf(int32(v))))
-						continue
-					}
-
-					if configType.Field(i).Type.Elem().Kind() == reflect.String {
-						configValue.Elem().Field(i).Set(reflect.Append(configValue.Elem().Field(i), reflect.ValueOf(value)))
-						continue
-					}
-				}
 				log.Println(value)
-				configValue.Elem().Field(i).SetString(value)
+				if err := set(configField, configValue, value); err != nil {
+					return err
+				}
 			}
 		case configMapField:
 			model.ConfigMaps = append(model.ConfigMaps, models.SetConfigMap(key, value))
@@ -78,5 +67,64 @@ func setValue(model *models.PullRequestConfig, prefix, key, value string) error 
 			continue
 		}
 	}
+	return nil
+}
+
+func set(confType reflect.StructField, confValue reflect.Value, value string) error {
+
+	switch confType.Type.Kind() {
+	case reflect.String:
+		confValue.SetString(value)
+
+	case reflect.Int:
+		v, err := strconv.Atoi(value)
+		if err != nil {
+			return err
+		}
+		confValue.SetInt(int64(v))
+
+	case reflect.Int32:
+		v, err := strconv.Atoi(value)
+		if err != nil {
+			return err
+		}
+		confValue.SetInt(int64(v))
+
+	case reflect.Int64:
+		v, err := strconv.Atoi(value)
+		if err != nil {
+			return err
+		}
+		confValue.SetInt(int64(v))
+
+	case reflect.Slice:
+		switch confType.Type.Elem().Kind() {
+		case reflect.String:
+			confValue.Set(reflect.Append(confValue, reflect.ValueOf(value)))
+
+		case reflect.Int:
+			v, err := strconv.Atoi(value)
+			if err != nil {
+				return err
+			}
+			confValue.Set(reflect.Append(confValue, reflect.ValueOf(v)))
+
+		case reflect.Int32:
+			v, err := strconv.Atoi(value)
+			if err != nil {
+				return err
+			}
+			confValue.Set(reflect.Append(confValue, reflect.ValueOf(int32(v))))
+
+		case reflect.Int64:
+			v, err := strconv.Atoi(value)
+			if err != nil {
+				return err
+			}
+			confValue.Set(reflect.Append(confValue, reflect.ValueOf(int64(v))))
+		}
+
+	}
+
 	return nil
 }
