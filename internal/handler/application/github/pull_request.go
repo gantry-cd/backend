@@ -3,6 +3,7 @@ package github
 import (
 	"context"
 	"fmt"
+	"log"
 	"strings"
 
 	"github.com/gantrycd/backend/cmd/config"
@@ -51,6 +52,7 @@ func (ge *handler) PullRequest(e *github.PullRequestEvent) error {
 }
 
 func (ge *handler) pullRequestOpend(client *github.Client, e *github.PullRequestEvent) error {
+
 	config, err := parseConfig(*e.PullRequest.Body)
 	if err != nil {
 		ge.l.Error("error parsing config", "error", err.Error())
@@ -98,11 +100,17 @@ func parseConfig(prMessage string) (*models.PullRequestConfig, error) {
 		raw  string
 	)
 
-	for _, line := range strings.Split(prMessage, "\n") {
-		if strings.HasPrefix(line, configureIndentifer) || strings.HasPrefix(line, fmt.Sprintf(configureIndentifer, "/")) {
+	for _, line := range strings.Split(prMessage, "\r\n") {
+		if strings.HasPrefix(line, fmt.Sprintf(configureIndentifer, "")) {
 			scan = true
 			continue
 		}
+		if strings.HasPrefix(line, fmt.Sprintf(configureIndentifer, "/")) {
+			scan = false
+			continue
+		}
+
+		log.Println(scan, line)
 
 		if scan {
 			raw += line + "\n"

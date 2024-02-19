@@ -1,8 +1,6 @@
 package config
 
 import (
-	"fmt"
-
 	"github.com/caarlos0/env"
 	"github.com/joho/godotenv"
 )
@@ -30,6 +28,5 @@ func LoadEnv(path ...string) {
 		panic(err)
 	}
 
-	fmt.Println(config)
 	Config = config
 }

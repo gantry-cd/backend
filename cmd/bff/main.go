@@ -13,8 +13,9 @@ import (
 
 func init() {
 	config.LoadEnv(
-		"keycloak.env",
-		"bff.env",
+		".env/keycloak.env",
+		".env/bff.env",
+		".env/github.env",
 	)
 }
 
@@ -25,7 +26,7 @@ func main() {
 }
 
 func run() error {
-	controllerPbc := pbclient.NewConn(os.Getenv("K8S_CONTROLLER_ADDR"))
+	controllerPbc := pbclient.NewConn(config.Config.Bff.K8SControllerAddr)
 
 	if err := controllerPbc.Connect(); err != nil {
 		return fmt.Errorf("failed to connect to k8s controller: %w", err)
@@ -38,8 +39,8 @@ func run() error {
 
 	server := http.New(
 		handler,
-		http.WithPort(os.Getenv("PORT")),
-		http.WithHost(os.Getenv("HOST")),
+		http.WithPort(fmt.Sprintf("%d", config.Config.Bff.Port)),
+		http.WithHost(config.Config.Bff.Host),
 		http.WithShutdownTimeout(10),
 	)
 

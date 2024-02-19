@@ -118,6 +118,7 @@ func (ge *githubAppEvents) CreatePreviewEnvironment(ctx context.Context, param C
 			Value: c.Value,
 		})
 	}
+
 	// デプロイする
 	return ge.customController.CreatePreview(ctx, &v1.CreatePreviewRequest{
 		Organization:  param.Organization,
