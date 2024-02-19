@@ -7,6 +7,7 @@ import (
 
 	"github.com/gantrycd/backend/internal/models"
 	v1 "github.com/gantrycd/backend/proto"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type bffInteractor struct {
@@ -25,7 +26,7 @@ func NewBff(resource v1.K8SCustomControllerClient) BffInteractor {
 
 func (b *bffInteractor) GetHome(ctx context.Context, w http.ResponseWriter) error {
 	var orgInfos []models.OrganizationInfos
-	result, err := b.resource.GetAlls(ctx, nil)
+	result, err := b.resource.GetAlls(ctx, &emptypb.Empty{})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
