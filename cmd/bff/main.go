@@ -4,11 +4,19 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/gantrycd/backend/cmd/config"
 	"github.com/gantrycd/backend/internal/driver/pbclient"
 	"github.com/gantrycd/backend/internal/router"
 	"github.com/gantrycd/backend/internal/server/http"
 	v1 "github.com/gantrycd/backend/proto"
 )
+
+func init() {
+	config.LoadEnv(
+		"keycloak.env",
+		"bff.env",
+	)
+}
 
 func main() {
 	if err := run(); err != nil {

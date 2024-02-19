@@ -14,7 +14,6 @@ message ListNamespacesReply {
   repeated string names = 1;
 }
 
-
 message CreateDeploymentReply {
   string namespace = 1;
   string name = 2;
@@ -65,9 +64,14 @@ message GetResourceReply {
   bool is_disable = 2;
 };
 
+message NodePort {
+  int32 target = 1;
+  int32 port = 2;
+}
+
 message CreatePreviewReply {
   string namespace = 1;
   string name = 2;
   string version = 3;
-  string nodePort = 4;
+  repeated NodePort node_ports = 4;
 }

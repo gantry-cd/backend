@@ -3,3 +3,4 @@ influx/data
 *.env
 bin/
 .kube
+.crt

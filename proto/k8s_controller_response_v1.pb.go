@@ -636,21 +636,76 @@ func (x *GetResourceReply) GetIsDisable() bool {
 	return false
 }
 
+type NodePort struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Target int32 `protobuf:"varint,1,opt,name=target,proto3" json:"target,omitempty"`
+	Port   int32 `protobuf:"varint,2,opt,name=port,proto3" json:"port,omitempty"`
+}
+
+func (x *NodePort) Reset() {
+	*x = NodePort{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_k8s_controller_response_v1_proto_msgTypes[10]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *NodePort) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*NodePort) ProtoMessage() {}
+
+func (x *NodePort) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_k8s_controller_response_v1_proto_msgTypes[10]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use NodePort.ProtoReflect.Descriptor instead.
+func (*NodePort) Descriptor() ([]byte, []int) {
+	return file_proto_k8s_controller_response_v1_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *NodePort) GetTarget() int32 {
+	if x != nil {
+		return x.Target
+	}
+	return 0
+}
+
+func (x *NodePort) GetPort() int32 {
+	if x != nil {
+		return x.Port
+	}
+	return 0
+}
+
 type CreatePreviewReply struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Namespace string `protobuf:"bytes,1,opt,name=namespace,proto3" json:"namespace,omitempty"`
-	Name      string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Version   string `protobuf:"bytes,3,opt,name=version,proto3" json:"version,omitempty"`
-	NodePort  string `protobuf:"bytes,4,opt,name=nodePort,proto3" json:"nodePort,omitempty"`
+	Namespace string      `protobuf:"bytes,1,opt,name=namespace,proto3" json:"namespace,omitempty"`
+	Name      string      `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Version   string      `protobuf:"bytes,3,opt,name=version,proto3" json:"version,omitempty"`
+	NodePorts []*NodePort `protobuf:"bytes,4,rep,name=node_ports,json=nodePorts,proto3" json:"node_ports,omitempty"`
 }
 
 func (x *CreatePreviewReply) Reset() {
 	*x = CreatePreviewReply{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_k8s_controller_response_v1_proto_msgTypes[10]
+		mi := &file_proto_k8s_controller_response_v1_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -663,7 +718,7 @@ func (x *CreatePreviewReply) String() string {
 func (*CreatePreviewReply) ProtoMessage() {}
 
 func (x *CreatePreviewReply) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_k8s_controller_response_v1_proto_msgTypes[10]
+	mi := &file_proto_k8s_controller_response_v1_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -676,7 +731,7 @@ func (x *CreatePreviewReply) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreatePreviewReply.ProtoReflect.Descriptor instead.
 func (*CreatePreviewReply) Descriptor() ([]byte, []int) {
-	return file_proto_k8s_controller_response_v1_proto_rawDescGZIP(), []int{10}
+	return file_proto_k8s_controller_response_v1_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *CreatePreviewReply) GetNamespace() string {
@@ -700,11 +755,11 @@ func (x *CreatePreviewReply) GetVersion() string {
 	return ""
 }
 
-func (x *CreatePreviewReply) GetNodePort() string {
+func (x *CreatePreviewReply) GetNodePorts() []*NodePort {
 	if x != nil {
-		return x.NodePort
+		return x.NodePorts
 	}
-	return ""
+	return nil
 }
 
 var File_proto_k8s_controller_response_v1_proto protoreflect.FileDescriptor
@@ -786,19 +841,25 @@ var file_proto_k8s_controller_response_v1_proto_rawDesc = []byte{
 	0x2e, 0x52, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x52, 0x09, 0x72, 0x65, 0x73, 0x6f, 0x75,
 	0x72, 0x63, 0x65, 0x73, 0x12, 0x1d, 0x0a, 0x0a, 0x69, 0x73, 0x5f, 0x64, 0x69, 0x73, 0x61, 0x62,
 	0x6c, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x08, 0x52, 0x09, 0x69, 0x73, 0x44, 0x69, 0x73, 0x61,
-	0x62, 0x6c, 0x65, 0x22, 0x7c, 0x0a, 0x12, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x50, 0x72, 0x65,
-	0x76, 0x69, 0x65, 0x77, 0x52, 0x65, 0x70, 0x6c, 0x79, 0x12, 0x1c, 0x0a, 0x09, 0x6e, 0x61, 0x6d,
-	0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x6e, 0x61,
-	0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18,
-	0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x76,
-	0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x76, 0x65,
-	0x72, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x1a, 0x0a, 0x08, 0x6e, 0x6f, 0x64, 0x65, 0x50, 0x6f, 0x72,
-	0x74, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x6e, 0x6f, 0x64, 0x65, 0x50, 0x6f, 0x72,
-	0x74, 0x42, 0x3c, 0x5a, 0x3a, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f,
-	0x67, 0x61, 0x6e, 0x74, 0x72, 0x79, 0x63, 0x64, 0x2f, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64,
-	0x2f, 0x61, 0x70, 0x69, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x62, 0x2f, 0x6b, 0x38,
-	0x73, 0x2d, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x6c, 0x65, 0x72, 0x2f, 0x76, 0x31, 0x62,
-	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x62, 0x6c, 0x65, 0x22, 0x36, 0x0a, 0x08, 0x4e, 0x6f, 0x64, 0x65, 0x50, 0x6f, 0x72, 0x74, 0x12,
+	0x16, 0x0a, 0x06, 0x74, 0x61, 0x72, 0x67, 0x65, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52,
+	0x06, 0x74, 0x61, 0x72, 0x67, 0x65, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x70, 0x6f, 0x72, 0x74, 0x18,
+	0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x04, 0x70, 0x6f, 0x72, 0x74, 0x22, 0xa5, 0x01, 0x0a, 0x12,
+	0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x50, 0x72, 0x65, 0x76, 0x69, 0x65, 0x77, 0x52, 0x65, 0x70,
+	0x6c, 0x79, 0x12, 0x1c, 0x0a, 0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65,
+	0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04,
+	0x6e, 0x61, 0x6d, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x18,
+	0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x43,
+	0x0a, 0x0a, 0x6e, 0x6f, 0x64, 0x65, 0x5f, 0x70, 0x6f, 0x72, 0x74, 0x73, 0x18, 0x04, 0x20, 0x03,
+	0x28, 0x0b, 0x32, 0x24, 0x2e, 0x67, 0x61, 0x6e, 0x74, 0x72, 0x79, 0x63, 0x64, 0x2e, 0x6b, 0x38,
+	0x73, 0x5f, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x6c, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x2e,
+	0x4e, 0x6f, 0x64, 0x65, 0x50, 0x6f, 0x72, 0x74, 0x52, 0x09, 0x6e, 0x6f, 0x64, 0x65, 0x50, 0x6f,
+	0x72, 0x74, 0x73, 0x42, 0x3c, 0x5a, 0x3a, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f,
+	0x6d, 0x2f, 0x67, 0x61, 0x6e, 0x74, 0x72, 0x79, 0x63, 0x64, 0x2f, 0x62, 0x61, 0x63, 0x6b, 0x65,
+	0x6e, 0x64, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x62, 0x2f,
+	0x6b, 0x38, 0x73, 0x2d, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x6c, 0x65, 0x72, 0x2f, 0x76,
+	0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -813,7 +874,7 @@ func file_proto_k8s_controller_response_v1_proto_rawDescGZIP() []byte {
 	return file_proto_k8s_controller_response_v1_proto_rawDescData
 }
 
-var file_proto_k8s_controller_response_v1_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_proto_k8s_controller_response_v1_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_proto_k8s_controller_response_v1_proto_goTypes = []interface{}{
 	(*CreateNamespaceReply)(nil),  // 0: gantrycd.k8s_controller.v1.CreateNamespaceReply
 	(*ListNamespacesReply)(nil),   // 1: gantrycd.k8s_controller.v1.ListNamespacesReply
@@ -825,19 +886,21 @@ var file_proto_k8s_controller_response_v1_proto_goTypes = []interface{}{
 	(*Usage)(nil),                 // 7: gantrycd.k8s_controller.v1.Usage
 	(*Resource)(nil),              // 8: gantrycd.k8s_controller.v1.Resource
 	(*GetResourceReply)(nil),      // 9: gantrycd.k8s_controller.v1.GetResourceReply
-	(*CreatePreviewReply)(nil),    // 10: gantrycd.k8s_controller.v1.CreatePreviewReply
+	(*NodePort)(nil),              // 10: gantrycd.k8s_controller.v1.NodePort
+	(*CreatePreviewReply)(nil),    // 11: gantrycd.k8s_controller.v1.CreatePreviewReply
 }
 var file_proto_k8s_controller_response_v1_proto_depIdxs = []int32{
-	3, // 0: gantrycd.k8s_controller.v1.GetOrgReposReply.repositories:type_name -> gantrycd.k8s_controller.v1.repository
-	4, // 1: gantrycd.k8s_controller.v1.GetOrgReposReply.applications:type_name -> gantrycd.k8s_controller.v1.application
-	5, // 2: gantrycd.k8s_controller.v1.GetAllsReply.organization_infos:type_name -> gantrycd.k8s_controller.v1.GetOrgReposReply
-	7, // 3: gantrycd.k8s_controller.v1.Resource.usages:type_name -> gantrycd.k8s_controller.v1.Usage
-	8, // 4: gantrycd.k8s_controller.v1.GetResourceReply.resources:type_name -> gantrycd.k8s_controller.v1.Resource
-	5, // [5:5] is the sub-list for method output_type
-	5, // [5:5] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+	3,  // 0: gantrycd.k8s_controller.v1.GetOrgReposReply.repositories:type_name -> gantrycd.k8s_controller.v1.repository
+	4,  // 1: gantrycd.k8s_controller.v1.GetOrgReposReply.applications:type_name -> gantrycd.k8s_controller.v1.application
+	5,  // 2: gantrycd.k8s_controller.v1.GetAllsReply.organization_infos:type_name -> gantrycd.k8s_controller.v1.GetOrgReposReply
+	7,  // 3: gantrycd.k8s_controller.v1.Resource.usages:type_name -> gantrycd.k8s_controller.v1.Usage
+	8,  // 4: gantrycd.k8s_controller.v1.GetResourceReply.resources:type_name -> gantrycd.k8s_controller.v1.Resource
+	10, // 5: gantrycd.k8s_controller.v1.CreatePreviewReply.node_ports:type_name -> gantrycd.k8s_controller.v1.NodePort
+	6,  // [6:6] is the sub-list for method output_type
+	6,  // [6:6] is the sub-list for method input_type
+	6,  // [6:6] is the sub-list for extension type_name
+	6,  // [6:6] is the sub-list for extension extendee
+	0,  // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_proto_k8s_controller_response_v1_proto_init() }
@@ -967,6 +1030,18 @@ func file_proto_k8s_controller_response_v1_proto_init() {
 			}
 		}
 		file_proto_k8s_controller_response_v1_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*NodePort); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_k8s_controller_response_v1_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*CreatePreviewReply); i {
 			case 0:
 				return &v.state
@@ -985,7 +1060,7 @@ func file_proto_k8s_controller_response_v1_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_proto_k8s_controller_response_v1_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   11,
+			NumMessages:   12,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

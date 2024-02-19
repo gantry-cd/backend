@@ -16,7 +16,13 @@ func LoadEnv(path ...string) {
 
 	config := &config{}
 
-	if err := env.Parse(&config.Server); err != nil {
+	if err := env.Parse(&config.Bff); err != nil {
+		panic(err)
+	}
+	if err := env.Parse(&config.Controller); err != nil {
+		panic(err)
+	}
+	if err := env.Parse(&config.GitHub); err != nil {
 		panic(err)
 	}
 

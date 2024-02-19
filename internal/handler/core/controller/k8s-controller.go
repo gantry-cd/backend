@@ -3,8 +3,8 @@ package controller
 import (
 	"context"
 	"errors"
-	"fmt"
 	"sort"
+	"strconv"
 	"time"
 
 	coreErr "github.com/gantrycd/backend/internal/error"
@@ -108,21 +108,6 @@ func (c *controller) ApplyDeployment(ctx context.Context, in *v1.CreateDeploymen
 	if err != nil {
 		return nil, err
 	}
-
-	service, err := c.control.CreateNodePortService(ctx, k8sclient.CreateServiceNodePortParams{
-		Namespace:   in.Namespace,
-		ServiceName: in.AppName,
-		TargetPort:  80,
-	}, k8sclient.WithRepositoryLabel(in.Repository),
-		k8sclient.WithPrIDLabel(in.PrNumber),
-		k8sclient.WithEnvirionmentLabel(k8sclient.EnvPreview),
-		k8sclient.WithBaseBranchLabel(branch.Transpile1123(in.Branch)),
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	fmt.Println(service)
 
 	return &v1.CreateDeploymentReply{
 		Name:      dep.Name,
@@ -253,6 +238,7 @@ func (c *controller) CreatePreview(ctx context.Context, in *v1.CreatePreviewRequ
 			Namespace: in.Organization,
 			AppName:   in.Repository,
 			Image:     in.Image,
+			Config:    in.Configs,
 		},
 		k8sclient.WithRepositoryLabel(in.Repository),
 		k8sclient.WithPrIDLabel(in.PullRequestId),
@@ -268,7 +254,7 @@ func (c *controller) CreatePreview(ctx context.Context, in *v1.CreatePreviewRequ
 		k8sclient.CreateServiceNodePortParams{
 			Namespace:   in.Organization,
 			ServiceName: in.Repository,
-			TargetPort:  80,
+			TargetPort:  ToInt32Arr(in.ExposePorts),
 		},
 		k8sclient.WithAppLabel(in.Repository),
 		k8sclient.WithRepositoryLabel(in.Repository),
@@ -280,12 +266,19 @@ func (c *controller) CreatePreview(ctx context.Context, in *v1.CreatePreviewRequ
 	if err != nil {
 		return nil, err
 	}
+	var nodePorts []*v1.NodePort
+	for _, port := range service.Spec.Ports {
+		nodePorts = append(nodePorts, &v1.NodePort{
+			Port:   port.Port,
+			Target: port.NodePort,
+		})
+	}
 
 	return &v1.CreatePreviewReply{
 		Name:      dep.Name,
 		Namespace: dep.Namespace,
 		Version:   dep.ResourceVersion,
-		NodePort:  fmt.Sprintf("%d", service.Spec.Ports[0].NodePort),
+		NodePorts: nodePorts,
 	}, nil
 }
 
@@ -306,21 +299,21 @@ func (c *controller) UpdatePreview(ctx context.Context, in *v1.CreatePreviewRequ
 		return nil, status.Errorf(codes.NotFound, "deployment not found")
 	}
 
-	dep, err = c.control.UpdateDeployment(ctx,
-		k8sclient.UpdateDeploymentParams{
-			Namespace: in.Organization,
-			AppName:   in.Repository,
-			Image:     in.Image,
-		},
-		k8sclient.WithRepositoryLabel(in.Repository),
-		k8sclient.WithPrIDLabel(in.PullRequestId),
-		k8sclient.WithEnvirionmentLabel(k8sclient.EnvPreview),
-		k8sclient.WithBaseBranchLabel(branchName),
-		k8sclient.WithCreatedByLabel(k8sclient.AppIdentifier),
-	)
-	if err != nil {
-		return nil, err
-	}
+	// dep, err = c.control.UpdateDeployment(ctx,
+	// 	k8sclient.UpdateDeploymentParams{
+	// 		Namespace: in.Organization,
+	// 		AppName:   in.Repository,
+	// 		Image:     in.Image,
+	// 	},
+	// 	k8sclient.WithRepositoryLabel(in.Repository),
+	// 	k8sclient.WithPrIDLabel(in.PullRequestId),
+	// 	k8sclient.WithEnvirionmentLabel(k8sclient.EnvPreview),
+	// 	k8sclient.WithBaseBranchLabel(branchName),
+	// 	k8sclient.WithCreatedByLabel(k8sclient.AppIdentifier),
+	// )
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	return &v1.CreatePreviewReply{
 		Name:      dep.Name,
@@ -356,4 +349,13 @@ func (c *controller) DeletePreview(ctx context.Context, in *v1.DeletePreviewRequ
 	}
 
 	return new(emptypb.Empty), nil
+}
+
+func ToInt32Arr(s []string) []int32 {
+	var arr []int32
+	for _, v := range s {
+		i, _ := strconv.Atoi(v)
+		arr = append(arr, int32(i))
+	}
+	return arr
 }
