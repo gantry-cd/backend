@@ -4,14 +4,13 @@ package gantrycd.bff.v1;
 
 import "google/protobuf/empty.proto";
 import "google/api/annotations.proto";
-import "google/protobuf/timestamp.proto";
 // import "validate/validate.Protobuf";
 // import "Protobufc-gen-openapiv2/options/annotations.Protobuf";
 
 option go_package = "github.com/gantrycd/backend/api/proto/bff/v1";
 
 service BffService {
-  rpc GetOrg(google.protobuf.Empty) returns (GetOrgResponse){
+  rpc GetOrg(google.protobuf.Empty) returns (HomeResponse){
     option (google.api.http) = {
       get: "/home"
     };
@@ -24,7 +23,7 @@ service BffService {
 
 }
 
-message GetOrgResponse {
+message HomeResponse {
   repeated OrganizationInfos organizationInfos = 1;
 }
 
@@ -48,5 +47,5 @@ message Apps{
   string name = 1;
   string status = 2;
   string version = 3;
-  google.protobuf.Timestamp age = 4;
+  string age = 4;
 }

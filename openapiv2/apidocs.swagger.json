@@ -23,7 +23,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1GetOrgResponse"
+              "$ref": "#/definitions/v1HomeResponse"
             }
           },
           "default": {
@@ -103,20 +103,7 @@
           "type": "string"
         },
         "age": {
-          "type": "string",
-          "format": "date-time"
-        }
-      }
-    },
-    "v1GetOrgResponse": {
-      "type": "object",
-      "properties": {
-        "organizationInfos": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/v1OrganizationInfos"
-          }
+          "type": "string"
         }
       }
     },
@@ -135,6 +122,18 @@
           "items": {
             "type": "object",
             "$ref": "#/definitions/v1Apps"
+          }
+        }
+      }
+    },
+    "v1HomeResponse": {
+      "type": "object",
+      "properties": {
+        "organizationInfos": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1OrganizationInfos"
           }
         }
       }
