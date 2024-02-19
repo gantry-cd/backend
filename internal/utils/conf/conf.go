@@ -1,7 +1,9 @@
 package conf
 
 import (
+	"log"
 	"reflect"
+	"strconv"
 	"strings"
 
 	"github.com/gantrycd/backend/internal/models"
@@ -51,10 +53,22 @@ func setValue(model *models.PullRequestConfig, prefix, key, value string) error 
 		case "":
 			if configType.Field(i).Tag.Get("conf") == key {
 				if configType.Field(i).Type.Kind() == reflect.Slice {
-					configValue.Elem().Field(i).Set(reflect.Append(configValue.Elem().Field(i), reflect.ValueOf(value)))
-					continue
-				}
+					if configType.Field(i).Type.Elem().Kind() == reflect.Int32 {
+						v, err := strconv.Atoi(value)
+						if err != nil {
+							return err
+						}
 
+						configValue.Elem().Field(i).Set(reflect.Append(configValue.Elem().Field(i), reflect.ValueOf(int32(v))))
+						continue
+					}
+
+					if configType.Field(i).Type.Elem().Kind() == reflect.String {
+						configValue.Elem().Field(i).Set(reflect.Append(configValue.Elem().Field(i), reflect.ValueOf(value)))
+						continue
+					}
+				}
+				log.Println(value)
 				configValue.Elem().Field(i).SetString(value)
 			}
 		case configMapField:
