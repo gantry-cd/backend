@@ -37,6 +37,28 @@
           "BffService"
         ]
       }
+    },
+    "/repository": {
+      "get": {
+        "operationId": "BffService_GetRepositoryApps",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetRepositoryAppsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "BffService"
+        ]
+      }
     }
   },
   "definitions": {
@@ -68,29 +90,78 @@
         }
       }
     },
+    "v1Apps": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "age": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
     "v1GetOrgResponse": {
       "type": "object",
       "properties": {
-        "orgRepository": {
+        "organizationInfos": {
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/v1OrgRepository"
+            "$ref": "#/definitions/v1OrganizationInfos"
           }
         }
       }
     },
-    "v1OrgRepository": {
+    "v1GetRepositoryAppsResponse": {
+      "type": "object",
+      "properties": {
+        "repositories": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Repositories"
+          }
+        },
+        "apps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Apps"
+          }
+        }
+      }
+    },
+    "v1OrganizationInfos": {
       "type": "object",
       "properties": {
         "organization": {
           "type": "string"
         },
-        "repository": {
+        "repositories": {
           "type": "array",
           "items": {
             "type": "string"
           }
+        }
+      }
+    },
+    "v1Repositories": {
+      "type": "object",
+      "properties": {
+        "repository": {
+          "type": "string"
+        },
+        "deployments": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     }
