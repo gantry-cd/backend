@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"sort"
-	"strconv"
 	"time"
 
 	coreErr "github.com/gantrycd/backend/internal/error"
@@ -254,7 +253,7 @@ func (c *controller) CreatePreview(ctx context.Context, in *v1.CreatePreviewRequ
 		k8sclient.CreateServiceNodePortParams{
 			Namespace:   in.Organization,
 			ServiceName: in.Repository,
-			TargetPort:  ToInt32Arr(in.ExposePorts),
+			TargetPort:  in.ExposePorts,
 		},
 		k8sclient.WithAppLabel(in.Repository),
 		k8sclient.WithRepositoryLabel(in.Repository),
@@ -349,13 +348,4 @@ func (c *controller) DeletePreview(ctx context.Context, in *v1.DeletePreviewRequ
 	}
 
 	return new(emptypb.Empty), nil
-}
-
-func ToInt32Arr(s []string) []int32 {
-	var arr []int32
-	for _, v := range s {
-		i, _ := strconv.Atoi(v)
-		arr = append(arr, int32(i))
-	}
-	return arr
 }
