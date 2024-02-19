@@ -1,11 +1,17 @@
 package router
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/gantrycd/backend/internal/handler/application/controller"
+	"github.com/gantrycd/backend/internal/usecases/bff"
+)
 
 func (r *router) page() {
-	r.mux.Handle("GET /", r.middleware.KeyCloakOAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("OK"))
+	bc := controller.NewBff(
+		bff.NewBff(r.controllerConn),
+	)
 
-	})))
+	r.mux.Handle("GET /", r.middleware.KeyCloakOAuth(http.HandlerFunc(bc.Home)))
+
 }
