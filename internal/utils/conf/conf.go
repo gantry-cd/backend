@@ -1,45 +1,68 @@
 package conf
 
 import (
-	"gopkg.in/ini.v1"
+	"reflect"
+	"strings"
+
+	"github.com/gantrycd/backend/internal/models"
 )
 
-func LoadConf(path string) error {
-	cfg, err := ini.Load(path)
-	if err != nil {
-		return err
+const (
+	configMapField = "[config-map]"
+)
+
+// LoadConf は指定されたファイルパスの設定ファイルを読み込み、指定された構造体にマッピングする
+// path: 設定ファイルのパス
+// model: 設定ファイルをマッピングする構造体のポインタ
+// if err := conf.LoadConf("path/to/config.ini", &conf.Config); err != nil { ... }
+func LoadConf(conf string) (*models.PullRequestConfig, error) {
+	var (
+		config models.PullRequestConfig
+		prefix string
+	)
+
+	for _, line := range strings.Split(conf, "\n") {
+		if strings.HasPrefix(line, "#") {
+			continue
+		}
+
+		if strings.HasPrefix(line, configMapField) {
+			prefix = configMapField
+			continue
+		}
+
+		parts := strings.Split(line, "=")
+		if len(parts) != 2 {
+			continue
+		}
+
+		if err := setValue(&config, prefix, parts[0], parts[1]); err != nil {
+			return nil, err
+		}
 	}
+	return &config, nil
+}
 
-	config := new(config)
+func setValue(model *models.PullRequestConfig, prefix, key, value string) error {
+	configType := reflect.TypeOf(*model)
+	configValue := reflect.ValueOf(model)
+	for i := 0; i < configType.NumField(); i++ {
+		switch prefix {
+		case "":
+			if configType.Field(i).Tag.Get("conf") == key {
+				if configType.Field(i).Type.Kind() == reflect.Slice {
+					configValue.Elem().Field(i).Set(reflect.Append(configValue.Elem().Field(i), reflect.ValueOf(value)))
+					continue
+				}
 
-	config.cfg = cfg
-	config.path = path
-
-	if err := cfg.MapTo(config); err != nil {
-		return err
+				configValue.Elem().Field(i).SetString(value)
+			}
+		case configMapField:
+			model.ConfigMaps = append(model.ConfigMaps, models.SetConfigMap(key, value))
+			return nil
+		default:
+			continue
+		}
 	}
-
-	Config = config
-
 	return nil
-}
-
-func (c *config) GetSection(section string) *ini.Section {
-	return c.cfg.Section(section)
-}
-
-func (c *config) GetKey(section, key string) *ini.Key {
-	return c.cfg.Section(section).Key(key)
-}
-
-func (c *config) Update(section, key, value string) error {
-	c.cfg.Section(section).Key(key).SetValue(value)
-	if err := c.cfg.MapTo(c); err != nil {
-		return err
-	}
-	return c.SaveTo()
-}
-
-func (c *config) SaveTo() error {
-	return c.cfg.SaveTo(c.path)
 }

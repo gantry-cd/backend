@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	coreErr "github.com/gantrycd/backend/internal/error"
+	pbv1 "github.com/gantrycd/backend/proto"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -15,6 +16,7 @@ type CreateDeploymentParams struct {
 	Namespace string
 	AppName   string
 	Image     string
+	Config    []*pbv1.Config
 }
 
 func (k *k8sClient) CreateDeployment(ctx context.Context, in CreateDeploymentParams, opts ...Option) (*appsv1.Deployment, error) {
@@ -26,6 +28,15 @@ func (k *k8sClient) CreateDeployment(ctx context.Context, in CreateDeploymentPar
 	k.l.Info("creating deployment", "namespace", in.Namespace, "appName", in.AppName, "image", in.Image, CreatedByLabel, o.labelSelector[CreatedByLabel])
 
 	o.labelSelector[AppLabel] = in.AppName
+
+	var config []corev1.EnvVar
+	for _, c := range in.Config {
+		config = append(config, corev1.EnvVar{
+			Name:  c.GetName(),
+			Value: c.GetValue(),
+		})
+
+	}
 
 	return k.client.AppsV1().Deployments(in.Namespace).Create(ctx, &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
@@ -47,6 +58,7 @@ func (k *k8sClient) CreateDeployment(ctx context.Context, in CreateDeploymentPar
 							Name:            in.AppName,
 							Image:           in.Image,
 							ImagePullPolicy: o.containerOption[in.Image].imagePullPolicy,
+							Env:             config,
 						},
 					},
 				},

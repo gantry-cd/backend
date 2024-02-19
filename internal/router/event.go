@@ -9,9 +9,7 @@ import (
 
 func (r *router) GitHubEvent() {
 	githubHandler := github.New(
-		githubapp.New(
-			r.controllerConn,
-		),
+		githubapp.New(r.controllerConn),
 	)
 	r.mux.Handle("POST /github/app/webhook", http.HandlerFunc(githubHandler.GithubAppsHandler))
 }
