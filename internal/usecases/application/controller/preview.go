@@ -29,6 +29,10 @@ func (ge *githubAppEvents) CreatePreviewEnvironment(ctx context.Context, param C
 		})
 	}
 
+	if param.Config.Replicas == 0 {
+		param.Config.Replicas = 1
+	}
+
 	// デプロイする
 	return ge.customController.CreatePreview(ctx, &v1.CreatePreviewRequest{
 		Organization:  param.Organization,
