@@ -36,7 +36,7 @@ func (ge *githubAppEvents) CreatePreviewEnvironment(ctx context.Context, param C
 		PullRequestId: param.PrNumber,
 		Branch:        param.Branch,
 		Image:         image,
-		Replicas:      "1",
+		Replicas:      param.Config.Replicas,
 		Configs:       configs,
 		ExposePorts:   param.Config.ExposePort,
 	})
