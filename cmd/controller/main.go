@@ -8,9 +8,11 @@ import (
 	"os/signal"
 
 	"github.com/gantrycd/backend/internal/driver/k8s"
-	"github.com/gantrycd/backend/internal/handler/controller"
-	v1 "github.com/gantrycd/backend/proto/k8s-controller"
+	"github.com/gantrycd/backend/internal/handler/core/controller"
+	"github.com/gantrycd/backend/internal/usecases/core/resource"
+	v1 "github.com/gantrycd/backend/proto"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 func main() {
@@ -21,7 +23,13 @@ func main() {
 
 func run() error {
 	path := ".kube/config"
-	client, err := k8s.New(&path).ConnectTyped("")
+	k8sConn := k8s.New(&path)
+	client, err := k8sConn.ConnectTyped("")
+	if err != nil {
+		return err
+	}
+
+	metric, err := k8sConn.ConnectMetrics("")
 	if err != nil {
 		return err
 	}
@@ -37,7 +45,9 @@ func run() error {
 	}
 
 	// TODO: Implement the server
-	v1.RegisterK8SCustomControllerServer(grpcServer, controller.NewCustomController(client))
+	v1.RegisterK8SCustomControllerServer(grpcServer, controller.NewController(client, resource.New(metric)))
+
+	reflection.Register(grpcServer)
 
 	go func() {
 		l.Info("server is running at :8080")

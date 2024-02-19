@@ -1,4 +1,5 @@
 keycloak/data
-.env
+influx/data
+*.env
 bin/
 .kube

@@ -15,25 +15,18 @@ services:
       - ./keycloak/data:/opt/keycloak/data
     command:
       - start-dev
-    networks:
-      - gantry-dev-networks
   
-  webhook-service:
-    build: cmd/webhook-service/
-    container_name: webhook-service
-    tty: true
-    stdin_open: true
+  influxdb:
+    build: influx/
+    container_name: influx
+    volumes:
+      - ./influx/data:/var/lib/influxdb2
+      - ./influx/config:/etc/influxdb2
     ports:
-      - "8081:8081"
+      - 8086:8086
     environment:
-      - PORT=8081
-      - HOST=0.0.0.0
-    networks:
-      - gantry-dev-networks
-    depends_on:
-      - keycloak
-
-networks:
-  gantry-dev-networks:
-    external:
-      true
+    - DOCKER_INFLUXDB_INIT_MODE=setup
+    - DOCKER_INFLUXDB_INIT_USERNAME=admin
+    - DOCKER_INFLUXDB_INIT_PASSWORD=password
+    - DOCKER_INFLUXDB_INIT_ORG=organization
+    - DOCKER_INFLUXDB_INIT_BUCKET=bucket
