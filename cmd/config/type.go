@@ -1,17 +1,22 @@
 package config
 
-import "time"
-
 // config はアプリケーションの設定を表す構造体です。基本的には環境変数から読み込みます。
 type config struct {
-	Server struct {
-		Host            string        `env:"HOST" envDefault:"localhost"`
-		Port            int           `env:"PORT" envDefault:"8080"`
-		ShutdownTimeout time.Duration `env:"SHUTDOWN_TIMEOUT" envDefault:"10s"`
+	Bff struct {
+		Host              string `env:"BFF_HOST" envDefault:"0.0.0.0"`
+		Port              int    `env:"BFF_PORT" envDefault:"8080"`
+		K8SControllerAddr string `env:"K8S_CONTROLLER_ADDR" envDefault:"localhost:8081"`
 	}
 
-	Application struct {
-		Name string `env:"APP_NAME" envDefault:"gantry"`
+	Controller struct {
+		Host string `env:"CONTROLLER_HOST" envDefault:"0.0.0.0"`
+		Port int    `env:"CONTROLLER_PORT" envDefault:"8081"`
+	}
+
+	GitHub struct {
+		AppID     int64  `env:"GITHUB_APP_ID" envDefault:"0"`
+		InstallID int64  `env:"GITHUB_INSTALL_ID" envDefault:"0"`
+		CrtPath   string `env:"GITHUB_CRT_PATH" envDefault:""`
 	}
 
 	KeyCloak struct {

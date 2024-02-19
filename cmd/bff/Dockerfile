@@ -10,5 +10,7 @@ RUN apk --no-cache add ca-certificates
 WORKDIR /app
 
 COPY --from=builder /build/bff /app/bff
+COPY --from=builder /build/.env /app/.env
+COPY --from=builder /build/.crt /app/.crt
 
 CMD ["./bff"]

@@ -1,0 +1,66 @@
+// ライセンスはいつか書いておく
+
+syntax = "proto3";
+
+package gantrycd.k8s_controller.v1;
+
+option go_package = "github.com/gantrycd/backend/api/proto/pb/k8s-controller/v1";
+
+message CreateNamespaceRequest {
+  string name = 1;
+}
+
+
+message DeleteNamespaceRequest {
+  string name = 1;
+}
+
+message CreateDeploymentRequest {
+  string namespace = 1;
+  string repository = 2;
+  string pr_number = 3;
+  string image = 4;
+  string branch = 5;
+  string app_name = 6;
+  string replicas = 7;
+  string created_by = 8;
+}
+
+message DeleteDeploymentRequest {
+  string namespace = 1;
+  string repository = 2;
+  string pr_number = 3;
+}
+
+message GetOrgRepoRequest {
+  string organization = 1;
+}
+
+message GetResourceRequest {
+  string organization = 1;
+  string repository = 2;
+};
+
+message DeletePreviewRequest {
+  string organization = 1;
+  string repository = 2;
+  string pull_request_id = 3;
+  string branch = 4;
+};
+
+message Config {
+  string name = 1;
+  string value = 2;
+}
+
+message CreatePreviewRequest {
+  string organization = 1;
+  string repository = 2;
+  string pull_request_id = 3;
+  string branch = 4; 
+  string image = 5;
+  string image_pull_policy = 6;
+  string replicas = 7;
+  repeated Config configs = 8;
+  repeated string expose_ports = 9;
+};

@@ -1,0 +1,35 @@
+// ライセンスはいつか書いておく
+
+syntax = "proto3";
+
+package gantrycd.k8s_controller.v1;
+
+import "google/protobuf/empty.proto";
+import "proto/k8s_controller_request_v1.proto";
+import "proto/k8s_controller_response_v1.proto";
+
+option go_package = "github.com/gantrycd/backend/api/proto/pb/k8s-controller/v1";
+
+service K8sCustomController {
+  // Namespace Control
+  rpc CreateNamespace(CreateNamespaceRequest) returns(CreateNamespaceReply);
+  rpc ListNamespaces(google.protobuf.Empty) returns(ListNamespacesReply);
+  rpc DeleteNamespace(DeleteNamespaceRequest) returns(google.protobuf.Empty);
+
+  // Deployment Control
+  rpc ApplyDeployment(CreateDeploymentRequest) returns(CreateDeploymentReply);
+  rpc DeleteDeployment(DeleteDeploymentRequest) returns(google.protobuf.Empty);
+
+
+
+  // Resource Control
+  rpc GetAlls(google.protobuf.Empty) returns(GetAllsReply);
+  rpc GetOrgRepos(GetOrgRepoRequest) returns(GetOrgReposReply);
+
+  rpc CreatePreview(CreatePreviewRequest) returns(CreatePreviewReply);
+  rpc UpdatePreview(CreatePreviewRequest) returns(CreatePreviewReply);
+  rpc DeletePreview(DeletePreviewRequest) returns(google.protobuf.Empty);
+  
+
+  rpc GetResource(GetResourceRequest) returns (GetResourceReply);
+}

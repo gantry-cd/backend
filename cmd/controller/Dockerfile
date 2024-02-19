@@ -10,6 +10,7 @@ RUN apk --no-cache add ca-certificates
 WORKDIR /app
 
 COPY --from=builder /build/controller /app/controller
-COPY --from=builder /build/.kube/ /app/.kube/
+COPY --from=builder /build/.kube /app/.kube
+COPY --from=builder /build/.env /app/.env
 
 CMD ["./controller"]

@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/gantrycd/backend/internal/models"
 	v1 "github.com/gantrycd/backend/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -25,7 +26,7 @@ type GithubAppEvents interface {
 	ListNameSpace(ctx context.Context, prefix string) ([]string, error)
 	DeleteNameSpace(ctx context.Context, name string) error
 
-	CreatePreviewEnvironment(ctx context.Context, param CreatePreviewEnvironmentPrarams) error
+	CreatePreviewEnvironment(ctx context.Context, param CreatePreviewEnvironmentPrarams) (*v1.CreatePreviewReply, error)
 	DeletePreviewEnvironment(ctx context.Context, param DeletePreviewEnvironmentParams) error
 }
 
@@ -102,22 +103,33 @@ type CreatePreviewEnvironmentPrarams struct {
 	Repository   string
 	PrNumber     string
 	Branch       string
+
+	Config models.PullRequestConfig
 }
 
-func (ge *githubAppEvents) CreatePreviewEnvironment(ctx context.Context, param CreatePreviewEnvironmentPrarams) error {
+func (ge *githubAppEvents) CreatePreviewEnvironment(ctx context.Context, param CreatePreviewEnvironmentPrarams) (*v1.CreatePreviewReply, error) {
 	// TODO: image buildする
 	image := "nginx:1.16"
+
+	var configs []*v1.Config
+	for _, c := range param.Config.ConfigMaps {
+		configs = append(configs, &v1.Config{
+			Name:  c.Name,
+			Value: c.Value,
+		})
+	}
+
 	// デプロイする
-	_, err := ge.customController.CreatePreview(ctx, &v1.CreatePreviewRequest{
+	return ge.customController.CreatePreview(ctx, &v1.CreatePreviewRequest{
 		Organization:  param.Organization,
 		Repository:    param.Repository,
 		PullRequestId: param.PrNumber,
 		Branch:        param.Branch,
 		Image:         image,
 		Replicas:      "1",
+		Configs:       configs,
+		ExposePorts:   param.Config.ExposePort,
 	})
-
-	return err
 }
 
 type DeletePreviewEnvironmentParams struct {

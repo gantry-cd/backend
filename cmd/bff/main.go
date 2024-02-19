@@ -4,11 +4,20 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/gantrycd/backend/cmd/config"
 	"github.com/gantrycd/backend/internal/driver/pbclient"
 	"github.com/gantrycd/backend/internal/router"
 	"github.com/gantrycd/backend/internal/server/http"
 	v1 "github.com/gantrycd/backend/proto"
 )
+
+func init() {
+	config.LoadEnv(
+		".env/keycloak.env",
+		".env/bff.env",
+		".env/github.env",
+	)
+}
 
 func main() {
 	if err := run(); err != nil {
@@ -17,7 +26,7 @@ func main() {
 }
 
 func run() error {
-	controllerPbc := pbclient.NewConn(os.Getenv("K8S_CONTROLLER_ADDR"))
+	controllerPbc := pbclient.NewConn(config.Config.Bff.K8SControllerAddr)
 
 	if err := controllerPbc.Connect(); err != nil {
 		return fmt.Errorf("failed to connect to k8s controller: %w", err)
@@ -30,8 +39,8 @@ func run() error {
 
 	server := http.New(
 		handler,
-		http.WithPort(os.Getenv("PORT")),
-		http.WithHost(os.Getenv("HOST")),
+		http.WithPort(fmt.Sprintf("%d", config.Config.Bff.Port)),
+		http.WithHost(config.Config.Bff.Host),
 		http.WithShutdownTimeout(10),
 	)
 
