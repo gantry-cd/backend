@@ -1,4 +1,4 @@
-package githubapp
+package controller
 
 import (
 	"context"
@@ -7,7 +7,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/gantrycd/backend/internal/models"
 	v1 "github.com/gantrycd/backend/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -26,7 +25,7 @@ type GithubAppEvents interface {
 	ListNameSpace(ctx context.Context, prefix string) ([]string, error)
 	DeleteNameSpace(ctx context.Context, name string) error
 
-	CreatePreviewEnvironment(ctx context.Context, param CreatePreviewEnvironmentPrarams) (*v1.CreatePreviewReply, error)
+	CreatePreviewEnvironment(ctx context.Context, param CreatePreviewEnvironmentParams) error
 	DeletePreviewEnvironment(ctx context.Context, param DeletePreviewEnvironmentParams) error
 }
 
@@ -41,10 +40,13 @@ func WithLogger(l *slog.Logger) Option {
 }
 
 // New は新しいGithubAppのインタラクターを作成します。
-func New(customController v1.K8SCustomControllerClient, opts ...Option) GithubAppEvents {
+func New(
+	customController v1.K8SCustomControllerClient,
+	opts ...Option,
+) GithubAppEvents {
 	ge := &githubAppEvents{
-		customController: customController,
 		l:                slog.New(slog.NewTextHandler(os.Stderr, nil)).WithGroup("app-interactor"),
+		customController: customController,
 	}
 
 	for _, opt := range opts {
@@ -93,58 +95,6 @@ func (ge *githubAppEvents) DeleteNameSpace(ctx context.Context, name string) err
 	ge.l.Info(fmt.Sprintf("deleting namespace: %s", name))
 	_, err := ge.customController.DeleteNamespace(ctx, &v1.DeleteNamespaceRequest{
 		Name: name,
-	})
-
-	return err
-}
-
-type CreatePreviewEnvironmentPrarams struct {
-	Organization string
-	Repository   string
-	PrNumber     string
-	Branch       string
-
-	Config models.PullRequestConfig
-}
-
-func (ge *githubAppEvents) CreatePreviewEnvironment(ctx context.Context, param CreatePreviewEnvironmentPrarams) (*v1.CreatePreviewReply, error) {
-	// TODO: image buildする
-	image := "nginx:1.16"
-
-	var configs []*v1.Config
-	for _, c := range param.Config.ConfigMaps {
-		configs = append(configs, &v1.Config{
-			Name:  c.Name,
-			Value: c.Value,
-		})
-	}
-
-	// デプロイする
-	return ge.customController.CreatePreview(ctx, &v1.CreatePreviewRequest{
-		Organization:  param.Organization,
-		Repository:    param.Repository,
-		PullRequestId: param.PrNumber,
-		Branch:        param.Branch,
-		Image:         image,
-		Replicas:      "1",
-		Configs:       configs,
-		ExposePorts:   param.Config.ExposePort,
-	})
-}
-
-type DeletePreviewEnvironmentParams struct {
-	Organization string
-	Repository   string
-	PrNumber     string
-	Branch       string
-}
-
-func (ge *githubAppEvents) DeletePreviewEnvironment(ctx context.Context, param DeletePreviewEnvironmentParams) error {
-	_, err := ge.customController.DeletePreview(ctx, &v1.DeletePreviewRequest{
-		Organization:  param.Organization,
-		Repository:    param.Repository,
-		PullRequestId: param.PrNumber,
-		Branch:        param.Branch,
 	})
 
 	return err

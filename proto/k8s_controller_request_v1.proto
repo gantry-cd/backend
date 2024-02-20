@@ -60,7 +60,7 @@ message CreatePreviewRequest {
   string branch = 4; 
   string image = 5;
   string image_pull_policy = 6;
-  string replicas = 7;
+  int32 replicas = 7;
   repeated Config configs = 8;
-  repeated string expose_ports = 9;
+  repeated int32 expose_ports = 9;
 };
