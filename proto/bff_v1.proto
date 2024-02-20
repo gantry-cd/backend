@@ -10,19 +10,47 @@ import "google/api/annotations.proto";
 option go_package = "github.com/gantrycd/backend/api/proto/bff/v1";
 
 service BffService {
-  rpc GetOrg(google.protobuf.Empty) returns (GetOrgResponse){
+  rpc GetOrg(google.protobuf.Empty) returns (HomeResponse){
     option (google.api.http) = {
-      get: "/home"
+      get: "/organization"
+    };
+  }
+  rpc GetRepositoryApps(GetRepositoryAppsRequest) returns (GetRepositoryAppsResponse){
+    option (google.api.http) = {
+      get: "/organization/{organization}/repository"
     };
   }
 
 }
 
-message GetOrgResponse {
-  repeated OrgRepository orgRepository = 1;
+message HomeResponse {
+  repeated OrganizationInfos organizationInfos = 1;
 }
 
-message OrgRepository{
+message OrganizationInfos{
   string organization  = 1;
-  repeated string repository  = 2;
+  repeated string repositories  = 2;
+}
+
+
+
+message GetRepositoryAppsRequest{
+  string organization = 1;
+}
+
+message GetRepositoryAppsResponse{
+  repeated Repositories repositories = 1;
+  repeated Apps apps = 2;
+}
+
+message Repositories{
+  string repository  = 1;
+  int32  deployments = 2;
+}
+
+message Apps{
+  string name = 1;
+  string status = 2;
+  string version = 3;
+  string age = 4;
 }

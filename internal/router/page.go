@@ -13,10 +13,11 @@ func (r *router) page() {
 		bff.NewBff(r.controllerConn),
 	)
 
-	r.mux.Handle("GET /home",
+	r.mux.Handle("GET /organization",
 		middleware.BuildChain(
 			r.middleware.Integrate(
 				http.HandlerFunc(bc.Home),
 			),
 		))
+	r.mux.Handle("GET /organization/{organization}/repository", (http.HandlerFunc(bc.RepositoryApps)))
 }
