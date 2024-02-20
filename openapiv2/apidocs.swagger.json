@@ -16,7 +16,7 @@
     "application/json"
   ],
   "paths": {
-    "/home": {
+    "/organization": {
       "get": {
         "operationId": "BffService_GetOrg",
         "responses": {
@@ -38,7 +38,7 @@
         ]
       }
     },
-    "/repository": {
+    "/organization/{organization}/repository": {
       "get": {
         "operationId": "BffService_GetRepositoryApps",
         "responses": {
@@ -55,6 +55,14 @@
             }
           }
         },
+        "parameters": [
+          {
+            "name": "organization",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
         "tags": [
           "BffService"
         ]

@@ -12,12 +12,12 @@ option go_package = "github.com/gantrycd/backend/api/proto/bff/v1";
 service BffService {
   rpc GetOrg(google.protobuf.Empty) returns (HomeResponse){
     option (google.api.http) = {
-      get: "/home"
+      get: "/organization"
     };
   }
-  rpc GetRepositoryApps(google.protobuf.Empty) returns (GetRepositoryAppsResponse){
+  rpc GetRepositoryApps(GetRepositoryAppsRequest) returns (GetRepositoryAppsResponse){
     option (google.api.http) = {
-      get: "/repository"
+      get: "/organization/{organization}/repository"
     };
   }
 
@@ -32,6 +32,11 @@ message OrganizationInfos{
   repeated string repositories  = 2;
 }
 
+
+
+message GetRepositoryAppsRequest{
+  string organization = 1;
+}
 
 message GetRepositoryAppsResponse{
   repeated Repositories repositories = 1;
