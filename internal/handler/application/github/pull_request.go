@@ -61,14 +61,19 @@ func (ge *handler) pullRequestOpened(client *github.Client, e *github.PullReques
 	}
 
 	ghClient, err := ghconn.GitHubConnection(
-		*e.Installation.AppID,
+		config.Config.GitHub.AppID,
 		*e.Installation.ID,
 		config.Config.GitHub.CrtPath,
 	)
+	log.Println(config.Config.GitHub.AppID,
+		*e.Installation.ID,
+		config.Config.GitHub.CrtPath)
 	if err != nil {
 		ge.l.Error("error parsing config", "error", err.Error())
 		return err
 	}
+
+	log.Println(c)
 
 	return ge.interactor.CreatePreviewEnvironment(context.Background(), controller.CreatePreviewEnvironmentParams{
 		Organization: *e.Organization.Login,

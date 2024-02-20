@@ -6,6 +6,8 @@ type config struct {
 		Host              string `env:"BFF_HOST" envDefault:"0.0.0.0"`
 		Port              int    `env:"BFF_PORT" envDefault:"8080"`
 		K8SControllerAddr string `env:"K8S_CONTROLLER_ADDR" envDefault:"localhost:8081"`
+		Environment       string `env:"ENVIRONMENTS" envDefault:"local"`
+		AllowOrigins      string `env:"ALLOW_ORIGINS" envDefault:"http://localhost:3000"`
 	}
 
 	Controller struct {

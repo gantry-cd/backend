@@ -27,25 +27,14 @@ func (ge *githubAppEvents) CreatePreviewEnvironment(ctx context.Context, param C
 		Repository:   param.Repository,
 		Number:       param.PrNumber,
 	}
-	comment, _, err := param.GhClient.CreatePullRequestComment(ctx, meta, fmt.Sprintf("[%v]Creating preview environment for %s 🚀 ...\n Building Docker image at %s", time.Now().Format(time.DateTime), param.Branch, param.Config.BuildFilePath))
-	if err != nil {
-		return err
-	}
 
 	// TODO: image buildする
 	image := "nginx:1.16"
-
-	comment, _, err = param.GhClient.EditPullRequestComment(ctx, meta, github.EditPullRequestComment{
-		CommentID: comment.GetID(),
-		Comment:   fmt.Sprintf("%s\n[%v] ✔️Docker image built at %s\n Creating deployment and service... ", comment.GetBody(), time.Now().Format(time.DateTime), image),
-	})
-	if err != nil {
-		_, _, err := param.GhClient.EditPullRequestComment(ctx, meta, github.EditPullRequestComment{
-			CommentID: comment.GetID(),
-			Comment:   fmt.Sprintf("%s\n[%v] ❌Failed to build Docker image: %v", comment.GetBody(), time.Now().Format(time.DateTime), err),
-		})
-		return err
-	}
+	time.Sleep(5 * time.Second)
+	// if err != nil {
+	// 	_, _, err := param.GhClient.CreateReview(ctx, meta, fmt.Sprintf("%s\n[%v] ❌Failed to build Docker image: %v", comment.GetBody(), time.Now().Format(time.DateTime), err))
+	// 	return err
+	// }
 
 	var configs []*v1.Config
 	for _, c := range param.Config.ConfigMaps {
@@ -72,10 +61,7 @@ func (ge *githubAppEvents) CreatePreviewEnvironment(ctx context.Context, param C
 	})
 
 	if err != nil {
-		_, _, err = param.GhClient.EditPullRequestComment(ctx, meta, github.EditPullRequestComment{
-			CommentID: comment.GetID(),
-			Comment:   fmt.Sprintf("%s\n[%v] ❌Failed to create deployment and service: %v", comment.GetBody(), time.Now().Format(time.DateTime), err),
-		})
+		_, _, err = param.GhClient.CreateReview(ctx, meta, fmt.Sprintf("[%v] ❌Failed to create deployment and service: %v", time.Now().Format(time.DateTime), err))
 		return err
 	}
 
@@ -84,10 +70,7 @@ func (ge *githubAppEvents) CreatePreviewEnvironment(ctx context.Context, param C
 		ports += fmt.Sprintf("%d:%d ", p.Port, p.Target)
 	}
 
-	_, _, err = param.GhClient.EditPullRequestComment(ctx, meta, github.EditPullRequestComment{
-		CommentID: comment.GetID(),
-		Comment:   fmt.Sprintf("%s\n[%v] ✔️Deployment and service created\n Exposing service on port %s ", comment.GetBody(), time.Now().Format(time.DateTime), ports),
-	})
+	_, _, err = param.GhClient.CreateReview(ctx, meta, fmt.Sprintf("[%v] ✔️Deployment and service created\n Exposing service on port %s ", time.Now().Format(time.DateTime), ports))
 	if err != nil {
 		return err
 	}

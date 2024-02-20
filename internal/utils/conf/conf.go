@@ -77,21 +77,21 @@ func set(confType reflect.StructField, confValue reflect.Value, value string) er
 		confValue.SetString(value)
 
 	case reflect.Int:
-		v, err := strconv.Atoi(value)
+		v, err := strconv.Atoi(strings.ReplaceAll(value, " ", ""))
 		if err != nil {
 			return err
 		}
 		confValue.SetInt(int64(v))
 
 	case reflect.Int32:
-		v, err := strconv.Atoi(value)
+		v, err := strconv.Atoi(strings.ReplaceAll(value, " ", ""))
 		if err != nil {
 			return err
 		}
 		confValue.SetInt(int64(v))
 
 	case reflect.Int64:
-		v, err := strconv.Atoi(value)
+		v, err := strconv.Atoi(strings.ReplaceAll(value, " ", ""))
 		if err != nil {
 			return err
 		}
@@ -103,21 +103,21 @@ func set(confType reflect.StructField, confValue reflect.Value, value string) er
 			confValue.Set(reflect.Append(confValue, reflect.ValueOf(value)))
 
 		case reflect.Int:
-			v, err := strconv.Atoi(value)
+			v, err := strconv.Atoi(strings.ReplaceAll(value, " ", ""))
 			if err != nil {
 				return err
 			}
 			confValue.Set(reflect.Append(confValue, reflect.ValueOf(v)))
 
 		case reflect.Int32:
-			v, err := strconv.Atoi(value)
+			v, err := strconv.Atoi(strings.ReplaceAll(value, " ", ""))
 			if err != nil {
 				return err
 			}
 			confValue.Set(reflect.Append(confValue, reflect.ValueOf(int32(v))))
 
 		case reflect.Int64:
-			v, err := strconv.Atoi(value)
+			v, err := strconv.Atoi(strings.ReplaceAll(value, " ", ""))
 			if err != nil {
 				return err
 			}
