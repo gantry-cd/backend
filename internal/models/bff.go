@@ -9,6 +9,10 @@ type OrganizationInfos struct {
 	Repositories []string `json:"repositories"`
 }
 
+type GetRepositoryAppsRequest struct {
+	Organization string `json:"organization"`
+}
+
 type GetRepositoryAppsResponse struct {
 	Repositories []Repositories `json:"repositories"`
 	Apps         []Apps         `json:"apps"`
