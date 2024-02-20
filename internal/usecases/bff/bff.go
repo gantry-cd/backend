@@ -81,6 +81,9 @@ func (b *bffInteractor) GetRepositoryApps(ctx context.Context, w http.ResponseWr
 			Deployment: int32(repoCount[repoName]),
 		})
 	}
+	for _, resRepo := range resRepos {
+		print(resRepo.Repository, resRepo.Deployment)
+	}
 	for _, app := range apps {
 		resApps = append(resApps, models.Apps{
 			Name:    app.Name,
@@ -88,10 +91,9 @@ func (b *bffInteractor) GetRepositoryApps(ctx context.Context, w http.ResponseWr
 			Version: app.Version,
 			Age:     app.Age,
 		})
-
-		if err := json.NewEncoder(w).Encode(models.GetRepositoryAppsResponse{Repositories: resRepos, Apps: resApps}); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
+	}
+	if err := json.NewEncoder(w).Encode(models.GetRepositoryAppsResponse{Repositories: resRepos, Apps: resApps}); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 	return nil
 }
