@@ -19,6 +19,7 @@ import (
 func init() {
 	config.LoadEnv(
 		".env/controller.env",
+		".env/harbor.env",
 	)
 }
 

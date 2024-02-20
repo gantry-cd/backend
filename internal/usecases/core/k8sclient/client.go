@@ -32,6 +32,9 @@ type K8SClient interface {
 	// service
 	CreateNodePortService(ctx context.Context, param CreateServiceNodePortParams, opts ...Option) (*corev1.Service, error)
 	DeleteService(ctx context.Context, namespace string, opts ...Option) error
+
+	// builder
+	Builder(ctx context.Context, param BuilderParams, opts ...Option) error
 }
 
 func New(client *kubernetes.Clientset) K8SClient {

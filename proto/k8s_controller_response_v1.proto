@@ -77,9 +77,12 @@ message CreatePreviewReply {
 }
 
 message BuildImageRequest {
-  string git_repo = 1;
-  string image_name = 2;
-  string registry_host = 3;
-  string registry_username = 4;
-  string registry_password = 5;
+  string namespace = 1;
+  string repository = 2;
+  string branch = 3;
+  string pull_request_id = 4;
+  string git_repo = 5;
+  string dockerfile_dir = 6;
+  string dockerfile_path = 7;
+  string image_name = 8;
 }
