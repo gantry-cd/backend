@@ -12,7 +12,7 @@ import (
 type CreateServiceNodePortParams struct {
 	Namespace   string
 	ServiceName string
-	TargetPort  int32
+	TargetPort  []int32
 }
 
 func (k *k8sClient) CreateNodePortService(ctx context.Context, param CreateServiceNodePortParams, opts ...Option) (*corev1.Service, error) {
@@ -21,17 +21,25 @@ func (k *k8sClient) CreateNodePortService(ctx context.Context, param CreateServi
 		opt(o)
 	}
 
+	var expose []corev1.ServicePort
+	for _, port := range param.TargetPort {
+		if port == 0 {
+			continue
+		}
+		// rand, _ := random.RandomString(10)
+		expose = append(expose, corev1.ServicePort{
+			Port: port,
+		})
+
+	}
+
 	return k.client.CoreV1().Services(param.Namespace).Create(ctx, &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			GenerateName: fmt.Sprintf("%s-", param.ServiceName),
 			Labels:       o.labelSelector,
 		},
 		Spec: corev1.ServiceSpec{
-			Ports: []corev1.ServicePort{
-				{
-					Port: param.TargetPort,
-				},
-			},
+			Ports:    expose,
 			Selector: o.labelSelector,
 			Type:     corev1.ServiceTypeNodePort,
 		},

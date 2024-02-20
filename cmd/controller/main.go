@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/signal"
 
+	"github.com/gantrycd/backend/cmd/config"
 	"github.com/gantrycd/backend/internal/driver/k8s"
 	"github.com/gantrycd/backend/internal/handler/core/controller"
 	"github.com/gantrycd/backend/internal/usecases/core/resource"
@@ -14,6 +15,12 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
+
+func init() {
+	config.LoadEnv(
+		".env/controller.env",
+	)
+}
 
 func main() {
 	if err := run(); err != nil {
@@ -39,7 +46,7 @@ func run() error {
 	grpcServer := grpc.NewServer()
 	defer grpcServer.Stop()
 
-	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%s", os.Getenv("HOST"), os.Getenv("PORT")))
+	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%d", config.Config.Controller.Host, config.Config.Controller.Port))
 	if err != nil {
 		return err
 	}
@@ -50,7 +57,7 @@ func run() error {
 	reflection.Register(grpcServer)
 
 	go func() {
-		l.Info("server is running at :8080")
+		l.Info(fmt.Sprintf("server is running at %s", fmt.Sprintf("%s:%d", config.Config.Controller.Host, config.Config.Controller.Port)))
 		if err := grpcServer.Serve(listener); err != nil {
 			l.Error("failed to serve", "error", err)
 		}

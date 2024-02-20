@@ -6,14 +6,14 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/gantrycd/backend/internal/usecases/application/githubapp"
+	"github.com/gantrycd/backend/internal/usecases/application/controller"
 	"github.com/google/go-github/v29/github"
 )
 
 type handler struct {
 	l *slog.Logger
 
-	interactor githubapp.GithubAppEvents
+	interactor controller.GithubAppEvents
 }
 
 // Option はサーバーのオプションを設定するための関数です。
@@ -27,7 +27,7 @@ func WithLogger(l *slog.Logger) Option {
 }
 
 // New は新しいWebhookのハンドラーを作成します。
-func New(interactor githubapp.GithubAppEvents, opts ...Option) *handler {
+func New(interactor controller.GithubAppEvents, opts ...Option) *handler {
 	handler := &handler{
 		l:          slog.New(slog.NewTextHandler(os.Stderr, nil)).WithGroup("handler"),
 		interactor: interactor,

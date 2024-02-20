@@ -13,6 +13,9 @@ func (r *router) Usage() {
 		resource.New(r.controllerConn),
 	)
 
-	r.mux.Handle("/usage", middleware.BuildChain(http.HandlerFunc(uc.Usage)))
-	r.mux.Handle("/", http.FileServer(http.Dir("./static")))
+	r.mux.Handle("/usage", middleware.BuildChain(
+		r.middleware.Integrate(
+			http.HandlerFunc(uc.Usage),
+		),
+	))
 }
