@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -16,7 +15,6 @@ var (
 	keycloakRealm        = "test"
 	keycloakClientID     = "test-client"
 	keycloakClientSecret = "LntMHtmL5Ef2KXtIy0u1TNG8AJBgRVW0"
-	keycloakRequestURL   = fmt.Sprintf("%s/realms/%s/protocol/openid-connect/token/introspect", keycloakDomain, keycloakRealm)
 )
 
 const (
