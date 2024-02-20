@@ -19,5 +19,4 @@ func (r *router) page() {
 				http.HandlerFunc(bc.Home),
 			),
 		))
-
 }
