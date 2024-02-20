@@ -16,9 +16,6 @@ import (
 )
 
 func (ge *handler) PullRequest(e *github.PullRequestEvent) error {
-	ge.l.Info(fmt.Sprintf("pull request event received: %v", e))
-	ctx := context.Background()
-
 	client, err := ghconn.GitHubConnection(
 		config.Config.GitHub.AppID,
 		*e.Installation.ID,
@@ -38,14 +35,12 @@ func (ge *handler) PullRequest(e *github.PullRequestEvent) error {
 
 	case "closed":
 		ge.l.Info(fmt.Sprintf("pull request closed: %v", e))
-		if err := ge.interactor.DeletePreviewEnvironment(ctx, controller.DeletePreviewEnvironmentParams{
-			Organization: *e.Organization.Login,
-			Repository:   *e.Repo.Name,
-			PrNumber:     fmt.Sprintf("%d", *e.Number),
-			Branch:       *e.PullRequest.Head.Ref,
-		}); err != nil {
+		if err := ge.pullRequestClosed(client, e); err != nil {
 			ge.l.Error("error deleting preview environment", "error", err.Error())
 		}
+	case "synchronize":
+		ge.l.Info(fmt.Sprintf("pull request synchronize: %v", e))
+
 	default:
 		ge.l.Info(fmt.Sprintf("pull request event action not supported: %v", *e.Action))
 	}
@@ -65,15 +60,10 @@ func (ge *handler) pullRequestOpened(client *github.Client, e *github.PullReques
 		*e.Installation.ID,
 		config.Config.GitHub.CrtPath,
 	)
-	log.Println(config.Config.GitHub.AppID,
-		*e.Installation.ID,
-		config.Config.GitHub.CrtPath)
 	if err != nil {
 		ge.l.Error("error parsing config", "error", err.Error())
 		return err
 	}
-
-	log.Println(c)
 
 	return ge.interactor.CreatePreviewEnvironment(context.Background(), controller.CreatePreviewEnvironmentParams{
 		Organization: *e.Organization.Login,
@@ -83,6 +73,19 @@ func (ge *handler) pullRequestOpened(client *github.Client, e *github.PullReques
 		Config:       *c,
 		GhClient:     ghInteractor.New(ghClient),
 	})
+}
+
+func (ge *handler) pullRequestClosed(client *github.Client, e *github.PullRequestEvent) error {
+	return ge.interactor.DeletePreviewEnvironment(context.Background(), controller.DeletePreviewEnvironmentParams{
+		Organization: *e.Organization.Login,
+		Repository:   *e.Repo.Name,
+		PrNumber:     fmt.Sprintf("%d", *e.Number),
+		Branch:       *e.PullRequest.Head.Ref,
+	})
+}
+
+func (ge *handler) pullRequestSynchronize(client *github.Client, e *github.PullRequestEvent) error {
+	return ge.interactor.UpdatePreviewEnvironment(context.Background(), controller.UpdatePreviewEnvironmentParams{})
 }
 
 const (

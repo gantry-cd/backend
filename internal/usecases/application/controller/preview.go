@@ -95,3 +95,48 @@ func (ge *githubAppEvents) DeletePreviewEnvironment(ctx context.Context, param D
 
 	return err
 }
+
+type UpdatePreviewEnvironmentParams struct {
+	Organization string
+	Repository   string
+	PrNumber     int
+	Branch       string
+	GhClient     github.GitHubClientInteractor
+}
+
+func (ge *githubAppEvents) UpdatePreviewEnvironment(ctx context.Context, param UpdatePreviewEnvironmentParams) error {
+	meta := github.MetaData{
+		Organization: param.Organization,
+		Repository:   param.Repository,
+		Number:       param.PrNumber,
+	}
+
+	// TODO: image buildする
+	image := "nginx:1.16"
+	time.Sleep(5 * time.Second)
+	// if err != nil {
+	// 	_, _, err := param.GhClient.CreateReview(ctx, meta, fmt.Sprintf("%s\n[%v] ❌Failed to build Docker image: %v", comment.GetBody(), time.Now().Format(time.DateTime), err))
+	// 	return err
+	// }
+
+	// デプロイする
+	_, err := ge.customController.UpdatePreview(ctx, &v1.CreatePreviewRequest{
+		Organization:  param.Organization,
+		Repository:    param.Repository,
+		PullRequestId: fmt.Sprintf("%d", param.PrNumber),
+		Branch:        param.Branch,
+		Image:         image,
+	})
+
+	if err != nil {
+		_, _, err = param.GhClient.CreateReview(ctx, meta, fmt.Sprintf("[%v] ❌Failed to create deployment and service: %v", time.Now().Format(time.DateTime), err))
+		return err
+	}
+
+	_, _, err = param.GhClient.CreateReview(ctx, meta, fmt.Sprintf("[%v] Deployments Updated!  :)", time.Now().Format(time.DateTime)))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

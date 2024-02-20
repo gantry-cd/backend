@@ -27,6 +27,7 @@ type GithubAppEvents interface {
 
 	CreatePreviewEnvironment(ctx context.Context, param CreatePreviewEnvironmentParams) error
 	DeletePreviewEnvironment(ctx context.Context, param DeletePreviewEnvironmentParams) error
+	UpdatePreviewEnvironment(ctx context.Context, param UpdatePreviewEnvironmentParams) error
 }
 
 // Option はサーバーのオプションを設定するための関数です。
