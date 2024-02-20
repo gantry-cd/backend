@@ -11,8 +11,7 @@ type gitHubClientInteractor struct {
 }
 
 type GitHubClientInteractor interface {
-	CreatePullRequestComment(ctx context.Context, meta MetaData, comment string) (*github.PullRequestComment, *github.Response, error)
-	EditPullRequestComment(ctx context.Context, meta MetaData, param EditPullRequestComment) (*github.PullRequestComment, *github.Response, error)
+	CreateReview(ctx context.Context, meta MetaData, comment string) (*github.PullRequestReview, *github.Response, error)
 }
 
 func New(client *github.Client) GitHubClientInteractor {
