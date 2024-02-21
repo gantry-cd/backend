@@ -18,7 +18,7 @@ type GetBranchInfoRequest struct {
 	Repository   string `json:"repository"`
 }
 
-type GerBranchInfoResponse struct {
+type GetBranchInfoResponse struct {
 	YAML string `json:"yaml"`
 }
 
