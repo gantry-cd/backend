@@ -64,3 +64,8 @@ message CreatePreviewRequest {
   repeated Config configs = 8;
   repeated int32 expose_ports = 9;
 };
+
+message GetLogsRequest{
+  string namespace = 1;
+  string podName = 2;
+}

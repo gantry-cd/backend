@@ -75,3 +75,8 @@ message CreatePreviewReply {
   string version = 3;
   repeated NodePort node_ports = 4;
 }
+
+message GetLogsReply {
+  int32 id = 1;
+  string message = 2;
+}

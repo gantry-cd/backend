@@ -3,6 +3,8 @@ package controller
 import (
 	"context"
 	"errors"
+	corev1 "k8s.io/api/core/v1"
+	restclient "k8s.io/client-go/rest"
 	"sort"
 	"time"
 
@@ -209,4 +211,8 @@ func (c *controller) getOrganization(ctx context.Context, organization string) (
 		Applications: apps,
 		Repositories: repos,
 	}, nil
+}
+
+func (c *controller) GetLog(namespace string, podName string, option corev1.PodLogOptions) *restclient.Request {
+	return c.control.GetLogs(namespace, podName, option)
 }

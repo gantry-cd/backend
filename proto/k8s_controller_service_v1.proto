@@ -32,4 +32,6 @@ service K8sCustomController {
   
 
   rpc GetResource(GetResourceRequest) returns (GetResourceReply);
+
+  rpc GetLogs(GetLogsRequest) returns (stream GetLogsReply);
 }

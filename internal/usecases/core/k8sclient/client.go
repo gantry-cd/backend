@@ -2,6 +2,7 @@ package k8sclient
 
 import (
 	"context"
+	restclient "k8s.io/client-go/rest"
 	"log/slog"
 	"os"
 
@@ -31,6 +32,9 @@ type K8SClient interface {
 	// service
 	CreateNodePortService(ctx context.Context, param CreateServiceNodePortParams, opts ...Option) (*corev1.Service, error)
 	DeleteService(ctx context.Context, namespace string, opts ...Option) error
+
+	// log
+	GetLogs(namespace string, podName string, option corev1.PodLogOptions) *restclient.Request
 }
 
 func New(client *kubernetes.Clientset) K8SClient {
