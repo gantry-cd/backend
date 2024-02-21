@@ -48,14 +48,16 @@ func (ge *handler) PullRequest(e *github.PullRequestEvent) error {
 	return nil
 }
 
+// pullRequestOpened はプルリクエストがオープンされたときにプレビュー環境を作成する
 func (ge *handler) pullRequestOpened(client *github.Client, e *github.PullRequestEvent) error {
-
-	c, err := parseConfig(*e.PullRequest.Body)
+	// Body から設定を取得して設定をパースする
+	c, err := parseConfig(e.PullRequest.GetBody())
 	if err != nil {
 		ge.l.Error("error parsing config", "error", err.Error())
 		return err
 	}
 
+	// GitHub クライアントを作成する
 	ghClient, err := ghconn.GitHubConnection(
 		config.Config.GitHub.AppID,
 		*e.Installation.ID,
@@ -77,6 +79,7 @@ func (ge *handler) pullRequestOpened(client *github.Client, e *github.PullReques
 	})
 }
 
+// pullRequestClosed はプルリクエストがクローズされたときにプレビュー環境を削除する
 func (ge *handler) pullRequestClosed(client *github.Client, e *github.PullRequestEvent) error {
 	return ge.interactor.DeletePreviewEnvironment(context.Background(), controller.DeletePreviewEnvironmentParams{
 		Organization: *e.Organization.Login,
@@ -86,13 +89,15 @@ func (ge *handler) pullRequestClosed(client *github.Client, e *github.PullReques
 	})
 }
 
+// pullRequestSynchronize はプルリクエストが更新されたときにプレビュー環境を更新する
 func (ge *handler) pullRequestSynchronize(client *github.Client, e *github.PullRequestEvent) error {
-	c, err := parseConfig(*e.PullRequest.Body)
+	c, err := parseConfig(e.PullRequest.GetBody())
 	if err != nil {
 		ge.l.Error("error parsing config", "error", err.Error())
 		return err
 	}
 
+	// GitHub クライアントを作成する
 	ghClient, err := ghconn.GitHubConnection(
 		config.Config.GitHub.AppID,
 		*e.Installation.ID,
