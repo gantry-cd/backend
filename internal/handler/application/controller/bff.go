@@ -25,10 +25,10 @@ func (bc *BffController) Home(w http.ResponseWriter, r *http.Request) {
 }
 
 func (bc *BffController) RepositoryApps(w http.ResponseWriter, r *http.Request) {
-	queries := r.URL.Query()
+	organization := r.PathValue(models.ParamOrganization)
 
 	if err := bc.interactor.GetRepositoryApps(r.Context(), w, models.GetRepositoryAppsRequest{
-		Organization: queries.Get(models.QueryOrganization),
+		Organization: organization,
 	}); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
