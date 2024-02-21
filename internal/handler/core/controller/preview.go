@@ -3,18 +3,13 @@ package controller
 import (
 	"context"
 	"errors"
-	"log"
 
 	coreErr "github.com/gantrycd/backend/internal/error"
 	"github.com/gantrycd/backend/internal/usecases/core/k8sclient"
 	"github.com/gantrycd/backend/internal/utils"
 	"github.com/gantrycd/backend/internal/utils/branch"
 	v1 "github.com/gantrycd/backend/proto"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
-	appsv1 "k8s.io/api/apps/v1"
-	corev1 "k8s.io/api/core/v1"
 )
 
 func (c *controller) CreatePreview(ctx context.Context, in *v1.CreatePreviewRequest) (*v1.CreatePreviewReply, error) {
@@ -38,12 +33,12 @@ func (c *controller) CreatePreview(ctx context.Context, in *v1.CreatePreviewRequ
 		}, nil
 	}
 
-	var (
-		service *corev1.Service
-		deps    *appsv1.Deployment
-	)
+	return c.createDeployment(ctx, in)
+}
 
-	deps, err = c.control.CreateDeployment(ctx,
+func (c *controller) createDeployment(ctx context.Context, in *v1.CreatePreviewRequest) (*v1.CreatePreviewReply, error) {
+	branchName := branch.Transpile1123(in.Branch)
+	deps, err := c.control.CreateDeployment(ctx,
 		k8sclient.CreateDeploymentParams{
 			Namespace: in.Organization,
 			AppName:   in.Repository,
@@ -70,7 +65,7 @@ func (c *controller) CreatePreview(ctx context.Context, in *v1.CreatePreviewRequ
 		}, nil
 	}
 
-	service, err = c.control.CreateNodePortService(ctx,
+	service, err := c.control.CreateNodePortService(ctx,
 		k8sclient.CreateServiceNodePortParams{
 			Namespace:   in.Organization,
 			ServiceName: in.Repository,
@@ -83,7 +78,6 @@ func (c *controller) CreatePreview(ctx context.Context, in *v1.CreatePreviewRequ
 		k8sclient.WithBaseBranchLabel(branchName),
 		k8sclient.WithCreatedByLabel(k8sclient.AppIdentifier),
 	)
-	log.Printf("service: %v", err)
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +112,7 @@ func (c *controller) UpdatePreview(ctx context.Context, in *v1.CreatePreviewRequ
 	}
 
 	if dep == nil {
-		return nil, status.Errorf(codes.NotFound, "deployment not found")
+		return c.createDeployment(ctx, in)
 	}
 
 	dep, err = c.control.UpdateDeployment(ctx, dep, k8sclient.UpdateDeploymentParams{
