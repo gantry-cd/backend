@@ -75,3 +75,7 @@ message CreatePreviewReply {
   string version = 3;
   repeated NodePort node_ports = 4;
 }
+
+message BuildImageReply {
+  string image = 1;
+}
