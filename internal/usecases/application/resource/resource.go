@@ -10,21 +10,21 @@ import (
 	v1 "github.com/gantrycd/backend/proto"
 )
 
-type resrouceInteractor struct {
+type resourceInteractor struct {
 	resource v1.K8SCustomControllerClient
 }
 
-type ResrouceInteractor interface {
+type ResourceInteractor interface {
 	GetResource(ctx context.Context, w http.ResponseWriter, request models.UsageRequest) error
 }
 
-func New(resource v1.K8SCustomControllerClient) ResrouceInteractor {
-	return &resrouceInteractor{
+func New(resource v1.K8SCustomControllerClient) ResourceInteractor {
+	return &resourceInteractor{
 		resource: resource,
 	}
 }
 
-func (r *resrouceInteractor) GetResource(ctx context.Context, w http.ResponseWriter, request models.UsageRequest) error {
+func (r *resourceInteractor) GetResource(ctx context.Context, w http.ResponseWriter, request models.UsageRequest) error {
 	var resp models.UsageResponse
 	var usages []models.Usage
 	result, err := r.resource.GetResource(ctx, &v1.GetResourceRequest{

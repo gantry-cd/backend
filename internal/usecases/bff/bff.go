@@ -75,15 +75,18 @@ func (b *bffInteractor) GetRepositoryApps(ctx context.Context, w http.ResponseWr
 			repoCount[repo.Name] += 1
 		}
 	}
+
 	for _, repoName := range repoIndex {
 		resRepos = append(resRepos, models.Repositories{
 			Repository: repoName,
 			Deployment: int32(repoCount[repoName]),
 		})
 	}
+
 	for _, resRepo := range resRepos {
 		print(resRepo.Repository, resRepo.Deployment)
 	}
+
 	for _, app := range apps {
 		resApps = append(resApps, models.Apps{
 			Name:    app.Name,
