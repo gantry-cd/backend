@@ -5,7 +5,7 @@ import (
 
 	"github.com/gantrycd/backend/internal/handler/application/controller"
 	"github.com/gantrycd/backend/internal/router/middleware"
-	"github.com/gantrycd/backend/internal/usecases/bff"
+	"github.com/gantrycd/backend/internal/usecases/application/bff"
 )
 
 func (r *router) page() {

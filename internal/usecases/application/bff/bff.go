@@ -108,7 +108,7 @@ func containsValue(list []string, value string) bool {
 }
 
 func (b *bffInteractor) GetBranchInfo(ctx context.Context, w http.ResponseWriter, request models.GetBranchInfoRequest) error {
-	var resBranches []models.Branches
+	var resBranches models.GerBranchInfoResponse
 	result, err := b.resource.GetBranchInfo(ctx, &v1.GetBranchInfoRequest{
 		Organization: request.Organization,
 		Repository:   request.Repository,

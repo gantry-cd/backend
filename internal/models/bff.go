@@ -4,11 +4,6 @@ type HomeResponse struct {
 	OrganizationInfos []OrganizationInfos `json:"organizationInfos"`
 }
 
-type OrganizationInfos struct {
-	Organization string   `json:"organization"`
-	Repositories []string `json:"repositories"`
-}
-
 type GetRepositoryAppsRequest struct {
 	Organization string `json:"organization"`
 }
@@ -16,6 +11,20 @@ type GetRepositoryAppsRequest struct {
 type GetRepositoryAppsResponse struct {
 	Repositories []Repositories `json:"repositories"`
 	Apps         []Apps         `json:"apps"`
+}
+
+type GetBranchInfoRequest struct {
+	Organization string `json:"organization"`
+	Repository   string `json:"repository"`
+}
+
+type GerBranchInfoResponse struct {
+	YAML string `json:"yaml"`
+}
+
+type OrganizationInfos struct {
+	Organization string   `json:"organization"`
+	Repositories []string `json:"repositories"`
 }
 
 type Repositories struct {

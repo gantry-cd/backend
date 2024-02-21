@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gantrycd/backend/internal/models"
-	"github.com/gantrycd/backend/internal/usecases/bff"
+	"github.com/gantrycd/backend/internal/usecases/application/bff"
 )
 
 type BffController struct {
@@ -29,6 +29,18 @@ func (bc *BffController) RepositoryApps(w http.ResponseWriter, r *http.Request) 
 
 	if err := bc.interactor.GetRepositoryApps(r.Context(), w, models.GetRepositoryAppsRequest{
 		Organization: queries.Get(models.QueryOrganization),
+	}); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+}
+
+func (bc *BffController) GetBranchInfo(w http.ResponseWriter, r *http.Request) {
+	queries := r.URL.Query()
+
+	if err := bc.interactor.GetBranchInfo(r.Context(), w, models.GetBranchInfoRequest{
+		Organization: queries.Get(models.QueryOrganization),
+		Repository:   queries.Get(models.QueryRepository),
 	}); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
