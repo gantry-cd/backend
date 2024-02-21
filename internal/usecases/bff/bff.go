@@ -60,7 +60,9 @@ func (b *bffInteractor) GetRepositoryApps(ctx context.Context, w http.ResponseWr
 	var resRepos []models.Repositories
 	var repoIndex []string
 	repoCount := make(map[string]int)
-	result, err := b.resource.GetOrgRepos(ctx, &v1.GetOrgRepoRequest{})
+	result, err := b.resource.GetOrgRepos(ctx, &v1.GetOrgRepoRequest{
+		Organization: request.Organization,
+	})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -80,9 +82,6 @@ func (b *bffInteractor) GetRepositoryApps(ctx context.Context, w http.ResponseWr
 			Repository: repoName,
 			Deployment: int32(repoCount[repoName]),
 		})
-	}
-	for _, resRepo := range resRepos {
-		print(resRepo.Repository, resRepo.Deployment)
 	}
 	for _, app := range apps {
 		resApps = append(resApps, models.Apps{
