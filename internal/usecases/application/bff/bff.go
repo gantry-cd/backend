@@ -67,6 +67,7 @@ func (b *bffInteractor) GetRepositoryApps(ctx context.Context, w http.ResponseWr
 
 	repos := result.GetRepositories()
 	apps := result.GetApplications()
+
 	for _, repo := range repos {
 		if !containsValue(repoIndex, repo.Name) {
 			repoIndex = append(repoIndex, repo.Name)
@@ -81,10 +82,6 @@ func (b *bffInteractor) GetRepositoryApps(ctx context.Context, w http.ResponseWr
 			Repository: repoName,
 			Deployment: int32(repoCount[repoName]),
 		})
-	}
-
-	for _, resRepo := range resRepos {
-		print(resRepo.Repository, resRepo.Deployment)
 	}
 
 	for _, app := range apps {
@@ -108,4 +105,24 @@ func containsValue(list []string, value string) bool {
 		}
 	}
 	return false
+}
+
+func (b *bffInteractor) GetBranchInfo(ctx context.Context, w http.ResponseWriter, request models.GetBranchInfoRequest) error {
+	var resBranches []models.Branches
+	result, err := b.resource.GetBranchInfo(ctx, &v1.GetBranchInfoRequest{
+		Organization: request.Organization,
+		Repository:   request.Repository,
+	})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	branches := result.GetBranches()
+	for _, branch := range branches {
+		resBranches = append(resBranches, models.Branches{})
+	}
+	if err := json.NewEncoder(w).Encode(models.GetBranchInfoResponse{Branches: resBranches}); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	return nil
 }
