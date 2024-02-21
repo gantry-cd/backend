@@ -4,3 +4,5 @@ influx/data
 bin/
 .kube
 .crt
+/pkg
+.idea
