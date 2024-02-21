@@ -1,10 +1,5 @@
 package models
 
-const (
-	QueryOrganization string = "organization"
-	QueryRepository   string = "repository"
-)
-
 type UsageRequest struct {
 	Organization string `json:"organization"`
 	Repository   string `json:"repository"`
