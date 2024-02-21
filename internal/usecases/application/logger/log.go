@@ -2,10 +2,11 @@ package logger
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/gantrycd/backend/internal/models"
 	v1 "github.com/gantrycd/backend/proto"
+	"io"
+	"log"
 	"net/http"
 )
 
@@ -23,46 +24,35 @@ func New(resource v1.K8SCustomControllerClient) LogInteractor {
 }
 
 func (r *logInteractor) GetLogStream(ctx context.Context, w http.ResponseWriter, request models.PodLogRequest) error {
-	var resp models.UsageResponse
-	var usages []models.Usage
-	result, err := r.resource.GetResource(ctx, &v1.GetResourceRequest{
-		Organization: request.Organization,
-		Repository:   request.Repository,
+	flusher, _ := w.(http.Flusher)
+
+	w.Header().Set("Content-Type", "text/event-stream")
+	w.Header().Set("Cache-Control", "no-cache")
+	w.Header().Set("Connection", "keep-alive")
+	logs, err := r.resource.GetLogs(ctx, &v1.GetLogsRequest{
+		Namespace: request.Organization,
+		PodName:   request.Pod,
 	})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-
-	// Prometheusとかない場合
-	if result.IsDisable {
-		resp.IsDisable = true
-	}
-
-	resources := result.GetResources()
-	for _, resource := range resources {
-		var usage models.Usage
-		usage.PodName = resource.GetPodName()
-		for _, metric := range resource.Usages {
-			usage = models.Usage{
-				CPU:     usage.CPU + int64(metric.Cpu),
-				MEM:     usage.MEM + int64(metric.Mem),
-				Storage: usage.Storage + int64(metric.Storage),
+	go func() {
+		for {
+			resp, err := logs.Recv()
+			if err == io.EOF {
+				break
 			}
+			if err != nil {
+				log.Fatalf("ストリームからの受信に失敗しました: %v", err)
+			}
+
+			_, err = fmt.Fprintf(w, "data: %s\n\n", resp.Message)
+			if err != nil {
+				return
+			}
+			flusher.Flush()
 		}
-		usages = append(usages, models.Usage{
-			PodName: resource.PodName,
-			Branch:  resource.Branch,
-			PrID:    resource.PullRequestId,
-			CPU:     usage.CPU / int64(len(resources)),
-			MEM:     usage.MEM / int64(len(resources)),
-			Storage: usage.Storage / int64(len(resources)),
-		})
-	}
-	resp.Usages = usages
-
-	if err := json.NewEncoder(w).Encode(resp); err != nil {
-		return fmt.Errorf("failed to encode response: %w", err)
-	}
-
+	}()
+	<-ctx.Done()
 	return nil
 }
