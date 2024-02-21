@@ -31,5 +31,7 @@ service K8sCustomController {
   rpc DeletePreview(DeletePreviewRequest) returns(google.protobuf.Empty);
   
 
+  rpc BuildImage(BuildImageRequest) returns (BuildImageReply);
+
   rpc GetResource(GetResourceRequest) returns (GetResourceReply);
 }

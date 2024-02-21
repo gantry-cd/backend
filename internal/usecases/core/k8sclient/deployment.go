@@ -106,6 +106,48 @@ func (k *k8sClient) ListDeployments(ctx context.Context, namespace string, opts 
 	return k.client.AppsV1().Deployments(namespace).List(ctx, metav1.ListOptions{LabelSelector: labels.Set(o.labelSelector).String()})
 }
 
+type UpdateDeploymentParams struct {
+	Namespace     string
+	Repository    string
+	PullRequestID string
+	Branch        string
+	AppName       string
+	Image         *string
+	Replicas      *int32
+	Config        []*pbv1.Config
+}
+
+func (k *k8sClient) UpdateDeployment(ctx context.Context, dep *appsv1.Deployment, in UpdateDeploymentParams, opts ...Option) (*appsv1.Deployment, error) {
+	o := newOption()
+	for _, opt := range opts {
+		opt(o)
+	}
+
+	k.l.Info("updating deployment", "namespace", in.Namespace, "appName", in.AppName, "image", in.Image, CreatedByLabel, o.labelSelector[CreatedByLabel])
+
+	if in.Image != nil {
+		dep.Spec.Template.Spec.Containers[0].Image = *in.Image
+	}
+
+	if in.Replicas != nil {
+		dep.Spec.Replicas = in.Replicas
+	}
+
+	if in.Config != nil {
+		var config []corev1.EnvVar
+		for _, c := range in.Config {
+			config = append(config, corev1.EnvVar{
+				Name:  c.GetName(),
+				Value: c.GetValue(),
+			})
+		}
+
+		dep.Spec.Template.Spec.Containers[0].Env = config
+	}
+
+	return k.client.AppsV1().Deployments(in.Namespace).Update(ctx, dep, metav1.UpdateOptions{})
+}
+
 func (k *k8sClient) DeleteDeployment(ctx context.Context, namespace string, opt ...Option) error {
 	o := newOption()
 

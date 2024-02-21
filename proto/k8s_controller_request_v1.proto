@@ -64,3 +64,14 @@ message CreatePreviewRequest {
   repeated Config configs = 8;
   repeated int32 expose_ports = 9;
 };
+
+message BuildImageRequest {
+  string namespace = 1;
+  string repository = 2;
+  string branch = 3;
+  string pull_request_id = 4;
+  string git_repo = 5;
+  string dockerfile_dir = 6;
+  string dockerfile_path = 7;
+  string image_name = 8;
+}

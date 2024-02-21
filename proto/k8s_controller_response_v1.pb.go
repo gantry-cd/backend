@@ -762,6 +762,53 @@ func (x *CreatePreviewReply) GetNodePorts() []*NodePort {
 	return nil
 }
 
+type BuildImageReply struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Image string `protobuf:"bytes,1,opt,name=image,proto3" json:"image,omitempty"`
+}
+
+func (x *BuildImageReply) Reset() {
+	*x = BuildImageReply{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_k8s_controller_response_v1_proto_msgTypes[12]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *BuildImageReply) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BuildImageReply) ProtoMessage() {}
+
+func (x *BuildImageReply) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_k8s_controller_response_v1_proto_msgTypes[12]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BuildImageReply.ProtoReflect.Descriptor instead.
+func (*BuildImageReply) Descriptor() ([]byte, []int) {
+	return file_proto_k8s_controller_response_v1_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *BuildImageReply) GetImage() string {
+	if x != nil {
+		return x.Image
+	}
+	return ""
+}
+
 var File_proto_k8s_controller_response_v1_proto protoreflect.FileDescriptor
 
 var file_proto_k8s_controller_response_v1_proto_rawDesc = []byte{
@@ -855,11 +902,14 @@ var file_proto_k8s_controller_response_v1_proto_rawDesc = []byte{
 	0x28, 0x0b, 0x32, 0x24, 0x2e, 0x67, 0x61, 0x6e, 0x74, 0x72, 0x79, 0x63, 0x64, 0x2e, 0x6b, 0x38,
 	0x73, 0x5f, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x6c, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x2e,
 	0x4e, 0x6f, 0x64, 0x65, 0x50, 0x6f, 0x72, 0x74, 0x52, 0x09, 0x6e, 0x6f, 0x64, 0x65, 0x50, 0x6f,
-	0x72, 0x74, 0x73, 0x42, 0x3c, 0x5a, 0x3a, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f,
-	0x6d, 0x2f, 0x67, 0x61, 0x6e, 0x74, 0x72, 0x79, 0x63, 0x64, 0x2f, 0x62, 0x61, 0x63, 0x6b, 0x65,
-	0x6e, 0x64, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x62, 0x2f,
-	0x6b, 0x38, 0x73, 0x2d, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x6c, 0x65, 0x72, 0x2f, 0x76,
-	0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x72, 0x74, 0x73, 0x22, 0x27, 0x0a, 0x0f, 0x42, 0x75, 0x69, 0x6c, 0x64, 0x49, 0x6d, 0x61, 0x67,
+	0x65, 0x52, 0x65, 0x70, 0x6c, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x69, 0x6d, 0x61, 0x67, 0x65, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x69, 0x6d, 0x61, 0x67, 0x65, 0x42, 0x3c, 0x5a, 0x3a,
+	0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x67, 0x61, 0x6e, 0x74, 0x72,
+	0x79, 0x63, 0x64, 0x2f, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2f, 0x61, 0x70, 0x69, 0x2f,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x62, 0x2f, 0x6b, 0x38, 0x73, 0x2d, 0x63, 0x6f, 0x6e,
+	0x74, 0x72, 0x6f, 0x6c, 0x6c, 0x65, 0x72, 0x2f, 0x76, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x33,
 }
 
 var (
@@ -874,7 +924,7 @@ func file_proto_k8s_controller_response_v1_proto_rawDescGZIP() []byte {
 	return file_proto_k8s_controller_response_v1_proto_rawDescData
 }
 
-var file_proto_k8s_controller_response_v1_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
+var file_proto_k8s_controller_response_v1_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_proto_k8s_controller_response_v1_proto_goTypes = []interface{}{
 	(*CreateNamespaceReply)(nil),  // 0: gantrycd.k8s_controller.v1.CreateNamespaceReply
 	(*ListNamespacesReply)(nil),   // 1: gantrycd.k8s_controller.v1.ListNamespacesReply
@@ -888,6 +938,7 @@ var file_proto_k8s_controller_response_v1_proto_goTypes = []interface{}{
 	(*GetResourceReply)(nil),      // 9: gantrycd.k8s_controller.v1.GetResourceReply
 	(*NodePort)(nil),              // 10: gantrycd.k8s_controller.v1.NodePort
 	(*CreatePreviewReply)(nil),    // 11: gantrycd.k8s_controller.v1.CreatePreviewReply
+	(*BuildImageReply)(nil),       // 12: gantrycd.k8s_controller.v1.BuildImageReply
 }
 var file_proto_k8s_controller_response_v1_proto_depIdxs = []int32{
 	3,  // 0: gantrycd.k8s_controller.v1.GetOrgReposReply.repositories:type_name -> gantrycd.k8s_controller.v1.repository
@@ -1053,6 +1104,18 @@ func file_proto_k8s_controller_response_v1_proto_init() {
 				return nil
 			}
 		}
+		file_proto_k8s_controller_response_v1_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*BuildImageReply); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -1060,7 +1123,7 @@ func file_proto_k8s_controller_response_v1_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_proto_k8s_controller_response_v1_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   12,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

@@ -14,3 +14,15 @@ func RemoveDuplocate[T any](s []T) []T {
 	}
 	return s
 }
+
+// toPtr converts a value to a pointer
+func ToPtr[T any](v T) *T {
+	t := reflect.TypeOf(v)
+
+	// ゼロ値の場合はnilを返す
+	if reflect.DeepEqual(v, reflect.Zero(t).Interface()) {
+		return nil
+	}
+
+	return &v
+}
