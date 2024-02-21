@@ -20,18 +20,17 @@ service BffService {
       get: "/organizations/{organization}/repositories"
     };
   }
+
+  rpc GetRepositoryBranchInfo(GetRepositoryBranchInfoRequest) returns (GetRepositoryBranchInfoResponse){
+    option (google.api.http) = {
+      get: "/organizations/{organization}/repositories/{repository}/branches"
+    };
+  }
 }
 
 message HomeResponse {
   repeated OrganizationInfos organizationInfos = 1;
 }
-
-message OrganizationInfos{
-  string organization  = 1;
-  repeated string repositories  = 2;
-}
-
-
 
 message GetRepositoryAppsRequest{
   string organization = 1;
@@ -40,6 +39,19 @@ message GetRepositoryAppsRequest{
 message GetRepositoryAppsResponse{
   repeated Repositories repositories = 1;
   repeated Apps apps = 2;
+}
+
+message GetRepositoryBranchInfoRequest{
+
+}
+
+message GetRepositoryBranchInfoResponse{
+  repeated Branches branches = 1;
+}
+
+message OrganizationInfos{
+  string organization  = 1;
+  repeated string repositories  = 2;
 }
 
 message Repositories{
