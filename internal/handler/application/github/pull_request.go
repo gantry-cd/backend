@@ -27,17 +27,17 @@ func (ge *handler) PullRequest(e *github.PullRequestEvent) error {
 	}
 
 	switch *e.Action {
-	case "opened":
+	case PullRequestOpened:
 		ge.l.Info(fmt.Sprintf("pull request opened: %v", e.Organization.Login))
 		if err := ge.pullRequestOpened(client, e); err != nil {
 			ge.l.Error("error creating preview environment", "error", err.Error())
 		}
-	case "closed":
+	case PullRequestClosed:
 		ge.l.Info(fmt.Sprintf("pull request closed: %v", e))
 		if err := ge.pullRequestClosed(client, e); err != nil {
 			ge.l.Error("error deleting preview environment", "error", err.Error())
 		}
-	case "synchronize":
+	case PullRequestSynchronize:
 		ge.l.Info(fmt.Sprintf("pull request synchronize: %v", e))
 		if err := ge.pullRequestSynchronize(client, e); err != nil {
 			ge.l.Error("error updating preview environment", "error", err.Error())
