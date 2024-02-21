@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "proto/bff_v1.proto",
+    "title": "openapiv2/bff_v1.proto",
     "version": "version not set"
   },
   "tags": [
@@ -16,7 +16,7 @@
     "application/json"
   ],
   "paths": {
-    "/organization": {
+    "/organizations": {
       "get": {
         "operationId": "BffService_GetOrg",
         "responses": {
@@ -38,7 +38,7 @@
         ]
       }
     },
-    "/organization/{organization}/repository": {
+    "/organizations/{organization}/repositories": {
       "get": {
         "operationId": "BffService_GetRepositoryApps",
         "responses": {
@@ -58,6 +58,42 @@
         "parameters": [
           {
             "name": "organization",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "BffService"
+        ]
+      }
+    },
+    "/organizations/{organization}/repositories/{repository}/information": {
+      "get": {
+        "operationId": "BffService_GetBranchInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetBranchInfoResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "organization",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "repository",
             "in": "path",
             "required": true,
             "type": "string"
@@ -111,6 +147,14 @@
           "type": "string"
         },
         "age": {
+          "type": "string"
+        }
+      }
+    },
+    "v1GetBranchInfoResponse": {
+      "type": "object",
+      "properties": {
+        "yaml": {
           "type": "string"
         }
       }

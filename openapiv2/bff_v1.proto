@@ -21,15 +21,9 @@ service BffService {
     };
   }
 
-  rpc GetBranchInfo(google.protobuf.Empty) returns (GetRepositoryBranchInfoResponse){
+  rpc GetBranchInfo(GetBranchInfoRequest) returns (GetBranchInfoResponse){
     option (google.api.http) = {
-      get: "/organizations/{organization}/repositories/{repository}/info"
-    };
-  }
-
-  rpc GetRepositoryBranchInfo(GetRepositoryBranchInfoRequest) returns (GetRepositoryBranchInfoResponse){
-    option (google.api.http) = {
-      get: "/organizations/{organization}/repositories/{repository}/branches"
+      get: "/organizations/{organization}/repositories/{repository}/information"
     };
   }
 }
@@ -47,16 +41,13 @@ message GetRepositoryAppsResponse{
   repeated Apps apps = 2;
 }
 
+message GetBranchInfoRequest{
+  string organization = 1;
+  string repository = 2;
+}
+
 message GetBranchInfoResponse{
   string yaml = 1;
-}
-
-message GetRepositoryBranchInfoRequest{
-
-}
-
-message GetRepositoryBranchInfoResponse{
-  
 }
 
 message OrganizationInfos{
