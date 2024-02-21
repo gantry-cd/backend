@@ -16,6 +16,7 @@ func init() {
 		".env/keycloak.env",
 		".env/bff.env",
 		".env/github.env",
+		".env/harbor.env",
 	)
 }
 

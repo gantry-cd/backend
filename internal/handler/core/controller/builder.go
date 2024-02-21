@@ -7,10 +7,9 @@ import (
 	v1 "github.com/gantrycd/backend/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-func (c *controller) BuildImage(ctx context.Context, in *v1.BuildImageRequest) (*emptypb.Empty, error) {
+func (c *controller) BuildImage(ctx context.Context, in *v1.BuildImageRequest) (*v1.BuildImageReply, error) {
 	var (
 		dockerfileDir  string = in.DockerfileDir
 		dockerfilePath string = in.DockerfilePath
@@ -28,7 +27,7 @@ func (c *controller) BuildImage(ctx context.Context, in *v1.BuildImageRequest) (
 		return nil, status.Errorf(codes.InvalidArgument, "deployment not found")
 	}
 
-	err := c.control.Builder(ctx, k8sclient.BuilderParams{
+	image, err := c.control.Builder(context.Background(), k8sclient.BuilderParams{
 		Namespace:     in.Namespace,
 		GitLink:       in.GitRepo,
 		Repository:    in.Repository,
@@ -42,9 +41,12 @@ func (c *controller) BuildImage(ctx context.Context, in *v1.BuildImageRequest) (
 		k8sclient.WithPrIDLabel(in.PullRequestId),
 		k8sclient.WithCreatedByLabel(k8sclient.CreatedByLabel),
 	)
+
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 
-	return &emptypb.Empty{}, nil
+	return &v1.BuildImageReply{
+		Image: *image,
+	}, nil
 }

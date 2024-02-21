@@ -32,7 +32,6 @@ func (ge *handler) PullRequest(e *github.PullRequestEvent) error {
 		if err := ge.pullRequestOpened(client, e); err != nil {
 			ge.l.Error("error creating preview environment", "error", err.Error())
 		}
-
 	case "closed":
 		ge.l.Info(fmt.Sprintf("pull request closed: %v", e))
 		if err := ge.pullRequestClosed(client, e); err != nil {
@@ -40,7 +39,9 @@ func (ge *handler) PullRequest(e *github.PullRequestEvent) error {
 		}
 	case "synchronize":
 		ge.l.Info(fmt.Sprintf("pull request synchronize: %v", e))
-
+		if err := ge.pullRequestSynchronize(client, e); err != nil {
+			ge.l.Error("error updating preview environment", "error", err.Error())
+		}
 	default:
 		ge.l.Info(fmt.Sprintf("pull request event action not supported: %v", *e.Action))
 	}
@@ -70,6 +71,7 @@ func (ge *handler) pullRequestOpened(client *github.Client, e *github.PullReques
 		Repository:   *e.Repo.Name,
 		PrNumber:     *e.Number,
 		Branch:       *e.PullRequest.Head.Ref,
+		GitLink:      *e.PullRequest.Head.Repo.CloneURL,
 		Config:       *c,
 		GhClient:     ghInteractor.New(ghClient),
 	})
@@ -85,7 +87,31 @@ func (ge *handler) pullRequestClosed(client *github.Client, e *github.PullReques
 }
 
 func (ge *handler) pullRequestSynchronize(client *github.Client, e *github.PullRequestEvent) error {
-	return ge.interactor.UpdatePreviewEnvironment(context.Background(), controller.UpdatePreviewEnvironmentParams{})
+	c, err := parseConfig(*e.PullRequest.Body)
+	if err != nil {
+		ge.l.Error("error parsing config", "error", err.Error())
+		return err
+	}
+
+	ghClient, err := ghconn.GitHubConnection(
+		config.Config.GitHub.AppID,
+		*e.Installation.ID,
+		config.Config.GitHub.CrtPath,
+	)
+	if err != nil {
+		ge.l.Error("error parsing config", "error", err.Error())
+		return err
+	}
+
+	return ge.interactor.UpdatePreviewEnvironment(context.Background(), controller.UpdatePreviewEnvironmentParams{
+		Organization: *e.Organization.Login,
+		Repository:   *e.Repo.Name,
+		PrNumber:     *e.Number,
+		Branch:       *e.PullRequest.Head.Ref,
+		GitLink:      *e.PullRequest.Head.Repo.CloneURL,
+		Config:       *c,
+		GhClient:     ghInteractor.New(ghClient),
+	})
 }
 
 const (

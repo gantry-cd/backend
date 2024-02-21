@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/gantrycd/backend/cmd/config"
 	"github.com/gantrycd/backend/internal/models"
 	"github.com/gantrycd/backend/internal/usecases/application/github"
 	v1 "github.com/gantrycd/backend/proto"
@@ -16,6 +17,7 @@ type CreatePreviewEnvironmentParams struct {
 	Repository   string
 	PrNumber     int
 	Branch       string
+	GitLink      string
 
 	GhClient github.GitHubClientInteractor
 	Config   models.PullRequestConfig
@@ -29,12 +31,18 @@ func (ge *githubAppEvents) CreatePreviewEnvironment(ctx context.Context, param C
 	}
 
 	// TODO: image buildする
-	image := "nginx:1.16"
-	time.Sleep(5 * time.Second)
-	// if err != nil {
-	// 	_, _, err := param.GhClient.CreateReview(ctx, meta, fmt.Sprintf("%s\n[%v] ❌Failed to build Docker image: %v", comment.GetBody(), time.Now().Format(time.DateTime), err))
-	// 	return err
-	// }
+	image, err := ge.BuildImage(ctx, BuildImageParams{
+		Organization:  param.Organization,
+		Repository:    param.Repository,
+		Branch:        param.Branch,
+		PullRequestID: fmt.Sprintf("%d", param.PrNumber),
+		GitLink:       param.GitLink,
+		Config:        param.Config,
+	})
+	if err != nil {
+		_, _, err := param.GhClient.CreateReview(ctx, meta, fmt.Sprintf("[%v] ❌Failed to build Docker image: %v", time.Now().Format(time.DateTime), err))
+		return err
+	}
 
 	var configs []*v1.Config
 	for _, c := range param.Config.ConfigMaps {
@@ -54,7 +62,7 @@ func (ge *githubAppEvents) CreatePreviewEnvironment(ctx context.Context, param C
 		Repository:    param.Repository,
 		PullRequestId: fmt.Sprintf("%d", param.PrNumber),
 		Branch:        param.Branch,
-		Image:         image,
+		Image:         *image,
 		Replicas:      param.Config.Replicas,
 		Configs:       configs,
 		ExposePorts:   param.Config.ExposePort,
@@ -101,6 +109,8 @@ type UpdatePreviewEnvironmentParams struct {
 	Repository   string
 	PrNumber     int
 	Branch       string
+	GitLink      string
+	Config       models.PullRequestConfig
 	GhClient     github.GitHubClientInteractor
 }
 
@@ -112,20 +122,26 @@ func (ge *githubAppEvents) UpdatePreviewEnvironment(ctx context.Context, param U
 	}
 
 	// TODO: image buildする
-	image := "nginx:1.16"
-	time.Sleep(5 * time.Second)
-	// if err != nil {
-	// 	_, _, err := param.GhClient.CreateReview(ctx, meta, fmt.Sprintf("%s\n[%v] ❌Failed to build Docker image: %v", comment.GetBody(), time.Now().Format(time.DateTime), err))
-	// 	return err
-	// }
+	image, err := ge.BuildImage(ctx, BuildImageParams{
+		Organization:  param.Organization,
+		Repository:    param.Repository,
+		Branch:        param.Branch,
+		PullRequestID: fmt.Sprintf("%d", param.PrNumber),
+		GitLink:       param.GitLink,
+		Config:        param.Config,
+	})
+	if err != nil {
+		_, _, err := param.GhClient.CreateReview(ctx, meta, fmt.Sprintf("[%v] ❌Failed to build Docker image: %v", time.Now().Format(time.DateTime), err))
+		return err
+	}
 
 	// デプロイする
-	_, err := ge.customController.UpdatePreview(ctx, &v1.CreatePreviewRequest{
+	_, err = ge.customController.UpdatePreview(ctx, &v1.CreatePreviewRequest{
 		Organization:  param.Organization,
 		Repository:    param.Repository,
 		PullRequestId: fmt.Sprintf("%d", param.PrNumber),
 		Branch:        param.Branch,
-		Image:         image,
+		Image:         *image,
 	})
 
 	if err != nil {
@@ -139,4 +155,33 @@ func (ge *githubAppEvents) UpdatePreviewEnvironment(ctx context.Context, param U
 	}
 
 	return nil
+}
+
+type BuildImageParams struct {
+	Organization  string
+	Repository    string
+	Branch        string
+	PullRequestID string
+	GitLink       string
+
+	Config models.PullRequestConfig
+}
+
+func (ge *githubAppEvents) BuildImage(ctx context.Context, param BuildImageParams) (*string, error) {
+	result, err := ge.customController.BuildImage(ctx, &v1.BuildImageRequest{
+		Namespace:      param.Organization,
+		Repository:     param.Repository,
+		Branch:         param.Branch,
+		PullRequestId:  param.PullRequestID,
+		GitRepo:        param.GitLink,
+		DockerfilePath: param.Config.BuildFilePath,
+		DockerfileDir:  param.Config.BuildFileDir,
+		ImageName:      fmt.Sprintf("%s/%s", config.Config.Registry.Host, config.Config.Application.ApplicationName),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &result.Image, nil
+
 }

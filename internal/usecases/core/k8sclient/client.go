@@ -34,7 +34,7 @@ type K8SClient interface {
 	DeleteService(ctx context.Context, namespace string, opts ...Option) error
 
 	// builder
-	Builder(ctx context.Context, param BuilderParams, opts ...Option) error
+	Builder(ctx context.Context, param BuilderParams, opts ...Option) (*string, error)
 }
 
 func New(client *kubernetes.Clientset) K8SClient {

@@ -76,13 +76,6 @@ message CreatePreviewReply {
   repeated NodePort node_ports = 4;
 }
 
-message BuildImageRequest {
-  string namespace = 1;
-  string repository = 2;
-  string branch = 3;
-  string pull_request_id = 4;
-  string git_repo = 5;
-  string dockerfile_dir = 6;
-  string dockerfile_path = 7;
-  string image_name = 8;
+message BuildImageReply {
+  string image = 1;
 }

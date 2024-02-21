@@ -36,7 +36,7 @@ type K8SCustomControllerClient interface {
 	CreatePreview(ctx context.Context, in *CreatePreviewRequest, opts ...grpc.CallOption) (*CreatePreviewReply, error)
 	UpdatePreview(ctx context.Context, in *CreatePreviewRequest, opts ...grpc.CallOption) (*CreatePreviewReply, error)
 	DeletePreview(ctx context.Context, in *DeletePreviewRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	BuildImage(ctx context.Context, in *BuildImageRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	BuildImage(ctx context.Context, in *BuildImageRequest, opts ...grpc.CallOption) (*BuildImageReply, error)
 	GetResource(ctx context.Context, in *GetResourceRequest, opts ...grpc.CallOption) (*GetResourceReply, error)
 }
 
@@ -138,8 +138,8 @@ func (c *k8SCustomControllerClient) DeletePreview(ctx context.Context, in *Delet
 	return out, nil
 }
 
-func (c *k8SCustomControllerClient) BuildImage(ctx context.Context, in *BuildImageRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
+func (c *k8SCustomControllerClient) BuildImage(ctx context.Context, in *BuildImageRequest, opts ...grpc.CallOption) (*BuildImageReply, error) {
+	out := new(BuildImageReply)
 	err := c.cc.Invoke(ctx, "/gantrycd.k8s_controller.v1.K8sCustomController/BuildImage", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -173,7 +173,7 @@ type K8SCustomControllerServer interface {
 	CreatePreview(context.Context, *CreatePreviewRequest) (*CreatePreviewReply, error)
 	UpdatePreview(context.Context, *CreatePreviewRequest) (*CreatePreviewReply, error)
 	DeletePreview(context.Context, *DeletePreviewRequest) (*emptypb.Empty, error)
-	BuildImage(context.Context, *BuildImageRequest) (*emptypb.Empty, error)
+	BuildImage(context.Context, *BuildImageRequest) (*BuildImageReply, error)
 	GetResource(context.Context, *GetResourceRequest) (*GetResourceReply, error)
 	mustEmbedUnimplementedK8SCustomControllerServer()
 }
@@ -212,7 +212,7 @@ func (UnimplementedK8SCustomControllerServer) UpdatePreview(context.Context, *Cr
 func (UnimplementedK8SCustomControllerServer) DeletePreview(context.Context, *DeletePreviewRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeletePreview not implemented")
 }
-func (UnimplementedK8SCustomControllerServer) BuildImage(context.Context, *BuildImageRequest) (*emptypb.Empty, error) {
+func (UnimplementedK8SCustomControllerServer) BuildImage(context.Context, *BuildImageRequest) (*BuildImageReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method BuildImage not implemented")
 }
 func (UnimplementedK8SCustomControllerServer) GetResource(context.Context, *GetResourceRequest) (*GetResourceReply, error) {

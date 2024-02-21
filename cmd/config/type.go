@@ -2,6 +2,10 @@ package config
 
 // config はアプリケーションの設定を表す構造体です。基本的には環境変数から読み込みます。
 type config struct {
+	Application struct {
+		ApplicationName string `env:"APPLICATION_NAME" envDefault:"gantrycd"`
+	}
+
 	Bff struct {
 		Host              string `env:"BFF_HOST" envDefault:"0.0.0.0"`
 		Port              int    `env:"BFF_PORT" envDefault:"8080"`
