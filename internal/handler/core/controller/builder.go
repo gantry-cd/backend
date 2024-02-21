@@ -31,6 +31,8 @@ func (c *controller) BuildImage(ctx context.Context, in *v1.BuildImageRequest) (
 	err := c.control.Builder(ctx, k8sclient.BuilderParams{
 		Namespace:     in.Namespace,
 		GitLink:       in.GitRepo,
+		Repository:    in.Repository,
+		Branch:        in.Branch,
 		DockerBaseDir: dockerfileDir,
 		DockrFilePath: dockerfilePath,
 		ImageName:     in.ImageName,
@@ -41,7 +43,7 @@ func (c *controller) BuildImage(ctx context.Context, in *v1.BuildImageRequest) (
 		k8sclient.WithCreatedByLabel(k8sclient.CreatedByLabel),
 	)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "deployment not found")
+		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 
 	return &emptypb.Empty{}, nil

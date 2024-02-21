@@ -28,5 +28,9 @@ func LoadEnv(path ...string) {
 		panic(err)
 	}
 
+	if err := env.Parse(&config.Registry); err != nil {
+		panic(err)
+	}
+
 	Config = config
 }

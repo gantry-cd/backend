@@ -6,13 +6,21 @@ import (
 	"strings"
 
 	"github.com/gantrycd/backend/cmd/config"
+	"github.com/gantrycd/backend/internal/utils"
 	"github.com/gantrycd/backend/internal/utils/random"
+	BatchV1 "k8s.io/api/batch/v1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+const (
+	DefaultBackoffLimit = 3
+)
+
 type BuilderParams struct {
 	Namespace     string
+	Repository    string
+	Branch        string
 	GitLink       string
 	DockerBaseDir string
 	DockrFilePath string
@@ -42,52 +50,66 @@ func (k *k8sClient) Builder(ctx context.Context, param BuilderParams, opts ...Op
 
 	gitlinks := fmt.Sprintf("%s//%s:%s@%s", urls[0], config.Config.GitHub.Username, config.Config.GitHub.Password, urls[1])
 
-	pod, err := k.client.CoreV1().Pods(param.Namespace).Create(ctx, &v1.Pod{
+	job, err := k.client.BatchV1().Jobs(param.Namespace).Create(ctx, &BatchV1.Job{
 		ObjectMeta: metav1.ObjectMeta{
-			GenerateName: "builder-",
-			Labels:       o.labelSelector,
+			GenerateName: "build-job-",
 		},
-		Spec: v1.PodSpec{
-			Containers: []v1.Container{
-				{
-					Name:  strings.ToLower(name),
-					Image: config.Config.Controller.ImageBuilder,
-					Env: []v1.EnvVar{
+		Spec: BatchV1.JobSpec{
+			Template: v1.PodTemplateSpec{
+				Spec: v1.PodSpec{
+					Containers: []v1.Container{
 						{
-							Name:  "GIT_REPO",
-							Value: gitlinks,
-						},
-						{
-							Name:  "IMAGE_NAME",
-							Value: fmt.Sprintf("%s/%s", param.ImageName, param.GitLink),
-						},
-						{
-							Name:  "IMAGE_TAG",
-							Value: name,
-						},
-						{
-							Name:  "DOCKER_REGISTRY",
-							Value: config.Config.Registry.Host,
-						},
-						{
-							Name:  "DOCKER_REGISTRY_USER",
-							Value: config.Config.Registry.User,
-						},
-						{
-							Name:  "DOCKER_REGISTRY_PASSWORD",
-							Value: config.Config.Registry.Password,
-						},
-						{
-							Name:  "DOCKER_BASE_DIR",
-							Value: param.DockerBaseDir,
-						},
-						{
-							Name:  "DOCKER_FILE_PATH",
-							Value: param.DockrFilePath,
+							Name:  strings.ToLower(name),
+							Image: config.Config.Controller.ImageBuilder,
+							Env: []v1.EnvVar{
+								{
+									Name:  "GIT_REPO",
+									Value: gitlinks,
+								},
+								{
+									Name:  "IMAGE_NAME",
+									Value: fmt.Sprintf("%s/%s", param.ImageName, param.Repository),
+								},
+								{
+									Name:  "IMAGE_TAG",
+									Value: name,
+								},
+								{
+									Name:  "DOCKER_REGISTRY",
+									Value: config.Config.Registry.Host,
+								},
+								{
+									Name:  "DOCKER_REGISTRY_USER",
+									Value: config.Config.Registry.User,
+								},
+								{
+									Name:  "DOCKER_REGISTRY_PASSWORD",
+									Value: config.Config.Registry.Password,
+								},
+								{
+									Name:  "DOCKER_BASE_DIR",
+									Value: param.DockerBaseDir,
+								},
+								{
+									Name:  "GIT_BRANCH",
+									Value: param.Branch,
+								},
+								{
+									Name:  "DOCKER_FILE_PATH",
+									Value: param.DockrFilePath,
+								},
+							},
+							SecurityContext: &v1.SecurityContext{
+								Privileged: utils.ToPtr(true),
+							},
 						},
 					},
+					RestartPolicy: "Never",
 				},
 			},
+			BackoffLimit: utils.ToPtr(int32(DefaultBackoffLimit)),
+			Completions:  utils.ToPtr(int32(1)),
+			Parallelism:  utils.ToPtr(int32(1)),
 		},
 	}, metav1.CreateOptions{})
 
@@ -95,18 +117,22 @@ func (k *k8sClient) Builder(ctx context.Context, param BuilderParams, opts ...Op
 		return err
 	}
 
-	return k.waitForPod(ctx, param.Namespace, pod.Name)
+	return k.waitForJob(ctx, param.Namespace, job.Name)
 }
 
-func (k *k8sClient) waitForPod(ctx context.Context, namespace, name string) error {
+func (k *k8sClient) waitForJob(ctx context.Context, namespace, name string) error {
 	for {
-		pod, err := k.client.CoreV1().Pods(namespace).Get(ctx, name, metav1.GetOptions{})
+		job, err := k.client.BatchV1().Jobs(namespace).Get(ctx, name, metav1.GetOptions{})
 		if err != nil {
 			return err
 		}
 
-		if pod.Status.Phase == v1.PodSucceeded || pod.Status.Phase == v1.PodFailed {
+		if job.Status.Succeeded > 0 {
 			return nil
+		}
+
+		if job.Status.Failed == DefaultBackoffLimit {
+			return fmt.Errorf("job failed")
 		}
 	}
 }
