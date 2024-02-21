@@ -28,13 +28,16 @@ func (c *controller) BuildImage(ctx context.Context, in *v1.BuildImageRequest) (
 	}
 
 	image, err := c.control.Builder(context.Background(), k8sclient.BuilderParams{
-		Namespace:     in.Namespace,
-		GitLink:       in.GitRepo,
-		Repository:    in.Repository,
-		Branch:        in.Branch,
-		DockerBaseDir: dockerfileDir,
-		DockrFilePath: dockerfilePath,
-		ImageName:     in.ImageName,
+		Namespace: in.Namespace,
+		Branch:    in.Branch,
+		BuilderParam: k8sclient.ImageBuilderParams{
+			Repository:     in.Repository,
+			GitRepo:        in.GitRepo,
+			GitBranch:      in.Branch,
+			ImageName:      in.ImageName,
+			DockerBaseDir:  dockerfileDir,
+			DockerFilePath: dockerfilePath,
+		},
 	},
 		k8sclient.WithAppLabel(k8sclient.AppLabel),
 		k8sclient.WithBaseBranchLabel(in.Branch),

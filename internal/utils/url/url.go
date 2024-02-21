@@ -5,9 +5,9 @@ import (
 	"strings"
 )
 
-// IncludeBasicAuth は指定された URL に Basic 認証情報を含めた URL を返す
-// ex: https://example.com , user , pass -> https://user:pass@example.com
-// ex: example.com , user , pass -> https://user:pass@example.com
+// IncludeBasicAuth は指定された URL に Basic 認証情報を含めた URL を返す .
+// ex: https://example.com , user , pass -> https://user:pass@example.com .
+// ex: example.com , user , pass -> https://user:pass@example.com .
 func IncludeBasicAuth(url, user, pass string) string {
 	urls := strings.Split(url, "//")
 	if len(urls) < 2 {

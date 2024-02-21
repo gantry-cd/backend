@@ -2,6 +2,7 @@ package k8sclient
 
 import (
 	"context"
+	"crypto/sha256"
 	"fmt"
 	"strings"
 	"time"
@@ -9,6 +10,7 @@ import (
 	"github.com/gantrycd/backend/cmd/config"
 	"github.com/gantrycd/backend/internal/utils"
 	"github.com/gantrycd/backend/internal/utils/random"
+	"github.com/gantrycd/backend/internal/utils/url"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	BatchV1 "k8s.io/api/batch/v1"
@@ -17,17 +19,56 @@ import (
 )
 
 const (
+	// Image Builder Environment variables
+	EnvGitRepo        = "GIT_REPO"
+	EnvGitBranch      = "GIT_BRANCH"
+	EnvImageName      = "IMAGE_NAME"
+	EnvImageTag       = "IMAGE_TAG"
+	EnvDockerBaseDir  = "DOCKER_BASE_DIR"
+	EnvDockerFilePath = "DOCKER_FILE_PATH"
+	EnvDockerRegistry = "DOCKER_REGISTRY"
+	EnvDockerUser     = "DOCKER_REGISTRY_USER"
+	EnvDockerPassword = "DOCKER_REGISTRY_PASSWORD"
+)
+
+type ImageBuilderParams struct {
+	Repository     string
+	GitRepo        string
+	GitBranch      string
+	ImageName      string
+	ImageTag       string
+	DockerBaseDir  string
+	DockerFilePath string
+}
+
+// imageBuilderEnv はイメージビルダーの環境変数とimageを生成する .
+func imageBuilderEnv(param ImageBuilderParams) ([]v1.EnvVar, string) {
+	tagSha := string(sha256.New().Sum([]byte(time.Now().String())))
+	image := fmt.Sprintf("%s/%s/%s", config.Config.Registry.Host, config.Config.Application.ApplicationName, param.Repository)
+
+	return []v1.EnvVar{
+		toEnvVar(EnvGitRepo, url.IncludeBasicAuth(param.GitRepo, config.Config.GitHub.Username, config.Config.GitHub.Password)),
+		toEnvVar(EnvGitBranch, param.GitBranch),
+		toEnvVar(EnvImageName, image),
+		toEnvVar(EnvImageTag, tagSha),
+		toEnvVar(EnvDockerBaseDir, param.DockerBaseDir),
+		toEnvVar(EnvDockerFilePath, param.DockerFilePath),
+		toEnvVar(EnvDockerRegistry, config.Config.Registry.Host),
+		toEnvVar(EnvDockerUser, config.Config.Registry.User),
+		toEnvVar(EnvDockerPassword, config.Config.Registry.Password),
+	}, fmt.Sprintf("%s:%s", image, tagSha)
+}
+
+const (
+	// DefaultBackoffLimit はジョブのバックオフリミットのデフォルト値 .
 	DefaultBackoffLimit = 3
 )
 
 type BuilderParams struct {
-	Namespace     string
-	Repository    string
-	Branch        string
-	GitLink       string
-	DockerBaseDir string
-	DockrFilePath string
-	ImageName     string
+	Namespace string
+	Branch    string
+
+	BuilderParam ImageBuilderParams
 }
 
 func (k *k8sClient) Builder(ctx context.Context, param BuilderParams, opts ...Option) (*string, error) {
@@ -37,18 +78,12 @@ func (k *k8sClient) Builder(ctx context.Context, param BuilderParams, opts ...Op
 		opt(o)
 	}
 
-	urls := strings.Split(param.GitLink, "//")
-	if len(urls) < 2 {
-		return nil, fmt.Errorf("invalid git link")
-	}
-
 	name, err := random.RandomString(20)
 	if err != nil {
 		return nil, err
 	}
 
-	gitlinks := fmt.Sprintf("%s//%s:%s@%s", urls[0], config.Config.GitHub.Username, config.Config.GitHub.Password, urls[1])
-	image := fmt.Sprintf("%s/%s", param.ImageName, param.Repository)
+	envVar, image := imageBuilderEnv(param.BuilderParam)
 
 	job, err := k.client.BatchV1().Jobs(param.Namespace).Create(ctx, &BatchV1.Job{
 		ObjectMeta: metav1.ObjectMeta{
@@ -61,44 +96,7 @@ func (k *k8sClient) Builder(ctx context.Context, param BuilderParams, opts ...Op
 						{
 							Name:  strings.ToLower(name),
 							Image: config.Config.Controller.ImageBuilder,
-							Env: []v1.EnvVar{
-								{
-									Name:  "GIT_REPO",
-									Value: gitlinks,
-								},
-								{
-									Name:  "IMAGE_NAME",
-									Value: image,
-								},
-								{
-									Name:  "IMAGE_TAG",
-									Value: name,
-								},
-								{
-									Name:  "DOCKER_REGISTRY",
-									Value: config.Config.Registry.Host,
-								},
-								{
-									Name:  "DOCKER_REGISTRY_USER",
-									Value: config.Config.Registry.User,
-								},
-								{
-									Name:  "DOCKER_REGISTRY_PASSWORD",
-									Value: config.Config.Registry.Password,
-								},
-								{
-									Name:  "DOCKER_BASE_DIR",
-									Value: param.DockerBaseDir,
-								},
-								{
-									Name:  "GIT_BRANCH",
-									Value: param.Branch,
-								},
-								{
-									Name:  "DOCKER_FILE_PATH",
-									Value: param.DockrFilePath,
-								},
-							},
+							Env:   envVar,
 							SecurityContext: &v1.SecurityContext{
 								Privileged: utils.ToPtr(true),
 							},
@@ -120,7 +118,7 @@ func (k *k8sClient) Builder(ctx context.Context, param BuilderParams, opts ...Op
 		return nil, err
 	}
 
-	return utils.ToPtr(fmt.Sprintf("%s:%s", image, name)), nil
+	return utils.ToPtr(image), nil
 }
 
 func (k *k8sClient) waitForJob(ctx context.Context, namespace, name string) error {
@@ -130,6 +128,7 @@ func (k *k8sClient) waitForJob(ctx context.Context, namespace, name string) erro
 			return status.Errorf(codes.Internal, err.Error())
 		}
 
+		// jobが成功したらjob消して終了
 		if job.Status.Succeeded > 0 {
 			return nil
 		}
