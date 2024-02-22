@@ -13,7 +13,7 @@ func (r *router) Log() {
 		logger.New(r.controllerConn),
 	)
 
-	r.mux.Handle("/organizations/{organization}/repositories/{repository}/pulls/{pull}/pods/{pod}/log", middleware.BuildChain(
+	r.mux.Handle("/organizations/{organization}/pods/{pod}/log", middleware.BuildChain(
 		r.middleware.Integrate(
 			http.HandlerFunc(uc.Log),
 		),

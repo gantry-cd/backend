@@ -20,8 +20,6 @@ func New(interactor logger.LogInteractor) *Controller {
 func (uc *Controller) Log(w http.ResponseWriter, r *http.Request) {
 	if err := uc.interactor.GetLogStream(r.Context(), w, models.PodLogRequest{
 		Organization: r.PathValue(models.QueryOrganization),
-		Repository:   r.PathValue(models.QueryRepository),
-		Pull:         r.PathValue(models.QueryPull),
 		Pod:          r.PathValue(models.QueryPod),
 	}); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
