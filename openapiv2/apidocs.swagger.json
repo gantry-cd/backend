@@ -97,13 +97,6 @@
             "in": "path",
             "required": true,
             "type": "string"
-          },
-          {
-            "name": "pullRequestID",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32"
           }
         ],
         "tags": [
@@ -118,7 +111,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1BranchInformationResponse"
+              "$ref": "#/definitions/v1GetBranchInformationResponse"
             }
           },
           "default": {
@@ -201,7 +194,24 @@
         }
       }
     },
-    "v1BranchInformationResponse": {
+    "v1Branches": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "age": {
+          "type": "string"
+        }
+      }
+    },
+    "v1GetBranchInformationResponse": {
       "type": "object",
       "properties": {
         "branchName": {
@@ -218,23 +228,6 @@
           }
         },
         "yaml": {
-          "type": "string"
-        }
-      }
-    },
-    "v1Branches": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "status": {
-          "type": "string"
-        },
-        "version": {
-          "type": "string"
-        },
-        "age": {
           "type": "string"
         }
       }
