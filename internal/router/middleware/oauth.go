@@ -60,7 +60,7 @@ func (m *middleware) KeyCloakOAuth(h http.HandlerFunc) http.HandlerFunc {
 		}
 		// role, err := client.GetRoleMappingByUserID(ctx, token.AccessToken, keycloakRealm, keycloakClientID)
 		// if err != nil {
-		// 	logger.go.Println("Failed to get role mapping", err)
+		// 	log.Println("Failed to get role mapping", err)
 		// 	w.WriteHeader(http.StatusUnauthorized)
 		// 	return
 		// }
