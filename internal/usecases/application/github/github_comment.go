@@ -12,6 +12,7 @@ type gitHubClientInteractor struct {
 
 type GitHubClientInteractor interface {
 	CreateReview(ctx context.Context, meta MetaData, comment string) (*github.PullRequestReview, *github.Response, error)
+	GetToken(ctx context.Context, installID int64) (string, error)
 }
 
 func New(client *github.Client) GitHubClientInteractor {

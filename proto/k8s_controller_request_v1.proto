@@ -74,4 +74,5 @@ message BuildImageRequest {
   string dockerfile_dir = 6;
   string dockerfile_path = 7;
   string image_name = 8;
+  string token = 9;
 }

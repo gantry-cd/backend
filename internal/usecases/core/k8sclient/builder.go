@@ -38,6 +38,7 @@ type ImageBuilderParams struct {
 	ImageTag       string
 	DockerBaseDir  string
 	DockerFilePath string
+	Token          string
 }
 
 // imageBuilderEnv はイメージビルダーの環境変数とimageを生成する .
@@ -46,7 +47,7 @@ func imageBuilderEnv(param ImageBuilderParams) ([]v1.EnvVar, string) {
 	image := fmt.Sprintf("%s/%s/%s", config.Config.Registry.Host, config.Config.Application.ApplicationName, param.Repository)
 
 	return []v1.EnvVar{
-		toEnvVar(EnvGitRepo, url.IncludeBasicAuth(param.GitRepo, config.Config.GitHub.Username, config.Config.GitHub.Password)),
+		toEnvVar(EnvGitRepo, url.IncludeBasicAuth(param.GitRepo, config.Config.GitHub.Username, param.Token)),
 		toEnvVar(EnvGitBranch, param.GitBranch),
 		toEnvVar(EnvImageName, image),
 		toEnvVar(EnvImageTag, tag),

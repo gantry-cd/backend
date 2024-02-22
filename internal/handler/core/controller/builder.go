@@ -37,6 +37,7 @@ func (c *controller) BuildImage(ctx context.Context, in *v1.BuildImageRequest) (
 			ImageName:      in.ImageName,
 			DockerBaseDir:  dockerfileDir,
 			DockerFilePath: dockerfilePath,
+			Token:          in.Token,
 		},
 	},
 		k8sclient.WithAppLabel(k8sclient.AppLabel),

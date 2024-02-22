@@ -56,10 +56,12 @@ func (ge *handler) pullRequestOpened(client *github.Client, e *github.PullReques
 		return err
 	}
 
+	installID := e.Installation.GetID()
+
 	// GitHub クライアントを作成する
 	ghClient, err := ghconn.GitHubConnection(
 		config.Config.GitHub.AppID,
-		*e.Installation.ID,
+		installID,
 		config.Config.GitHub.CrtPath,
 	)
 	if err != nil {
@@ -73,6 +75,7 @@ func (ge *handler) pullRequestOpened(client *github.Client, e *github.PullReques
 		PrNumber:     *e.Number,
 		Branch:       *e.PullRequest.Head.Ref,
 		GitLink:      *e.PullRequest.Head.Repo.CloneURL,
+		GhInstallID:  installID,
 		Config:       *c,
 		GhClient:     ghInteractor.New(ghClient),
 	})
@@ -96,10 +99,12 @@ func (ge *handler) pullRequestSynchronize(client *github.Client, e *github.PullR
 		return err
 	}
 
+	installID := e.Installation.GetID()
+
 	// GitHub クライアントを作成する
 	ghClient, err := ghconn.GitHubConnection(
 		config.Config.GitHub.AppID,
-		*e.Installation.ID,
+		installID,
 		config.Config.GitHub.CrtPath,
 	)
 	if err != nil {
@@ -113,6 +118,7 @@ func (ge *handler) pullRequestSynchronize(client *github.Client, e *github.PullR
 		PrNumber:     *e.Number,
 		Branch:       *e.PullRequest.Head.Ref,
 		GitLink:      *e.PullRequest.Head.Repo.CloneURL,
+		GhInstallID:  installID,
 		Config:       *c,
 		GhClient:     ghInteractor.New(ghClient),
 	})
