@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"errors"
+	"fmt"
 	"sort"
 	"time"
 
@@ -222,5 +223,31 @@ func (c *controller) getOrganization(ctx context.Context, organization string) (
 		Organization: organization,
 		Applications: apps,
 		Repositories: repos,
+	}, nil
+}
+
+func (c *controller) GetRepoBranches(ctx context.Context, in *v1.GetRepoBranchesRequest) (*v1.GetRepoBranchesReply, error) {
+	dep, err := c.control.ListDeployments(ctx, in.Organization, k8sclient.WithRepositoryLabel(in.Repository))
+	if err != nil {
+		return nil, err
+	}
+	var branches []*v1.Branches
+	for _, d := range dep.Items {
+		branchName, brOk := d.Labels[k8sclient.BaseBranchLabel]
+
+		if !brOk {
+			// branches = append(branches, d.Labels[k8sclient.BaseBranchLabel])
+		}
+
+		branches = append(branches, &v1.Branches{
+			Name:    branchName,
+			Status:  string(d.Status.Conditions[0].Type),
+			Version: d.Spec.Template.GetResourceVersion(),
+			Age:     d.CreationTimestamp.Format(time.DateTime),
+		})
+	}
+	fmt.Println(branches)
+	return &v1.GetRepoBranchesReply{
+		Branches: branches,
 	}, nil
 }
