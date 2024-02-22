@@ -210,3 +210,13 @@ func (c *controller) getOrganization(ctx context.Context, organization string) (
 		Repositories: repos,
 	}, nil
 }
+
+func (c *controller) GetBranchInfo(ctx context.Context, in *v1.GetBranchInfoRequest) (*v1.GetBranchInfoReply, error) {
+	dep, err := c.control.GetDeployment(ctx, k8sclient.GetDeploymentParams{
+		Namespace:  in.Organization,
+		Repository: in.Repository,
+		Branch:     branch.Transpile1123(in.Branch),
+	},
+	k8sclient.
+)
+}

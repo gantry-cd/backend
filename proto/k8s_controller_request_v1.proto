@@ -45,6 +45,7 @@ message GetBranchInfoRequest {
   string organization = 1;
   string repository = 2;
   string branch = 3;
+  string pullreq_id = 4;
 }
 
 message DeletePreviewRequest {
