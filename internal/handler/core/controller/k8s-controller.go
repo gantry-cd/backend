@@ -234,7 +234,7 @@ func (c *controller) GetBranchInfo(ctx context.Context, in *v1.GetBranchInfoRequ
 	}, nil
 }
 
-func (c *controller) GetDeployYamls(ctx context.Context, in *v1.GetDeployYamlsRequest) (*v1.GetDeployYamlsReply, error) {
+func (c *controller) GetDeployInfomation(ctx context.Context, in *v1.GetDeployInfomationRequest) (*v1.GetDeployInfomationReply, error) {
 	dep, err := c.control.GetDeployment(ctx, k8sclient.GetDeploymentParams{
 		Namespace:     in.Organization,
 		Repository:    in.Repository,
@@ -244,6 +244,7 @@ func (c *controller) GetDeployYamls(ctx context.Context, in *v1.GetDeployYamlsRe
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
+
 	// objectmeta.managefields.fieldv1のフィールドを削除
 	for i := range dep.GetObjectMeta().GetManagedFields() {
 		dep.ObjectMeta.ManagedFields[i].FieldsV1 = nil
@@ -277,9 +278,25 @@ func (c *controller) GetDeployYamls(ctx context.Context, in *v1.GetDeployYamlsRe
 		depYaml = append(depYaml, []byte(fmt.Sprintf("\n---\n%s", svcYaml))...)
 	}
 
-	fmt.Println(string(depYaml))
+	pods, err := c.control.GetPods(ctx, in.Organization, in.Repository)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
 
-	return &v1.GetDeployYamlsReply{
-		Yaml: string(depYaml),
+	var respPods []*v1.Pod
+	for _, pod := range pods {
+		respPods = append(respPods, &v1.Pod{
+			Name:   pod.Name,
+			Status: string(pod.Status.Phase),
+			Age:    pod.CreationTimestamp.Format(time.DateTime),
+			Image:  pod.Spec.Containers[0].Image,
+		})
+	}
+
+	return &v1.GetDeployInfomationReply{
+		Namespace: in.GetOrganization(),
+		Branch:    dep.Labels[k8sclient.BaseBranchLabel],
+		Pods:      respPods,
+		Yaml:      string(depYaml),
 	}, nil
 }

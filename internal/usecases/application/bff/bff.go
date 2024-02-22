@@ -3,6 +3,7 @@ package bff
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/gantrycd/backend/internal/models"
@@ -108,22 +109,36 @@ func containsValue(list []string, value string) bool {
 	return false
 }
 
-// func (b *bffInteractor) GetBranchInfo(ctx context.Context, w http.ResponseWriter, request models.GetBranchInfoRequest) error {
-// 	var resBranches models.GerBranchInfoResponse
-// 	result, err := b.resource.GetBranchInfo(ctx, &v1.GetBranchInfoRequest{
-// 		Organization: request.Organization,
-// 		Repository:   request.Repository,
-// 	})
-// 	if err != nil {
-// 		http.Error(w, err.Error(), http.StatusInternalServerError)
-// 	}
+func (b *bffInteractor) GetBranchInfo(ctx context.Context, w http.ResponseWriter, request models.GetBranchInfoRequest) error {
+	result, err := b.resource.GetDeployInfomation(ctx, &v1.GetDeployInfomationRequest{
+		Organization:  request.Organization,
+		Repository:    request.Repository,
+		PullRequestId: request.PullreqID,
+		Branch:        request.Branch,
+	})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return nil
+	}
 
-// 	branches := result.GetBranches()
-// 	for _, branch := range branches {
-// 		resBranches = append(resBranches, models.Branches{})
-// 	}
-// 	if err := json.NewEncoder(w).Encode(models.GetBranchInfoResponse{Branches: resBranches}); err != nil {
-// 		http.Error(w, err.Error(), http.StatusInternalServerError)
-// 	}
-// 	return nil
-// }
+	var pods []models.Pod
+	for _, pod := range result.Pods {
+		pods = append(pods, models.Pod{
+			Name:   pod.Name,
+			Age:    pod.Age,
+			Status: pod.Status,
+			Image:  pod.Image,
+		})
+	}
+
+	if err := json.NewEncoder(w).Encode(models.BranchInfomationResponse{
+		BranchName: result.Branch,
+		GitHubLink: fmt.Sprintf("https://github.com/%s/%s/pull/%s", request.Organization, request.Repository, request.PullreqID),
+		Pods:       pods,
+		Yaml:       result.Yaml,
+	}); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return nil
+	}
+	return nil
+}

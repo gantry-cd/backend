@@ -33,11 +33,11 @@ type K8SCustomControllerClient interface {
 	// Resource Control
 	GetAlls(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetAllsReply, error)
 	GetOrgRepos(ctx context.Context, in *GetOrgRepoRequest, opts ...grpc.CallOption) (*GetOrgReposReply, error)
-	GetBranchInfo(ctx context.Context, in *GetBranchInfoRequest, opts ...grpc.CallOption) (*GetBranchInfoReply, error)
+	// preview control
 	CreatePreview(ctx context.Context, in *CreatePreviewRequest, opts ...grpc.CallOption) (*CreatePreviewReply, error)
 	UpdatePreview(ctx context.Context, in *CreatePreviewRequest, opts ...grpc.CallOption) (*CreatePreviewReply, error)
 	DeletePreview(ctx context.Context, in *DeletePreviewRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	GetDeployYamls(ctx context.Context, in *GetDeployYamlsRequest, opts ...grpc.CallOption) (*GetDeployYamlsReply, error)
+	GetDeployInfomation(ctx context.Context, in *GetDeployInfomationRequest, opts ...grpc.CallOption) (*GetDeployInfomationReply, error)
 	GetResource(ctx context.Context, in *GetResourceRequest, opts ...grpc.CallOption) (*GetResourceReply, error)
 }
 
@@ -112,15 +112,6 @@ func (c *k8SCustomControllerClient) GetOrgRepos(ctx context.Context, in *GetOrgR
 	return out, nil
 }
 
-func (c *k8SCustomControllerClient) GetBranchInfo(ctx context.Context, in *GetBranchInfoRequest, opts ...grpc.CallOption) (*GetBranchInfoReply, error) {
-	out := new(GetBranchInfoReply)
-	err := c.cc.Invoke(ctx, "/gantrycd.k8s_controller.v1.K8sCustomController/GetBranchInfo", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *k8SCustomControllerClient) CreatePreview(ctx context.Context, in *CreatePreviewRequest, opts ...grpc.CallOption) (*CreatePreviewReply, error) {
 	out := new(CreatePreviewReply)
 	err := c.cc.Invoke(ctx, "/gantrycd.k8s_controller.v1.K8sCustomController/CreatePreview", in, out, opts...)
@@ -148,9 +139,9 @@ func (c *k8SCustomControllerClient) DeletePreview(ctx context.Context, in *Delet
 	return out, nil
 }
 
-func (c *k8SCustomControllerClient) GetDeployYamls(ctx context.Context, in *GetDeployYamlsRequest, opts ...grpc.CallOption) (*GetDeployYamlsReply, error) {
-	out := new(GetDeployYamlsReply)
-	err := c.cc.Invoke(ctx, "/gantrycd.k8s_controller.v1.K8sCustomController/GetDeployYamls", in, out, opts...)
+func (c *k8SCustomControllerClient) GetDeployInfomation(ctx context.Context, in *GetDeployInfomationRequest, opts ...grpc.CallOption) (*GetDeployInfomationReply, error) {
+	out := new(GetDeployInfomationReply)
+	err := c.cc.Invoke(ctx, "/gantrycd.k8s_controller.v1.K8sCustomController/GetDeployInfomation", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -180,11 +171,11 @@ type K8SCustomControllerServer interface {
 	// Resource Control
 	GetAlls(context.Context, *emptypb.Empty) (*GetAllsReply, error)
 	GetOrgRepos(context.Context, *GetOrgRepoRequest) (*GetOrgReposReply, error)
-	GetBranchInfo(context.Context, *GetBranchInfoRequest) (*GetBranchInfoReply, error)
+	// preview control
 	CreatePreview(context.Context, *CreatePreviewRequest) (*CreatePreviewReply, error)
 	UpdatePreview(context.Context, *CreatePreviewRequest) (*CreatePreviewReply, error)
 	DeletePreview(context.Context, *DeletePreviewRequest) (*emptypb.Empty, error)
-	GetDeployYamls(context.Context, *GetDeployYamlsRequest) (*GetDeployYamlsReply, error)
+	GetDeployInfomation(context.Context, *GetDeployInfomationRequest) (*GetDeployInfomationReply, error)
 	GetResource(context.Context, *GetResourceRequest) (*GetResourceReply, error)
 	mustEmbedUnimplementedK8SCustomControllerServer()
 }
@@ -214,9 +205,6 @@ func (UnimplementedK8SCustomControllerServer) GetAlls(context.Context, *emptypb.
 func (UnimplementedK8SCustomControllerServer) GetOrgRepos(context.Context, *GetOrgRepoRequest) (*GetOrgReposReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetOrgRepos not implemented")
 }
-func (UnimplementedK8SCustomControllerServer) GetBranchInfo(context.Context, *GetBranchInfoRequest) (*GetBranchInfoReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetBranchInfo not implemented")
-}
 func (UnimplementedK8SCustomControllerServer) CreatePreview(context.Context, *CreatePreviewRequest) (*CreatePreviewReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreatePreview not implemented")
 }
@@ -226,8 +214,8 @@ func (UnimplementedK8SCustomControllerServer) UpdatePreview(context.Context, *Cr
 func (UnimplementedK8SCustomControllerServer) DeletePreview(context.Context, *DeletePreviewRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeletePreview not implemented")
 }
-func (UnimplementedK8SCustomControllerServer) GetDeployYamls(context.Context, *GetDeployYamlsRequest) (*GetDeployYamlsReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetDeployYamls not implemented")
+func (UnimplementedK8SCustomControllerServer) GetDeployInfomation(context.Context, *GetDeployInfomationRequest) (*GetDeployInfomationReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDeployInfomation not implemented")
 }
 func (UnimplementedK8SCustomControllerServer) GetResource(context.Context, *GetResourceRequest) (*GetResourceReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetResource not implemented")
@@ -371,24 +359,6 @@ func _K8SCustomController_GetOrgRepos_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
-func _K8SCustomController_GetBranchInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetBranchInfoRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(K8SCustomControllerServer).GetBranchInfo(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/gantrycd.k8s_controller.v1.K8sCustomController/GetBranchInfo",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(K8SCustomControllerServer).GetBranchInfo(ctx, req.(*GetBranchInfoRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _K8SCustomController_CreatePreview_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreatePreviewRequest)
 	if err := dec(in); err != nil {
@@ -443,20 +413,20 @@ func _K8SCustomController_DeletePreview_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
-func _K8SCustomController_GetDeployYamls_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetDeployYamlsRequest)
+func _K8SCustomController_GetDeployInfomation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDeployInfomationRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(K8SCustomControllerServer).GetDeployYamls(ctx, in)
+		return srv.(K8SCustomControllerServer).GetDeployInfomation(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/gantrycd.k8s_controller.v1.K8sCustomController/GetDeployYamls",
+		FullMethod: "/gantrycd.k8s_controller.v1.K8sCustomController/GetDeployInfomation",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(K8SCustomControllerServer).GetDeployYamls(ctx, req.(*GetDeployYamlsRequest))
+		return srv.(K8SCustomControllerServer).GetDeployInfomation(ctx, req.(*GetDeployInfomationRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -515,10 +485,6 @@ var K8SCustomController_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _K8SCustomController_GetOrgRepos_Handler,
 		},
 		{
-			MethodName: "GetBranchInfo",
-			Handler:    _K8SCustomController_GetBranchInfo_Handler,
-		},
-		{
 			MethodName: "CreatePreview",
 			Handler:    _K8SCustomController_CreatePreview_Handler,
 		},
@@ -531,8 +497,8 @@ var K8SCustomController_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _K8SCustomController_DeletePreview_Handler,
 		},
 		{
-			MethodName: "GetDeployYamls",
-			Handler:    _K8SCustomController_GetDeployYamls_Handler,
+			MethodName: "GetDeployInfomation",
+			Handler:    _K8SCustomController_GetDeployInfomation_Handler,
 		},
 		{
 			MethodName: "GetResource",

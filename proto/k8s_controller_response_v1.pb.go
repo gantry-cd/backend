@@ -809,16 +809,19 @@ func (x *CreatePreviewReply) GetNodePorts() []*NodePort {
 	return nil
 }
 
-type GetDeployYamlsReply struct {
+type Pod struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Yaml string `protobuf:"bytes,1,opt,name=yaml,proto3" json:"yaml,omitempty"`
+	Name   string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Status string `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
+	Age    string `protobuf:"bytes,3,opt,name=age,proto3" json:"age,omitempty"`
+	Image  string `protobuf:"bytes,4,opt,name=image,proto3" json:"image,omitempty"`
 }
 
-func (x *GetDeployYamlsReply) Reset() {
-	*x = GetDeployYamlsReply{}
+func (x *Pod) Reset() {
+	*x = Pod{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_proto_k8s_controller_response_v1_proto_msgTypes[13]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -826,13 +829,13 @@ func (x *GetDeployYamlsReply) Reset() {
 	}
 }
 
-func (x *GetDeployYamlsReply) String() string {
+func (x *Pod) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetDeployYamlsReply) ProtoMessage() {}
+func (*Pod) ProtoMessage() {}
 
-func (x *GetDeployYamlsReply) ProtoReflect() protoreflect.Message {
+func (x *Pod) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_k8s_controller_response_v1_proto_msgTypes[13]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -844,12 +847,104 @@ func (x *GetDeployYamlsReply) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetDeployYamlsReply.ProtoReflect.Descriptor instead.
-func (*GetDeployYamlsReply) Descriptor() ([]byte, []int) {
+// Deprecated: Use Pod.ProtoReflect.Descriptor instead.
+func (*Pod) Descriptor() ([]byte, []int) {
 	return file_proto_k8s_controller_response_v1_proto_rawDescGZIP(), []int{13}
 }
 
-func (x *GetDeployYamlsReply) GetYaml() string {
+func (x *Pod) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *Pod) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *Pod) GetAge() string {
+	if x != nil {
+		return x.Age
+	}
+	return ""
+}
+
+func (x *Pod) GetImage() string {
+	if x != nil {
+		return x.Image
+	}
+	return ""
+}
+
+type GetDeployInfomationReply struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Namespace string `protobuf:"bytes,1,opt,name=namespace,proto3" json:"namespace,omitempty"`
+	Branch    string `protobuf:"bytes,2,opt,name=branch,proto3" json:"branch,omitempty"`
+	Pods      []*Pod `protobuf:"bytes,3,rep,name=pods,proto3" json:"pods,omitempty"`
+	Yaml      string `protobuf:"bytes,4,opt,name=yaml,proto3" json:"yaml,omitempty"`
+}
+
+func (x *GetDeployInfomationReply) Reset() {
+	*x = GetDeployInfomationReply{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_k8s_controller_response_v1_proto_msgTypes[14]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetDeployInfomationReply) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDeployInfomationReply) ProtoMessage() {}
+
+func (x *GetDeployInfomationReply) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_k8s_controller_response_v1_proto_msgTypes[14]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDeployInfomationReply.ProtoReflect.Descriptor instead.
+func (*GetDeployInfomationReply) Descriptor() ([]byte, []int) {
+	return file_proto_k8s_controller_response_v1_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *GetDeployInfomationReply) GetNamespace() string {
+	if x != nil {
+		return x.Namespace
+	}
+	return ""
+}
+
+func (x *GetDeployInfomationReply) GetBranch() string {
+	if x != nil {
+		return x.Branch
+	}
+	return ""
+}
+
+func (x *GetDeployInfomationReply) GetPods() []*Pod {
+	if x != nil {
+		return x.Pods
+	}
+	return nil
+}
+
+func (x *GetDeployInfomationReply) GetYaml() string {
 	if x != nil {
 		return x.Yaml
 	}
@@ -951,14 +1046,27 @@ var file_proto_k8s_controller_response_v1_proto_rawDesc = []byte{
 	0x5f, 0x70, 0x6f, 0x72, 0x74, 0x73, 0x18, 0x04, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x24, 0x2e, 0x67,
 	0x61, 0x6e, 0x74, 0x72, 0x79, 0x63, 0x64, 0x2e, 0x6b, 0x38, 0x73, 0x5f, 0x63, 0x6f, 0x6e, 0x74,
 	0x72, 0x6f, 0x6c, 0x6c, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x2e, 0x4e, 0x6f, 0x64, 0x65, 0x50, 0x6f,
-	0x72, 0x74, 0x52, 0x09, 0x6e, 0x6f, 0x64, 0x65, 0x50, 0x6f, 0x72, 0x74, 0x73, 0x22, 0x29, 0x0a,
-	0x13, 0x47, 0x65, 0x74, 0x44, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x59, 0x61, 0x6d, 0x6c, 0x73, 0x52,
-	0x65, 0x70, 0x6c, 0x79, 0x12, 0x12, 0x0a, 0x04, 0x79, 0x61, 0x6d, 0x6c, 0x18, 0x01, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x04, 0x79, 0x61, 0x6d, 0x6c, 0x42, 0x3c, 0x5a, 0x3a, 0x67, 0x69, 0x74, 0x68,
-	0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x67, 0x61, 0x6e, 0x74, 0x72, 0x79, 0x63, 0x64, 0x2f,
-	0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x2f, 0x70, 0x62, 0x2f, 0x6b, 0x38, 0x73, 0x2d, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c,
-	0x6c, 0x65, 0x72, 0x2f, 0x76, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x72, 0x74, 0x52, 0x09, 0x6e, 0x6f, 0x64, 0x65, 0x50, 0x6f, 0x72, 0x74, 0x73, 0x22, 0x59, 0x0a,
+	0x03, 0x50, 0x6f, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x16, 0x0a, 0x06, 0x73, 0x74, 0x61, 0x74,
+	0x75, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73,
+	0x12, 0x10, 0x0a, 0x03, 0x61, 0x67, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x61,
+	0x67, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x69, 0x6d, 0x61, 0x67, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x05, 0x69, 0x6d, 0x61, 0x67, 0x65, 0x22, 0x99, 0x01, 0x0a, 0x18, 0x47, 0x65, 0x74,
+	0x44, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x49, 0x6e, 0x66, 0x6f, 0x6d, 0x61, 0x74, 0x69, 0x6f, 0x6e,
+	0x52, 0x65, 0x70, 0x6c, 0x79, 0x12, 0x1c, 0x0a, 0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61,
+	0x63, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70,
+	0x61, 0x63, 0x65, 0x12, 0x16, 0x0a, 0x06, 0x62, 0x72, 0x61, 0x6e, 0x63, 0x68, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x06, 0x62, 0x72, 0x61, 0x6e, 0x63, 0x68, 0x12, 0x33, 0x0a, 0x04, 0x70,
+	0x6f, 0x64, 0x73, 0x18, 0x03, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x1f, 0x2e, 0x67, 0x61, 0x6e, 0x74,
+	0x72, 0x79, 0x63, 0x64, 0x2e, 0x6b, 0x38, 0x73, 0x5f, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c,
+	0x6c, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x2e, 0x50, 0x6f, 0x64, 0x52, 0x04, 0x70, 0x6f, 0x64, 0x73,
+	0x12, 0x12, 0x0a, 0x04, 0x79, 0x61, 0x6d, 0x6c, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04,
+	0x79, 0x61, 0x6d, 0x6c, 0x42, 0x3c, 0x5a, 0x3a, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63,
+	0x6f, 0x6d, 0x2f, 0x67, 0x61, 0x6e, 0x74, 0x72, 0x79, 0x63, 0x64, 0x2f, 0x62, 0x61, 0x63, 0x6b,
+	0x65, 0x6e, 0x64, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x62,
+	0x2f, 0x6b, 0x38, 0x73, 0x2d, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x6c, 0x65, 0x72, 0x2f,
+	0x76, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -973,22 +1081,23 @@ func file_proto_k8s_controller_response_v1_proto_rawDescGZIP() []byte {
 	return file_proto_k8s_controller_response_v1_proto_rawDescData
 }
 
-var file_proto_k8s_controller_response_v1_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_proto_k8s_controller_response_v1_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
 var file_proto_k8s_controller_response_v1_proto_goTypes = []interface{}{
-	(*CreateNamespaceReply)(nil),  // 0: gantrycd.k8s_controller.v1.CreateNamespaceReply
-	(*ListNamespacesReply)(nil),   // 1: gantrycd.k8s_controller.v1.ListNamespacesReply
-	(*CreateDeploymentReply)(nil), // 2: gantrycd.k8s_controller.v1.CreateDeploymentReply
-	(*Repository)(nil),            // 3: gantrycd.k8s_controller.v1.repository
-	(*Application)(nil),           // 4: gantrycd.k8s_controller.v1.application
-	(*GetOrgReposReply)(nil),      // 5: gantrycd.k8s_controller.v1.GetOrgReposReply
-	(*GetAllsReply)(nil),          // 6: gantrycd.k8s_controller.v1.GetAllsReply
-	(*Usage)(nil),                 // 7: gantrycd.k8s_controller.v1.Usage
-	(*Resource)(nil),              // 8: gantrycd.k8s_controller.v1.Resource
-	(*GetResourceReply)(nil),      // 9: gantrycd.k8s_controller.v1.GetResourceReply
-	(*GetBranchInfoReply)(nil),    // 10: gantrycd.k8s_controller.v1.GetBranchInfoReply
-	(*NodePort)(nil),              // 11: gantrycd.k8s_controller.v1.NodePort
-	(*CreatePreviewReply)(nil),    // 12: gantrycd.k8s_controller.v1.CreatePreviewReply
-	(*GetDeployYamlsReply)(nil),   // 13: gantrycd.k8s_controller.v1.GetDeployYamlsReply
+	(*CreateNamespaceReply)(nil),     // 0: gantrycd.k8s_controller.v1.CreateNamespaceReply
+	(*ListNamespacesReply)(nil),      // 1: gantrycd.k8s_controller.v1.ListNamespacesReply
+	(*CreateDeploymentReply)(nil),    // 2: gantrycd.k8s_controller.v1.CreateDeploymentReply
+	(*Repository)(nil),               // 3: gantrycd.k8s_controller.v1.repository
+	(*Application)(nil),              // 4: gantrycd.k8s_controller.v1.application
+	(*GetOrgReposReply)(nil),         // 5: gantrycd.k8s_controller.v1.GetOrgReposReply
+	(*GetAllsReply)(nil),             // 6: gantrycd.k8s_controller.v1.GetAllsReply
+	(*Usage)(nil),                    // 7: gantrycd.k8s_controller.v1.Usage
+	(*Resource)(nil),                 // 8: gantrycd.k8s_controller.v1.Resource
+	(*GetResourceReply)(nil),         // 9: gantrycd.k8s_controller.v1.GetResourceReply
+	(*GetBranchInfoReply)(nil),       // 10: gantrycd.k8s_controller.v1.GetBranchInfoReply
+	(*NodePort)(nil),                 // 11: gantrycd.k8s_controller.v1.NodePort
+	(*CreatePreviewReply)(nil),       // 12: gantrycd.k8s_controller.v1.CreatePreviewReply
+	(*Pod)(nil),                      // 13: gantrycd.k8s_controller.v1.Pod
+	(*GetDeployInfomationReply)(nil), // 14: gantrycd.k8s_controller.v1.GetDeployInfomationReply
 }
 var file_proto_k8s_controller_response_v1_proto_depIdxs = []int32{
 	3,  // 0: gantrycd.k8s_controller.v1.GetOrgReposReply.repositories:type_name -> gantrycd.k8s_controller.v1.repository
@@ -997,11 +1106,12 @@ var file_proto_k8s_controller_response_v1_proto_depIdxs = []int32{
 	7,  // 3: gantrycd.k8s_controller.v1.Resource.usages:type_name -> gantrycd.k8s_controller.v1.Usage
 	8,  // 4: gantrycd.k8s_controller.v1.GetResourceReply.resources:type_name -> gantrycd.k8s_controller.v1.Resource
 	11, // 5: gantrycd.k8s_controller.v1.CreatePreviewReply.node_ports:type_name -> gantrycd.k8s_controller.v1.NodePort
-	6,  // [6:6] is the sub-list for method output_type
-	6,  // [6:6] is the sub-list for method input_type
-	6,  // [6:6] is the sub-list for extension type_name
-	6,  // [6:6] is the sub-list for extension extendee
-	0,  // [0:6] is the sub-list for field type_name
+	13, // 6: gantrycd.k8s_controller.v1.GetDeployInfomationReply.pods:type_name -> gantrycd.k8s_controller.v1.Pod
+	7,  // [7:7] is the sub-list for method output_type
+	7,  // [7:7] is the sub-list for method input_type
+	7,  // [7:7] is the sub-list for extension type_name
+	7,  // [7:7] is the sub-list for extension extendee
+	0,  // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_proto_k8s_controller_response_v1_proto_init() }
@@ -1167,7 +1277,19 @@ func file_proto_k8s_controller_response_v1_proto_init() {
 			}
 		}
 		file_proto_k8s_controller_response_v1_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetDeployYamlsReply); i {
+			switch v := v.(*Pod); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_k8s_controller_response_v1_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetDeployInfomationReply); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1185,7 +1307,7 @@ func file_proto_k8s_controller_response_v1_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_proto_k8s_controller_response_v1_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   14,
+			NumMessages:   15,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

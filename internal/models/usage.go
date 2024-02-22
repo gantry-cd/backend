@@ -3,6 +3,8 @@ package models
 const (
 	QueryOrganization string = "organization"
 	QueryRepository   string = "repository"
+	QueryPullreqID    string = "pullRequestID"
+	QueryBranch       string = "branch"
 )
 
 type UsageRequest struct {

@@ -32,6 +32,9 @@ type K8SClient interface {
 	GetServices(ctx context.Context, param GetServicesParams, opts ...Option) ([]*corev1.Service, error)
 	CreateNodePortService(ctx context.Context, param CreateServiceNodePortParams, opts ...Option) (*corev1.Service, error)
 	DeleteService(ctx context.Context, namespace string, opts ...Option) error
+
+	// pod
+	GetPods(ctx context.Context, namespace, prefix string) ([]*corev1.Pod, error)
 }
 
 func New(client *kubernetes.Clientset) K8SClient {

@@ -20,4 +20,5 @@ func (r *router) page() {
 			),
 		))
 	r.mux.Handle("GET /organizations/{organization}/repositories", (http.HandlerFunc(bc.RepositoryApps)))
+	r.mux.Handle("GET /organizations/{organization}/repositories/{repository}/pulls/{pullRequestID}", middleware.BuildChain(r.middleware.Integrate(http.HandlerFunc(bc.GetBranchInfo))))
 }

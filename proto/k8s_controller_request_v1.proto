@@ -72,7 +72,7 @@ message CreatePreviewRequest {
   repeated int32 expose_ports = 9;
 };
 
-message GetDeployYamlsRequest {
+message GetDeployInfomationRequest {
   string organization = 1;
   string repository = 2;
   string pull_request_id = 3;

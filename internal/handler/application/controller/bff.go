@@ -36,11 +36,11 @@ func (bc *BffController) RepositoryApps(w http.ResponseWriter, r *http.Request) 
 }
 
 func (bc *BffController) GetBranchInfo(w http.ResponseWriter, r *http.Request) {
-	queries := r.URL.Query()
-
 	if err := bc.interactor.GetBranchInfo(r.Context(), w, models.GetBranchInfoRequest{
-		Organization: queries.Get(models.QueryOrganization),
-		Repository:   queries.Get(models.QueryRepository),
+		Organization: r.PathValue(models.QueryOrganization),
+		Repository:   r.PathValue(models.QueryRepository),
+		PullreqID:    r.PathValue(models.QueryPullreqID),
+		Branch:       r.PathValue(models.QueryBranch),
 	}); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

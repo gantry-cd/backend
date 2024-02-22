@@ -81,6 +81,18 @@ message CreatePreviewReply {
   repeated NodePort node_ports = 4;
 }
 
-message GetDeployYamlsReply{
-  string yaml = 1;
+
+message Pod {
+  string name = 1;
+  string status = 2;
+  string age = 3;
+  string image = 4;
 }
+
+message GetDeployInfomationReply{
+  string namespace = 1;
+  string branch =2;
+  repeated Pod pods = 3;
+  string yaml = 4;
+}
+

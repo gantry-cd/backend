@@ -31,8 +31,18 @@ func (k *k8sClient) GetServices(ctx context.Context, param GetServicesParams, op
 
 	for _, service := range services.Items {
 		// laebls match
-		if service.Labels[RepositoryLabel] == param.Repository && service.Labels[PullRequestID] == param.PullRequestID {
-			result = append(result, &service)
+		if service.Labels[RepositoryLabel] == param.Repository {
+			if len(param.PullRequestID) != 0 {
+				if service.Labels[PullRequestID] == param.PullRequestID {
+					result = append(result, &service)
+				}
+			}
+
+			if len(param.Branch) != 0 {
+				if service.Labels[BaseBranchLabel] == param.Branch {
+					result = append(result, &service)
+				}
+			}
 		}
 	}
 

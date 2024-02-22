@@ -16,6 +16,8 @@ type GetRepositoryAppsResponse struct {
 type GetBranchInfoRequest struct {
 	Organization string `json:"organization"`
 	Repository   string `json:"repository"`
+	PullreqID    string `json:"pullreqId"`
+	Branch       string `json:"branch"`
 }
 
 type GetBranchInfoResponse struct {

@@ -23,12 +23,14 @@ service K8sCustomController {
   // Resource Control
   rpc GetAlls(google.protobuf.Empty) returns(GetAllsReply);
   rpc GetOrgRepos(GetOrgRepoRequest) returns(GetOrgReposReply);
-  rpc GetBranchInfo(GetBranchInfoRequest) returns(GetBranchInfoReply);
+  
+  // preview control
   rpc CreatePreview(CreatePreviewRequest) returns(CreatePreviewReply);
   rpc UpdatePreview(CreatePreviewRequest) returns(CreatePreviewReply);
   rpc DeletePreview(DeletePreviewRequest) returns(google.protobuf.Empty);
   
-  rpc GetDeployYamls(GetDeployYamlsRequest) returns(GetDeployYamlsReply);
+ 
+  rpc GetDeployInfomation(GetDeployInfomationRequest) returns(GetDeployInfomationReply);
 
   rpc GetResource(GetResourceRequest) returns (GetResourceReply);
 }
