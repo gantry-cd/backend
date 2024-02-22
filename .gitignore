@@ -4,3 +4,7 @@ influx/data
 bin/
 .kube
 .crt
+/pkg
+.idea
+proto/bff_v1.pb.go
+proto/bff_v1_grpc.pb.go

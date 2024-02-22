@@ -1,8 +1,10 @@
 package controller
 
 import (
+	"bufio"
 	"context"
 	"errors"
+	corev1 "k8s.io/api/core/v1"
 	"sort"
 	"time"
 
@@ -223,4 +225,36 @@ func (c *controller) getOrganization(ctx context.Context, organization string) (
 		Applications: apps,
 		Repositories: repos,
 	}, nil
+}
+
+func (c *controller) GetLogs(request *v1.GetLogsRequest, server v1.K8SCustomController_GetLogsServer) error {
+	namespace := request.GetNamespace()
+	podName := request.GetPodName()
+	logRequest := c.control.GetLogs(namespace, podName, corev1.PodLogOptions{
+		Follow: true,
+	})
+	readCloser, err := logRequest.Stream(server.Context())
+	if err != nil {
+		return err
+	}
+	scanner := bufio.NewScanner(readCloser)
+	id := 0
+	for scanner.Scan() {
+		err := server.Send(&v1.GetLogsReply{
+			Id:      int32(id),
+			Message: scanner.Text(),
+		})
+		if err != nil {
+			return err
+		}
+		id++
+	}
+	if err := scanner.Err(); err != nil {
+		return err
+	}
+	if err := readCloser.Close(); err != nil {
+		return err
+	}
+
+	return nil
 }

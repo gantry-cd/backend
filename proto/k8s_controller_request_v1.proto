@@ -76,3 +76,8 @@ message BuildImageRequest {
   string image_name = 8;
   string token = 9;
 }
+
+message GetLogsRequest{
+  string namespace = 1;
+  string podName = 2;
+}

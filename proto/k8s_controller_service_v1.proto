@@ -34,4 +34,6 @@ service K8sCustomController {
   rpc BuildImage(BuildImageRequest) returns (BuildImageReply);
 
   rpc GetResource(GetResourceRequest) returns (GetResourceReply);
+
+  rpc GetLogs(GetLogsRequest) returns (stream GetLogsReply);
 }
