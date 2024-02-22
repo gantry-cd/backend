@@ -1,28 +1,27 @@
-package controller
+package usage
 
 import (
 	"net/http"
 
 	"github.com/gantrycd/backend/internal/models"
-	"github.com/gantrycd/backend/internal/usecases/application/resource"
+	"github.com/gantrycd/backend/internal/usecases/application/usage"
 )
 
 type UsageController struct {
-	interactor resource.ResrouceInteractor
+	interactor usage.ResrouceInteractor
 }
 
-func New(interactor resource.ResrouceInteractor) *UsageController {
+func New(interactor usage.ResrouceInteractor) *UsageController {
 	return &UsageController{
 		interactor: interactor,
 	}
 }
 
 func (uc *UsageController) Usage(w http.ResponseWriter, r *http.Request) {
-	queries := r.URL.Query()
 
 	if err := uc.interactor.GetResource(r.Context(), w, models.UsageRequest{
-		Organization: queries.Get(models.ParamOrganization),
-		Repository:   queries.Get(models.ParamRepository),
+		Organization: r.PathValue(models.ParamOrganization),
+		Pod:          r.PathValue(models.ParamPod),
 	}); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

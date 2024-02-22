@@ -3,14 +3,14 @@ package router
 import (
 	"net/http"
 
-	"github.com/gantrycd/backend/internal/handler/application/controller"
+	controller "github.com/gantrycd/backend/internal/handler/application/usage"
 	"github.com/gantrycd/backend/internal/router/middleware"
-	"github.com/gantrycd/backend/internal/usecases/application/resource"
+	usecase "github.com/gantrycd/backend/internal/usecases/application/usage"
 )
 
 func (r *router) Usage() {
 	uc := controller.New(
-		resource.New(r.controllerConn),
+		usecase.New(r.controllerConn),
 	)
 
 	r.mux.Handle("GET /organizations/pods", middleware.BuildChain(

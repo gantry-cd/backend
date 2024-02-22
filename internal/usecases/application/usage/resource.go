@@ -1,4 +1,4 @@
-package resource
+package usage
 
 import (
 	"context"
@@ -29,7 +29,7 @@ func (r *resrouceInteractor) GetResource(ctx context.Context, w http.ResponseWri
 	var usages []models.Usage
 	result, err := r.resource.GetResource(ctx, &v1.GetResourceRequest{
 		Organization: request.Organization,
-		Repository:   request.Repository,
+		Repository:   request.Pod,
 	})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

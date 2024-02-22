@@ -2,7 +2,7 @@ package models
 
 type UsageRequest struct {
 	Organization string `json:"organization"`
-	Repository   string `json:"repository"`
+	Pod          string `json:"pod"`
 }
 
 type UsageResponse struct {
