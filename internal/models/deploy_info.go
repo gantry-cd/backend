@@ -7,7 +7,7 @@ type Pod struct {
 	Image  string `json:"image"`
 }
 
-type BranchInfomationResponse struct {
+type BranchInformationResponse struct {
 	BranchName string `json:"branchName"`
 	GitHubLink string `json:"gitHubLink"`
 	Pods       []Pod  `json:"pods"`

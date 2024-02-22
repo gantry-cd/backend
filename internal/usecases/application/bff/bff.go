@@ -131,7 +131,7 @@ func (b *bffInteractor) GetBranchInfo(ctx context.Context, w http.ResponseWriter
 		})
 	}
 
-	if err := json.NewEncoder(w).Encode(models.BranchInfomationResponse{
+	if err := json.NewEncoder(w).Encode(models.BranchInformationResponse{
 		BranchName: result.Branch,
 		GitHubLink: fmt.Sprintf("https://github.com/%s/%s/pull/%s", request.Organization, request.Repository, request.PullreqID),
 		Pods:       pods,
