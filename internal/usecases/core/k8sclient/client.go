@@ -29,6 +29,7 @@ type K8SClient interface {
 	DeleteDeployment(ctx context.Context, namespace string, opts ...Option) error
 
 	// service
+	GetServices(ctx context.Context, param GetServicesParams, opts ...Option) ([]*corev1.Service, error)
 	CreateNodePortService(ctx context.Context, param CreateServiceNodePortParams, opts ...Option) (*corev1.Service, error)
 	DeleteService(ctx context.Context, namespace string, opts ...Option) error
 }

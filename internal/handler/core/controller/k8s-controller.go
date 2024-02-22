@@ -15,6 +15,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"gopkg.in/yaml.v3"
 	"k8s.io/client-go/kubernetes"
 )
 
@@ -230,5 +231,55 @@ func (c *controller) GetBranchInfo(ctx context.Context, in *v1.GetBranchInfoRequ
 	yaml := string(rowYaml)
 	return &v1.GetBranchInfoReply{
 		Yaml: yaml,
+	}, nil
+}
+
+func (c *controller) GetDeployYamls(ctx context.Context, in *v1.GetDeployYamlsRequest) (*v1.GetDeployYamlsReply, error) {
+	dep, err := c.control.GetDeployment(ctx, k8sclient.GetDeploymentParams{
+		Namespace:     in.Organization,
+		Repository:    in.Repository,
+		PullRequestID: in.PullRequestId,
+		Branch:        branch.Transpile1123(in.Branch),
+	})
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+	// objectmeta.managefields.fieldv1のフィールドを削除
+	for i := range dep.GetObjectMeta().GetManagedFields() {
+		dep.ObjectMeta.ManagedFields[i].FieldsV1 = nil
+	}
+
+	depYaml, err := yaml.Marshal(dep)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	services, err := c.control.GetServices(ctx, k8sclient.GetServicesParams{
+		Namespace:     in.Organization,
+		Repository:    in.Repository,
+		PullRequestID: in.PullRequestId,
+	})
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	for _, svc := range services {
+		// objectmeta.managefields.fieldv1のフィールドを削除
+		for i := range svc.GetObjectMeta().GetManagedFields() {
+			svc.ObjectMeta.ManagedFields[i].FieldsV1 = nil
+		}
+
+		svcYaml, err := yaml.Marshal(svc)
+
+		if err != nil {
+			return nil, status.Error(codes.Internal, err.Error())
+		}
+		depYaml = append(depYaml, []byte(fmt.Sprintf("\n---\n%s", svcYaml))...)
+	}
+
+	fmt.Println(string(depYaml))
+
+	return &v1.GetDeployYamlsReply{
+		Yaml: string(depYaml),
 	}, nil
 }

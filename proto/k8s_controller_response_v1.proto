@@ -80,3 +80,7 @@ message CreatePreviewReply {
   string version = 3;
   repeated NodePort node_ports = 4;
 }
+
+message GetDeployYamlsReply{
+  string yaml = 1;
+}

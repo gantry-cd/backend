@@ -9,6 +9,36 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 )
 
+type GetServicesParams struct {
+	Namespace     string
+	Repository    string
+	PullRequestID string
+	Branch        string
+}
+
+func (k *k8sClient) GetServices(ctx context.Context, param GetServicesParams, opts ...Option) ([]*corev1.Service, error) {
+	o := newOption()
+	for _, opt := range opts {
+		opt(o)
+	}
+
+	services, err := k.client.CoreV1().Services(param.Namespace).List(ctx, metav1.ListOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	var result []*corev1.Service
+
+	for _, service := range services.Items {
+		// laebls match
+		if service.Labels[RepositoryLabel] == param.Repository && service.Labels[PullRequestID] == param.PullRequestID {
+			result = append(result, &service)
+		}
+	}
+
+	return result, nil
+}
+
 type CreateServiceNodePortParams struct {
 	Namespace   string
 	ServiceName string
