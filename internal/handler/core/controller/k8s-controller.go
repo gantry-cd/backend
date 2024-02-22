@@ -224,3 +224,22 @@ func (c *controller) getOrganization(ctx context.Context, organization string) (
 		Repositories: repos,
 	}, nil
 }
+
+func (c *controller) GetRepoBranches(ctx context.Context, in *v1.GetRepoBranchesRequest) (*v1.GetRepoBranchesReply, error) {
+	dep, err := c.control.ListDeployments(ctx, in.Organization, k8sclient.WithRepositoryLabel(in.Repository))
+	if err != nil {
+		return nil, err
+	}
+	var branches []*v1.Branches
+	for _, d := range dep.Items {
+		branches = append(branches, &v1.Branches{
+			Name:    d.Labels[k8sclient.BaseBranchLabel],
+			Status:  string(d.Status.Conditions[0].Type),
+			Version: d.Spec.Template.GetResourceVersion(),
+			Age:     d.CreationTimestamp.Format(time.DateTime),
+		})
+	}
+	return &v1.GetRepoBranchesReply{
+		Branches: branches,
+	}, nil
+}
