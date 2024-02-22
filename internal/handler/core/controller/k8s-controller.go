@@ -216,7 +216,9 @@ func (c *controller) getOrganization(ctx context.Context, organization string) (
 func (c *controller) GetLogs(request *v1.GetLogsRequest, server v1.K8SCustomController_GetLogsServer) error {
 	namespace := request.GetNamespace()
 	podName := request.GetPodName()
-	logRequest := c.control.GetLogs(namespace, podName, corev1.PodLogOptions{})
+	logRequest := c.control.GetLogs(namespace, podName, corev1.PodLogOptions{
+		Follow: true,
+	})
 	readCloser, err := logRequest.Stream(server.Context())
 	if err != nil {
 		return err
@@ -233,7 +235,6 @@ func (c *controller) GetLogs(request *v1.GetLogsRequest, server v1.K8SCustomCont
 		}
 		id++
 	}
-
 	if err := scanner.Err(); err != nil {
 		return err
 	}
