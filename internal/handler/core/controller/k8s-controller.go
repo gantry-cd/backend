@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"errors"
+	"fmt"
 	"sort"
 	"time"
 
@@ -213,10 +214,21 @@ func (c *controller) getOrganization(ctx context.Context, organization string) (
 
 func (c *controller) GetBranchInfo(ctx context.Context, in *v1.GetBranchInfoRequest) (*v1.GetBranchInfoReply, error) {
 	dep, err := c.control.GetDeployment(ctx, k8sclient.GetDeploymentParams{
-		Namespace:  in.Organization,
-		Repository: in.Repository,
-		Branch:     branch.Transpile1123(in.Branch),
-	},
-	k8sclient.
-)
+		Namespace:     in.Organization,
+		Repository:    in.Repository,
+		PullRequestID: in.PullreqId,
+		Branch:        branch.Transpile1123(in.Branch),
+	})
+	if err != nil && !errors.Is(err, coreErr.ErrDeploymentsNotFound) {
+		return nil, err
+	}
+
+	rowYaml, err := dep.Marshal()
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal deployment: %w", err)
+	}
+	yaml := string(rowYaml)
+	return &v1.GetBranchInfoReply{
+		Yaml: yaml,
+	}, nil
 }

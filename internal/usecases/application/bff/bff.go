@@ -17,6 +17,7 @@ type bffInteractor struct {
 type BffInteractor interface {
 	GetHome(ctx context.Context, w http.ResponseWriter) error
 	GetRepositoryApps(ctx context.Context, w http.ResponseWriter, request models.GetRepositoryAppsRequest) error
+	GetBranchInfo(ctx context.Context, w http.ResponseWriter, request models.GetBranchInfoRequest) error
 }
 
 func NewBff(resource v1.K8SCustomControllerClient) BffInteractor {
