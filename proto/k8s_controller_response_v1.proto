@@ -71,7 +71,7 @@ message GetRepoBranchesReply{
 message Branches{
   string Name = 1;
   string Status = 2;
-  int32 Version = 3;
+  string Version = 3;
   string Age = 4; 
 }
 
