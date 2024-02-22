@@ -11,6 +11,7 @@ import (
 	coreErr "github.com/gantrycd/backend/internal/error"
 	"github.com/gantrycd/backend/internal/usecases/core/k8sclient"
 	"github.com/gantrycd/backend/internal/usecases/core/resource"
+	"github.com/gantrycd/backend/internal/utils"
 	"github.com/gantrycd/backend/internal/utils/branch"
 	v1 "github.com/gantrycd/backend/proto"
 	"google.golang.org/grpc/codes"
@@ -87,6 +88,19 @@ func (c *controller) ApplyDeployment(ctx context.Context, in *v1.CreateDeploymen
 
 	// リソースが既に存在している場合は、更新する
 	if dep != nil {
+		dep, err := c.control.UpdateDeployment(context.Background(), dep, k8sclient.UpdateDeploymentParams{
+			Namespace:     in.Namespace,
+			Repository:    in.Repository,
+			PullRequestID: in.PrNumber,
+			Branch:        branch.Transpile1123(in.Branch),
+			AppName:       in.AppName,
+			Image:         utils.ToPtr(in.Image),
+		})
+
+		if err != nil {
+			return nil, err
+		}
+
 		// TODO: Apply Deployment
 		return &v1.CreateDeploymentReply{
 			Name:      dep.Name,

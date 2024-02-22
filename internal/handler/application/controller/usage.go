@@ -21,8 +21,8 @@ func (uc *UsageController) Usage(w http.ResponseWriter, r *http.Request) {
 	queries := r.URL.Query()
 
 	if err := uc.interactor.GetResource(r.Context(), w, models.UsageRequest{
-		Organization: queries.Get(models.QueryOrganization),
-		Repository:   queries.Get(models.QueryRepository),
+		Organization: queries.Get(models.ParamOrganization),
+		Repository:   queries.Get(models.ParamRepository),
 	}); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

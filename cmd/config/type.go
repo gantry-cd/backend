@@ -2,6 +2,10 @@ package config
 
 // config はアプリケーションの設定を表す構造体です。基本的には環境変数から読み込みます。
 type config struct {
+	Application struct {
+		ApplicationName string `env:"APPLICATION_NAME" envDefault:"gantrycd"`
+	}
+
 	Bff struct {
 		Host              string `env:"BFF_HOST" envDefault:"0.0.0.0"`
 		Port              int    `env:"BFF_PORT" envDefault:"8080"`
@@ -11,14 +15,15 @@ type config struct {
 	}
 
 	Controller struct {
-		Host string `env:"CONTROLLER_HOST" envDefault:"0.0.0.0"`
-		Port int    `env:"CONTROLLER_PORT" envDefault:"8081"`
+		Host         string `env:"CONTROLLER_HOST" envDefault:"0.0.0.0"`
+		Port         int    `env:"CONTROLLER_PORT" envDefault:"8081"`
+		ImageBuilder string `env:"IMAGE_BUILDER" envDefault:"ghcr.io/gantrycd/image-builder:v0.0.3"`
 	}
 
 	GitHub struct {
-		AppID     int64  `env:"GITHUB_APP_ID" envDefault:"0"`
-		InstallID int64  `env:"GITHUB_INSTALL_ID" envDefault:"0"`
-		CrtPath   string `env:"GITHUB_CRT_PATH" envDefault:""`
+		AppID    int64  `env:"GITHUB_APP_ID" envDefault:"0"`
+		CrtPath  string `env:"GITHUB_CRT_PATH" envDefault:""`
+		Username string `env:"GITHUB_USERNAME" envDefault:""`
 	}
 
 	KeyCloak struct {
@@ -30,6 +35,12 @@ type config struct {
 		RootURL       string `env:"KEYCLOAK_ROOT_URL" envDefault:"http://localhost:3000"`
 		AdminID       string `env:"KEYCLOAK_ADMIN_ID" envDefault:"admin"`
 		AdminPassword string `env:"KEYCLOAK_ADMIN_PASSWORD" envDefault:"admin"`
+	}
+
+	Registry struct {
+		Host     string `env:"REGISTRY_HOST" envDefault:"localhost"`
+		User     string `env:"REGISTRY_USER" envDefault:""`
+		Password string `env:"REGISTRY_PASSWORD" envDefault:""`
 	}
 }
 

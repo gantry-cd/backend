@@ -19,9 +19,9 @@ const (
 // if err := conf.LoadConf("path/to/config.ini", &conf.Config); err != nil { ... }
 func LoadConf(conf string) (*models.PullRequestConfig, error) {
 	var (
-		config models.PullRequestConfig
 		prefix string
 	)
+	config := defaultConfig()
 
 	for _, line := range strings.Split(conf, "\n") {
 		if strings.HasPrefix(line, "#") {
@@ -42,6 +42,7 @@ func LoadConf(conf string) (*models.PullRequestConfig, error) {
 			return nil, err
 		}
 	}
+
 	return &config, nil
 }
 
@@ -68,6 +69,16 @@ func setValue(model *models.PullRequestConfig, prefix, key, value string) error 
 		}
 	}
 	return nil
+}
+
+func defaultConfig() models.PullRequestConfig {
+	return models.PullRequestConfig{
+		BuildFilePath: "Dockerfile",
+		BuildFileDir:  ".",
+		Replicas:      1,
+		ExposePort:    []int32{},
+		ConfigMaps:    []models.ConfigMap{},
+	}
 }
 
 func set(confType reflect.StructField, confValue reflect.Value, value string) error {
