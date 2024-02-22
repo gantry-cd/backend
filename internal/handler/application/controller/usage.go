@@ -8,10 +8,10 @@ import (
 )
 
 type UsageController struct {
-	interactor resource.ResrouceInteractor
+	interactor resource.ResourceInteractor
 }
 
-func New(interactor resource.ResrouceInteractor) *UsageController {
+func New(interactor resource.ResourceInteractor) *UsageController {
 	return &UsageController{
 		interactor: interactor,
 	}
