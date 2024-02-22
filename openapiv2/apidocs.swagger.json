@@ -97,6 +97,56 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "pullRequestID",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "BffService"
+        ]
+      }
+    },
+    "/organizations/{organization}/repositories/{repository}/pulls/{pullRequestID}": {
+      "get": {
+        "operationId": "BffService_GetBranchInformation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BranchInformationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "organization",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "repository",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "pullRequestID",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
           }
         ],
         "tags": [
@@ -151,19 +201,40 @@
         }
       }
     },
+    "v1BranchInformationResponse": {
+      "type": "object",
+      "properties": {
+        "branchName": {
+          "type": "string"
+        },
+        "gitHubLink": {
+          "type": "string"
+        },
+        "pods": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Pods"
+          }
+        },
+        "yaml": {
+          "type": "string"
+        }
+      }
+    },
     "v1Branches": {
       "type": "object",
       "properties": {
-        "Name": {
+        "name": {
           "type": "string"
         },
-        "Status": {
+        "status": {
           "type": "string"
         },
-        "Version": {
+        "version": {
           "type": "string"
         },
-        "Age": {
+        "age": {
           "type": "string"
         }
       }
@@ -222,6 +293,23 @@
           "items": {
             "type": "string"
           }
+        }
+      }
+    },
+    "v1Pods": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "age": {
+          "type": "string"
+        },
+        "image": {
+          "type": "string"
         }
       }
     },

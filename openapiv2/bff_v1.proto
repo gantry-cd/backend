@@ -25,6 +25,11 @@ service BffService {
       get: "/organizations/{organization}/repositories/{repository}/branches"
     };
   }
+  rpc GetBranchInformation(GetRepoBranchesRequest) returns (BranchInformationResponse){
+    option (google.api.http) = {
+      get: "/organizations/{organization}/repositories/{repository}/pulls/{pullRequestID}"
+    };
+  }
 }
 
 message HomeResponse {
@@ -43,17 +48,32 @@ message GetRepositoryAppsResponse{
 message GetRepoBranchesRequest{
   string organization = 1;
   string repository = 2;
+  int32 pullRequestID = 3;
 }
 
 message GetRepoBranchesResponse{
   repeated Branches branches = 1;
 }
 
+message BranchInformationResponse {
+  string branchName = 1;
+  string gitHubLink = 2;
+  repeated Pods pods = 3;
+  string yaml = 4;
+}
+
+message Pods {
+  string name = 1;
+  string status = 2;
+  string age = 3;
+  string image = 4;
+}
+
 message Branches{
-  string Name = 1;
-  string Status = 2;
-  string Version = 3;
-  string Age = 4; 
+  string name = 1;
+  string status = 2;
+  string version = 3;
+  string age = 4; 
 }
 
 message OrganizationInfos{
