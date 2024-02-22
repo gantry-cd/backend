@@ -146,13 +146,13 @@ func (c *controller) GetResource(ctx context.Context, in *v1.GetResourceRequest)
 	if err != nil {
 		return &v1.GetResourceReply{
 			Resources: resource,
-			IsDisable: false,
+			IsDisable: true,
 		}, nil
 	}
 
 	return &v1.GetResourceReply{
 		Resources: resource,
-		IsDisable: true,
+		IsDisable: false,
 	}, nil
 }
 
