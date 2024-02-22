@@ -121,7 +121,6 @@ func (ge *githubAppEvents) UpdatePreviewEnvironment(ctx context.Context, param U
 		Number:       param.PrNumber,
 	}
 
-	// TODO: image buildする
 	image, err := ge.BuildImage(ctx, BuildImageParams{
 		Organization:  param.Organization,
 		Repository:    param.Repository,
@@ -136,7 +135,7 @@ func (ge *githubAppEvents) UpdatePreviewEnvironment(ctx context.Context, param U
 	}
 
 	// デプロイする
-	_, err = ge.customController.UpdatePreview(ctx, &v1.CreatePreviewRequest{
+	dep, err := ge.customController.UpdatePreview(ctx, &v1.CreatePreviewRequest{
 		Organization:  param.Organization,
 		Repository:    param.Repository,
 		PullRequestId: fmt.Sprintf("%d", param.PrNumber),
@@ -149,7 +148,20 @@ func (ge *githubAppEvents) UpdatePreviewEnvironment(ctx context.Context, param U
 		return err
 	}
 
-	_, _, err = param.GhClient.CreateReview(ctx, meta, fmt.Sprintf("[%v] Deployments Updated!  :)", time.Now().Format(time.DateTime)))
+	if dep.GetNodePorts() == nil {
+		_, _, err = param.GhClient.CreateReview(ctx, meta, fmt.Sprintf("[%v] ✔️Deployment update successful ", time.Now().Format(time.DateTime)))
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
+	var ports string
+	for _, p := range dep.NodePorts {
+		ports += fmt.Sprintf("%d:%d ", p.Port, p.Target)
+	}
+
+	_, _, err = param.GhClient.CreateReview(ctx, meta, fmt.Sprintf("[%v] ✔️Deployment and service created\n Exposing service on port %s ", time.Now().Format(time.DateTime), ports))
 	if err != nil {
 		return err
 	}

@@ -38,6 +38,11 @@ func (c *controller) CreatePreview(ctx context.Context, in *v1.CreatePreviewRequ
 
 func (c *controller) createDeployment(ctx context.Context, in *v1.CreatePreviewRequest) (*v1.CreatePreviewReply, error) {
 	branchName := branch.Transpile1123(in.Branch)
+
+	if in.Replicas == 0 {
+		in.Replicas = 1
+	}
+
 	deps, err := c.control.CreateDeployment(ctx,
 		k8sclient.CreateDeploymentParams{
 			Namespace: in.Organization,
@@ -100,6 +105,7 @@ func (c *controller) createDeployment(ctx context.Context, in *v1.CreatePreviewR
 
 func (c *controller) UpdatePreview(ctx context.Context, in *v1.CreatePreviewRequest) (*v1.CreatePreviewReply, error) {
 	branchName := branch.Transpile1123(in.Branch)
+
 	dep, err := c.control.GetDeployment(ctx,
 		k8sclient.GetDeploymentParams{
 			Namespace:     in.Organization,

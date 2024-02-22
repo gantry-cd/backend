@@ -3,7 +3,6 @@ package github
 import (
 	"context"
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/gantrycd/backend/cmd/config"
@@ -140,10 +139,8 @@ func parseConfig(prMessage string) (*models.PullRequestConfig, error) {
 			continue
 		}
 
-		log.Println(scan, line)
-
 		if scan {
-			raw += line + "\n"
+			raw += strings.TrimSpace(line) + "\n"
 		}
 	}
 

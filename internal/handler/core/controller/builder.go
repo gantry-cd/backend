@@ -50,6 +50,6 @@ func (c *controller) BuildImage(ctx context.Context, in *v1.BuildImageRequest) (
 	}
 
 	return &v1.BuildImageReply{
-		Image: *image,
+		Image: image,
 	}, nil
 }

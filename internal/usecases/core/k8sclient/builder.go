@@ -2,7 +2,6 @@ package k8sclient
 
 import (
 	"context"
-	"crypto/sha256"
 	"fmt"
 	"strings"
 	"time"
@@ -43,20 +42,20 @@ type ImageBuilderParams struct {
 
 // imageBuilderEnv はイメージビルダーの環境変数とimageを生成する .
 func imageBuilderEnv(param ImageBuilderParams) ([]v1.EnvVar, string) {
-	tagSha := string(sha256.New().Sum([]byte(time.Now().String())))
+	tag, _ := random.RandomString(20)
 	image := fmt.Sprintf("%s/%s/%s", config.Config.Registry.Host, config.Config.Application.ApplicationName, param.Repository)
 
 	return []v1.EnvVar{
 		toEnvVar(EnvGitRepo, url.IncludeBasicAuth(param.GitRepo, config.Config.GitHub.Username, config.Config.GitHub.Password)),
 		toEnvVar(EnvGitBranch, param.GitBranch),
 		toEnvVar(EnvImageName, image),
-		toEnvVar(EnvImageTag, tagSha),
+		toEnvVar(EnvImageTag, tag),
 		toEnvVar(EnvDockerBaseDir, param.DockerBaseDir),
 		toEnvVar(EnvDockerFilePath, param.DockerFilePath),
 		toEnvVar(EnvDockerRegistry, config.Config.Registry.Host),
 		toEnvVar(EnvDockerUser, config.Config.Registry.User),
 		toEnvVar(EnvDockerPassword, config.Config.Registry.Password),
-	}, fmt.Sprintf("%s:%s", image, tagSha)
+	}, fmt.Sprintf("%s:%s", image, tag)
 }
 
 const (
@@ -71,7 +70,7 @@ type BuilderParams struct {
 	BuilderParam ImageBuilderParams
 }
 
-func (k *k8sClient) Builder(ctx context.Context, param BuilderParams, opts ...Option) (*string, error) {
+func (k *k8sClient) Builder(ctx context.Context, param BuilderParams, opts ...Option) (string, error) {
 	o := newOption()
 
 	for _, opt := range opts {
@@ -80,7 +79,7 @@ func (k *k8sClient) Builder(ctx context.Context, param BuilderParams, opts ...Op
 
 	name, err := random.RandomString(20)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	envVar, image := imageBuilderEnv(param.BuilderParam)
@@ -111,14 +110,14 @@ func (k *k8sClient) Builder(ctx context.Context, param BuilderParams, opts ...Op
 		},
 	}, metav1.CreateOptions{})
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, err.Error())
+		return "", status.Errorf(codes.Internal, err.Error())
 	}
 
 	if err := k.waitForJob(ctx, param.Namespace, job.Name); err != nil {
-		return nil, err
+		return "", err
 	}
-
-	return utils.ToPtr(image), nil
+	fmt.Println(image)
+	return image, nil
 }
 
 func (k *k8sClient) waitForJob(ctx context.Context, namespace, name string) error {
