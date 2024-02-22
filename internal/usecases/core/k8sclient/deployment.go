@@ -76,13 +76,7 @@ type GetDeploymentParams struct {
 }
 
 func (k *k8sClient) GetDeployment(ctx context.Context, param GetDeploymentParams) (*appsv1.Deployment, error) {
-	deps, err := k.client.AppsV1().Deployments(param.Namespace).List(ctx, metav1.ListOptions{
-		LabelSelector: labels.Set(map[string]string{
-			RepositoryLabel: param.Repository,
-			PullRequestID:   param.PullRequestID,
-			BaseBranchLabel: param.Branch,
-		}).String(),
-	})
+	deps, err := k.client.AppsV1().Deployments(param.Namespace).List(ctx, metav1.ListOptions{})
 
 	for _, dep := range deps.Items {
 		if dep.Labels[RepositoryLabel] == param.Repository && dep.Labels[PullRequestID] == param.PullRequestID && dep.Labels[BaseBranchLabel] == param.Branch {

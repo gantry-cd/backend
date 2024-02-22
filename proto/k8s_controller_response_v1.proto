@@ -64,6 +64,17 @@ message GetResourceReply {
   bool is_disable = 2;
 };
 
+message GetRepoBranchesReply{
+  repeated Branches branches = 1;
+}
+
+message Branches{
+  string Name = 1;
+  string Status = 2;
+  string Version = 3;
+  string Age = 4; 
+}
+
 message NodePort {
   int32 target = 1;
   int32 port = 2;

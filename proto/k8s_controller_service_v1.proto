@@ -25,6 +25,7 @@ service K8sCustomController {
   // Resource Control
   rpc GetAlls(google.protobuf.Empty) returns(GetAllsReply);
   rpc GetOrgRepos(GetOrgRepoRequest) returns(GetOrgReposReply);
+  rpc GetRepoBranches(GetRepoBranchesRequest) returns(GetRepoBranchesReply);
 
   rpc CreatePreview(CreatePreviewRequest) returns(CreatePreviewReply);
   rpc UpdatePreview(CreatePreviewRequest) returns(CreatePreviewReply);

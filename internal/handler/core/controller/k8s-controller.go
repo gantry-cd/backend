@@ -4,9 +4,10 @@ import (
 	"bufio"
 	"context"
 	"errors"
-	corev1 "k8s.io/api/core/v1"
 	"sort"
 	"time"
+
+	corev1 "k8s.io/api/core/v1"
 
 	coreErr "github.com/gantrycd/backend/internal/error"
 	"github.com/gantrycd/backend/internal/usecases/core/k8sclient"
@@ -148,13 +149,13 @@ func (c *controller) GetResource(ctx context.Context, in *v1.GetResourceRequest)
 	if err != nil {
 		return &v1.GetResourceReply{
 			Resources: resource,
-			IsDisable: false,
+			IsDisable: true,
 		}, nil
 	}
 
 	return &v1.GetResourceReply{
 		Resources: resource,
-		IsDisable: true,
+		IsDisable: false,
 	}, nil
 }
 
@@ -257,4 +258,23 @@ func (c *controller) GetLogs(request *v1.GetLogsRequest, server v1.K8SCustomCont
 	}
 
 	return nil
+}
+
+func (c *controller) GetRepoBranches(ctx context.Context, in *v1.GetRepoBranchesRequest) (*v1.GetRepoBranchesReply, error) {
+	dep, err := c.control.ListDeployments(ctx, in.Organization, k8sclient.WithRepositoryLabel(in.Repository))
+	if err != nil {
+		return nil, err
+	}
+	var branches []*v1.Branches
+	for _, d := range dep.Items {
+		branches = append(branches, &v1.Branches{
+			Name:    d.Labels[k8sclient.BaseBranchLabel],
+			Status:  string(d.Status.Conditions[0].Type),
+			Version: d.Spec.Template.GetResourceVersion(),
+			Age:     d.CreationTimestamp.Format(time.DateTime),
+		})
+	}
+	return &v1.GetRepoBranchesReply{
+		Branches: branches,
+	}, nil
 }

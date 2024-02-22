@@ -17,6 +17,7 @@ type bffInteractor struct {
 type BffInteractor interface {
 	GetHome(ctx context.Context, w http.ResponseWriter) error
 	GetRepositoryApps(ctx context.Context, w http.ResponseWriter, request models.GetRepositoryAppsRequest) error
+	GetRepoBranches(ctx context.Context, w http.ResponseWriter, request models.GetRepoBranchesRequest) error
 }
 
 func NewBff(resource v1.K8SCustomControllerClient) BffInteractor {
@@ -104,4 +105,28 @@ func containsValue(list []string, value string) bool {
 		}
 	}
 	return false
+}
+
+func (b *bffInteractor) GetRepoBranches(ctx context.Context, w http.ResponseWriter, request models.GetRepoBranchesRequest) error {
+	var branches []models.Branches
+	result, err := b.resource.GetRepoBranches(ctx, &v1.GetRepoBranchesRequest{
+		Organization: request.Organization,
+		Repository:   request.Repository,
+	})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	for _, branch := range result.GetBranches() {
+		branches = append(branches, models.Branches{
+			Name:    branch.Name,
+			Status:  branch.Status,
+			Version: branch.Version,
+			Age:     branch.Age,
+		})
+	}
+	if err := json.NewEncoder(w).Encode(models.GetRepoBranchesResponse{Branches: branches}); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	return nil
 }

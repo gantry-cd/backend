@@ -35,9 +35,9 @@ genrestproto:
     proto/bff*.proto
 
 genswag:
-	protoc -I . --openapiv2_out ./openapiv2 --openapiv2_opt=allow_merge=true proto/bff_v1.proto
+	protoc -I . --openapiv2_out ./openapiv2 --openapiv2_opt=allow_merge=true openapiv2/bff_v1.proto
 lintproto:
-	protolint lint proto/**/*.proto
+	protolint lint proto/*.proto
 
 .PHONY: create-network run
 

@@ -13,7 +13,7 @@ func (r *router) Usage() {
 		resource.New(r.controllerConn),
 	)
 
-	r.mux.Handle("GET /usage", middleware.BuildChain(
+	r.mux.Handle("GET /organizations/pods", middleware.BuildChain(
 		r.middleware.Integrate(
 			http.HandlerFunc(uc.Usage),
 		),
