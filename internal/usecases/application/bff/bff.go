@@ -108,22 +108,22 @@ func containsValue(list []string, value string) bool {
 	return false
 }
 
-func (b *bffInteractor) GetBranchInfo(ctx context.Context, w http.ResponseWriter, request models.GetBranchInfoRequest) error {
-	var resBranches models.GerBranchInfoResponse
-	result, err := b.resource.GetBranchInfo(ctx, &v1.GetBranchInfoRequest{
-		Organization: request.Organization,
-		Repository:   request.Repository,
-	})
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
+// func (b *bffInteractor) GetBranchInfo(ctx context.Context, w http.ResponseWriter, request models.GetBranchInfoRequest) error {
+// 	var resBranches models.GerBranchInfoResponse
+// 	result, err := b.resource.GetBranchInfo(ctx, &v1.GetBranchInfoRequest{
+// 		Organization: request.Organization,
+// 		Repository:   request.Repository,
+// 	})
+// 	if err != nil {
+// 		http.Error(w, err.Error(), http.StatusInternalServerError)
+// 	}
 
-	branches := result.GetBranches()
-	for _, branch := range branches {
-		resBranches = append(resBranches, models.Branches{})
-	}
-	if err := json.NewEncoder(w).Encode(models.GetBranchInfoResponse{Branches: resBranches}); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-	return nil
-}
+// 	branches := result.GetBranches()
+// 	for _, branch := range branches {
+// 		resBranches = append(resBranches, models.Branches{})
+// 	}
+// 	if err := json.NewEncoder(w).Encode(models.GetBranchInfoResponse{Branches: resBranches}); err != nil {
+// 		http.Error(w, err.Error(), http.StatusInternalServerError)
+// 	}
+// 	return nil
+// }
