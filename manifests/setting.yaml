@@ -1,0 +1,24 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: gantry-configs
+data:
+  TZ: Asia/Tokyo
+  # bff server setting
+  BFF_HOST: gantry-bff
+  BFF_PORT: "8080"
+  # controller server setting
+  CONTROLLER_HOST: gantry-controller
+  CONTROLLER_PORT: "8080"
+  # image builder
+  IMAGE_BUILDER: ghcr.io/gantrycd/image-builder:v0.0.5
+
+  # GitHubApp setting
+  GITHUB_APP_ID: "823299"
+  # crtはseceretに入れる
+  GITHUB_APP_NAME: "gantry-kensho-kun"
+
+  # Registry Setting
+  REGISTRY_HOST: ghcr.io
+  REGISTRY_USER: gantrycd
+  REGISTRY_PASS: afugishsifs

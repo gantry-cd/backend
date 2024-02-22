@@ -20,6 +20,30 @@ service BffService {
       get: "/organizations/{organization}/repositories"
     };
   }
+
+  rpc UpdateGlobalConfigGeneral(GlobalConfigGeneral) returns (GlobalConfigGeneral){
+    option (google.api.http) = {
+      put: "/global-config/general"
+    };
+  }
+
+  rpc GetGlobalConfigGeneralGet(google.protobuf.Empty) returns (GlobalConfigGeneral){
+    option (google.api.http) = {
+      get: "/global-config/general"
+    };
+  }
+
+  rpc GetGlobalConfigGeneralRegistry(google.protobuf.Empty) returns (GlobalConfigRegistry){
+    option (google.api.http) = {
+      get: "/global-config/registry"
+    };
+  }
+
+  rpc UpdateGlobalConfigGeneralRegistry(GlobalConfigRegistry) returns (GlobalConfigRegistry){
+    option (google.api.http) = {
+      put: "/global-config/registry"
+    };
+  }
 }
 
 message HomeResponse {
@@ -52,4 +76,14 @@ message Apps{
   string status = 2;
   string version = 3;
   string age = 4;
+}
+
+message GlobalConfigGeneral{
+  // TODO:増えたら増やす。いまはまだない。。。
+}
+
+message GlobalConfigRegistry{
+  string registry_hsot = 1;
+  string registry_user = 2;
+  string registry_password = 3;
 }

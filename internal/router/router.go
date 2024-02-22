@@ -31,5 +31,6 @@ func NewRouter(
 	r.health()
 	r.page()
 	r.Usage()
+	r.globalSetting()
 	return r.mux
 }
