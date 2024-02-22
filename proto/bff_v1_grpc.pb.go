@@ -23,7 +23,8 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type BffServiceClient interface {
-	GetOrg(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetOrgResponse, error)
+	GetOrg(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*HomeResponse, error)
+	GetRepositoryApps(ctx context.Context, in *GetRepositoryAppsRequest, opts ...grpc.CallOption) (*GetRepositoryAppsResponse, error)
 }
 
 type bffServiceClient struct {
@@ -34,9 +35,18 @@ func NewBffServiceClient(cc grpc.ClientConnInterface) BffServiceClient {
 	return &bffServiceClient{cc}
 }
 
-func (c *bffServiceClient) GetOrg(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetOrgResponse, error) {
-	out := new(GetOrgResponse)
+func (c *bffServiceClient) GetOrg(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*HomeResponse, error) {
+	out := new(HomeResponse)
 	err := c.cc.Invoke(ctx, "/gantrycd.bff.v1.BffService/GetOrg", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bffServiceClient) GetRepositoryApps(ctx context.Context, in *GetRepositoryAppsRequest, opts ...grpc.CallOption) (*GetRepositoryAppsResponse, error) {
+	out := new(GetRepositoryAppsResponse)
+	err := c.cc.Invoke(ctx, "/gantrycd.bff.v1.BffService/GetRepositoryApps", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +57,8 @@ func (c *bffServiceClient) GetOrg(ctx context.Context, in *emptypb.Empty, opts .
 // All implementations must embed UnimplementedBffServiceServer
 // for forward compatibility
 type BffServiceServer interface {
-	GetOrg(context.Context, *emptypb.Empty) (*GetOrgResponse, error)
+	GetOrg(context.Context, *emptypb.Empty) (*HomeResponse, error)
+	GetRepositoryApps(context.Context, *GetRepositoryAppsRequest) (*GetRepositoryAppsResponse, error)
 	mustEmbedUnimplementedBffServiceServer()
 }
 
@@ -55,8 +66,11 @@ type BffServiceServer interface {
 type UnimplementedBffServiceServer struct {
 }
 
-func (UnimplementedBffServiceServer) GetOrg(context.Context, *emptypb.Empty) (*GetOrgResponse, error) {
+func (UnimplementedBffServiceServer) GetOrg(context.Context, *emptypb.Empty) (*HomeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetOrg not implemented")
+}
+func (UnimplementedBffServiceServer) GetRepositoryApps(context.Context, *GetRepositoryAppsRequest) (*GetRepositoryAppsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRepositoryApps not implemented")
 }
 func (UnimplementedBffServiceServer) mustEmbedUnimplementedBffServiceServer() {}
 
@@ -89,6 +103,24 @@ func _BffService_GetOrg_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BffService_GetRepositoryApps_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetRepositoryAppsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BffServiceServer).GetRepositoryApps(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gantrycd.bff.v1.BffService/GetRepositoryApps",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BffServiceServer).GetRepositoryApps(ctx, req.(*GetRepositoryAppsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // BffService_ServiceDesc is the grpc.ServiceDesc for BffService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -99,6 +131,10 @@ var BffService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetOrg",
 			Handler:    _BffService_GetOrg_Handler,
+		},
+		{
+			MethodName: "GetRepositoryApps",
+			Handler:    _BffService_GetRepositoryApps_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

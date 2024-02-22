@@ -42,6 +42,7 @@ func LoadConf(conf string) (*models.PullRequestConfig, error) {
 			return nil, err
 		}
 	}
+
 	return &config, nil
 }
 
@@ -75,7 +76,7 @@ func defaultConfig() models.PullRequestConfig {
 		BuildFilePath: "Dockerfile",
 		BuildFileDir:  ".",
 		Replicas:      1,
-		ExposePort:    []int32{80},
+		ExposePort:    []int32{},
 		ConfigMaps:    []models.ConfigMap{},
 	}
 }
