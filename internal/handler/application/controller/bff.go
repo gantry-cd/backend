@@ -34,3 +34,16 @@ func (bc *BffController) RepositoryApps(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 }
+
+func (bc *BffController) GetRepoBranches(w http.ResponseWriter, r *http.Request) {
+	organization := r.PathValue(models.ParamOrganization)
+	repo := r.PathValue(models.ParamRepository)
+
+	if err := bc.interactor.GetRepoBranches(r.Context(), w, models.GetRepoBranchesRequest{
+		Organization: organization,
+		Repository:   repo,
+	}); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+}

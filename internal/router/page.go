@@ -20,4 +20,5 @@ func (r *router) page() {
 			),
 		))
 	r.mux.Handle("GET /organizations/{organization}/repositories", (http.HandlerFunc(bc.RepositoryApps)))
+	r.mux.Handle("GET /organizations/{organization}/repositories/{repository}/branches", (http.HandlerFunc(bc.GetRepoBranches)))
 }
