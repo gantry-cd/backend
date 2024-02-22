@@ -24,7 +24,6 @@ type config struct {
 		AppID    int64  `env:"GITHUB_APP_ID" envDefault:"0"`
 		CrtPath  string `env:"GITHUB_CRT_PATH" envDefault:""`
 		Username string `env:"GITHUB_USERNAME" envDefault:""`
-		Password string `env:"GITHUB_PASSWORD" envDefault:""`
 	}
 
 	KeyCloak struct {

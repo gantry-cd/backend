@@ -40,3 +40,15 @@ lintproto:
 	protolint lint proto/**/*.proto
 
 .PHONY: create-network run
+
+build_bff:
+	docker build -t harbor.seafood-dev.com/dev/bff:latest -f cmd/bff/Dockerfile .
+
+build_controller:
+	docker build -t harbor.seafood-dev.com/dev/controller:latest -f cmd/controller/Dockerfile .
+
+push_bff: build_bff
+	docker push harbor.seafood-dev.com/dev/bff:latest
+
+push_controller: build_controller
+	docker push harbor.seafood-dev.com/dev/controller:latest
