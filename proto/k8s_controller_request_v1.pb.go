@@ -732,6 +732,61 @@ func (x *BuildImageRequest) GetToken() string {
 	return ""
 }
 
+type GetLogsRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Namespace string `protobuf:"bytes,1,opt,name=namespace,proto3" json:"namespace,omitempty"`
+	PodName   string `protobuf:"bytes,2,opt,name=podName,proto3" json:"podName,omitempty"`
+}
+
+func (x *GetLogsRequest) Reset() {
+	*x = GetLogsRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_k8s_controller_request_v1_proto_msgTypes[10]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetLogsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetLogsRequest) ProtoMessage() {}
+
+func (x *GetLogsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_k8s_controller_request_v1_proto_msgTypes[10]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetLogsRequest.ProtoReflect.Descriptor instead.
+func (*GetLogsRequest) Descriptor() ([]byte, []int) {
+	return file_proto_k8s_controller_request_v1_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *GetLogsRequest) GetNamespace() string {
+	if x != nil {
+		return x.Namespace
+	}
+	return ""
+}
+
+func (x *GetLogsRequest) GetPodName() string {
+	if x != nil {
+		return x.PodName
+	}
+	return ""
+}
+
 var File_proto_k8s_controller_request_v1_proto protoreflect.FileDescriptor
 
 var file_proto_k8s_controller_request_v1_proto_rawDesc = []byte{
@@ -831,11 +886,16 @@ var file_proto_k8s_controller_request_v1_proto_rawDesc = []byte{
 	0x1d, 0x0a, 0x0a, 0x69, 0x6d, 0x61, 0x67, 0x65, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x08, 0x20,
 	0x01, 0x28, 0x09, 0x52, 0x09, 0x69, 0x6d, 0x61, 0x67, 0x65, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x14,
 	0x0a, 0x05, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x18, 0x09, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x74,
-	0x6f, 0x6b, 0x65, 0x6e, 0x42, 0x3c, 0x5a, 0x3a, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63,
-	0x6f, 0x6d, 0x2f, 0x67, 0x61, 0x6e, 0x74, 0x72, 0x79, 0x63, 0x64, 0x2f, 0x62, 0x61, 0x63, 0x6b,
-	0x65, 0x6e, 0x64, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x62,
-	0x2f, 0x6b, 0x38, 0x73, 0x2d, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x6c, 0x65, 0x72, 0x2f,
-	0x76, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x6f, 0x6b, 0x65, 0x6e, 0x22, 0x48, 0x0a, 0x0e, 0x47, 0x65, 0x74, 0x4c, 0x6f, 0x67, 0x73, 0x52,
+	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1c, 0x0a, 0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70,
+	0x61, 0x63, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73,
+	0x70, 0x61, 0x63, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x70, 0x6f, 0x64, 0x4e, 0x61, 0x6d, 0x65, 0x18,
+	0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x70, 0x6f, 0x64, 0x4e, 0x61, 0x6d, 0x65, 0x42, 0x3c,
+	0x5a, 0x3a, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x67, 0x61, 0x6e,
+	0x74, 0x72, 0x79, 0x63, 0x64, 0x2f, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2f, 0x61, 0x70,
+	0x69, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x62, 0x2f, 0x6b, 0x38, 0x73, 0x2d, 0x63,
+	0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x6c, 0x65, 0x72, 0x2f, 0x76, 0x31, 0x62, 0x06, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -850,7 +910,7 @@ func file_proto_k8s_controller_request_v1_proto_rawDescGZIP() []byte {
 	return file_proto_k8s_controller_request_v1_proto_rawDescData
 }
 
-var file_proto_k8s_controller_request_v1_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_proto_k8s_controller_request_v1_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_proto_k8s_controller_request_v1_proto_goTypes = []interface{}{
 	(*CreateNamespaceRequest)(nil),  // 0: gantrycd.k8s_controller.v1.CreateNamespaceRequest
 	(*DeleteNamespaceRequest)(nil),  // 1: gantrycd.k8s_controller.v1.DeleteNamespaceRequest
@@ -862,6 +922,7 @@ var file_proto_k8s_controller_request_v1_proto_goTypes = []interface{}{
 	(*Config)(nil),                  // 7: gantrycd.k8s_controller.v1.Config
 	(*CreatePreviewRequest)(nil),    // 8: gantrycd.k8s_controller.v1.CreatePreviewRequest
 	(*BuildImageRequest)(nil),       // 9: gantrycd.k8s_controller.v1.BuildImageRequest
+	(*GetLogsRequest)(nil),          // 10: gantrycd.k8s_controller.v1.GetLogsRequest
 }
 var file_proto_k8s_controller_request_v1_proto_depIdxs = []int32{
 	7, // 0: gantrycd.k8s_controller.v1.CreatePreviewRequest.configs:type_name -> gantrycd.k8s_controller.v1.Config
@@ -998,6 +1059,18 @@ func file_proto_k8s_controller_request_v1_proto_init() {
 				return nil
 			}
 		}
+		file_proto_k8s_controller_request_v1_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetLogsRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -1005,7 +1078,7 @@ func file_proto_k8s_controller_request_v1_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_proto_k8s_controller_request_v1_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   10,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

@@ -36,7 +36,7 @@ var file_proto_k8s_controller_service_v1_proto_rawDesc = []byte{
 	0x31, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x26, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x6b,
 	0x38, 0x73, 0x5f, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x6c, 0x65, 0x72, 0x5f, 0x72, 0x65,
 	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x5f, 0x76, 0x31, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x32,
-	0xf5, 0x09, 0x0a, 0x13, 0x4b, 0x38, 0x73, 0x43, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x43, 0x6f, 0x6e,
+	0xd8, 0x0a, 0x0a, 0x13, 0x4b, 0x38, 0x73, 0x43, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x43, 0x6f, 0x6e,
 	0x74, 0x72, 0x6f, 0x6c, 0x6c, 0x65, 0x72, 0x12, 0x77, 0x0a, 0x0f, 0x43, 0x72, 0x65, 0x61, 0x74,
 	0x65, 0x4e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x12, 0x32, 0x2e, 0x67, 0x61, 0x6e,
 	0x74, 0x72, 0x79, 0x63, 0x64, 0x2e, 0x6b, 0x38, 0x73, 0x5f, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x6f,
@@ -115,11 +115,17 @@ var file_proto_k8s_controller_service_v1_proto_rawDesc = []byte{
 	0x63, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x2c, 0x2e, 0x67, 0x61, 0x6e, 0x74,
 	0x72, 0x79, 0x63, 0x64, 0x2e, 0x6b, 0x38, 0x73, 0x5f, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c,
 	0x6c, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x52, 0x65, 0x73, 0x6f, 0x75, 0x72,
-	0x63, 0x65, 0x52, 0x65, 0x70, 0x6c, 0x79, 0x42, 0x3c, 0x5a, 0x3a, 0x67, 0x69, 0x74, 0x68, 0x75,
-	0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x67, 0x61, 0x6e, 0x74, 0x72, 0x79, 0x63, 0x64, 0x2f, 0x62,
-	0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x2f, 0x70, 0x62, 0x2f, 0x6b, 0x38, 0x73, 0x2d, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x6c,
-	0x65, 0x72, 0x2f, 0x76, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x63, 0x65, 0x52, 0x65, 0x70, 0x6c, 0x79, 0x12, 0x61, 0x0a, 0x07, 0x47, 0x65, 0x74, 0x4c, 0x6f,
+	0x67, 0x73, 0x12, 0x2a, 0x2e, 0x67, 0x61, 0x6e, 0x74, 0x72, 0x79, 0x63, 0x64, 0x2e, 0x6b, 0x38,
+	0x73, 0x5f, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x6c, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x2e,
+	0x47, 0x65, 0x74, 0x4c, 0x6f, 0x67, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x28,
+	0x2e, 0x67, 0x61, 0x6e, 0x74, 0x72, 0x79, 0x63, 0x64, 0x2e, 0x6b, 0x38, 0x73, 0x5f, 0x63, 0x6f,
+	0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x6c, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x4c,
+	0x6f, 0x67, 0x73, 0x52, 0x65, 0x70, 0x6c, 0x79, 0x30, 0x01, 0x42, 0x3c, 0x5a, 0x3a, 0x67, 0x69,
+	0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x67, 0x61, 0x6e, 0x74, 0x72, 0x79, 0x63,
+	0x64, 0x2f, 0x62, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x62, 0x2f, 0x6b, 0x38, 0x73, 0x2d, 0x63, 0x6f, 0x6e, 0x74, 0x72,
+	0x6f, 0x6c, 0x6c, 0x65, 0x72, 0x2f, 0x76, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var file_proto_k8s_controller_service_v1_proto_goTypes = []interface{}{
@@ -133,14 +139,16 @@ var file_proto_k8s_controller_service_v1_proto_goTypes = []interface{}{
 	(*DeletePreviewRequest)(nil),    // 7: gantrycd.k8s_controller.v1.DeletePreviewRequest
 	(*BuildImageRequest)(nil),       // 8: gantrycd.k8s_controller.v1.BuildImageRequest
 	(*GetResourceRequest)(nil),      // 9: gantrycd.k8s_controller.v1.GetResourceRequest
-	(*CreateNamespaceReply)(nil),    // 10: gantrycd.k8s_controller.v1.CreateNamespaceReply
-	(*ListNamespacesReply)(nil),     // 11: gantrycd.k8s_controller.v1.ListNamespacesReply
-	(*CreateDeploymentReply)(nil),   // 12: gantrycd.k8s_controller.v1.CreateDeploymentReply
-	(*GetAllsReply)(nil),            // 13: gantrycd.k8s_controller.v1.GetAllsReply
-	(*GetOrgReposReply)(nil),        // 14: gantrycd.k8s_controller.v1.GetOrgReposReply
-	(*CreatePreviewReply)(nil),      // 15: gantrycd.k8s_controller.v1.CreatePreviewReply
-	(*BuildImageReply)(nil),         // 16: gantrycd.k8s_controller.v1.BuildImageReply
-	(*GetResourceReply)(nil),        // 17: gantrycd.k8s_controller.v1.GetResourceReply
+	(*GetLogsRequest)(nil),          // 10: gantrycd.k8s_controller.v1.GetLogsRequest
+	(*CreateNamespaceReply)(nil),    // 11: gantrycd.k8s_controller.v1.CreateNamespaceReply
+	(*ListNamespacesReply)(nil),     // 12: gantrycd.k8s_controller.v1.ListNamespacesReply
+	(*CreateDeploymentReply)(nil),   // 13: gantrycd.k8s_controller.v1.CreateDeploymentReply
+	(*GetAllsReply)(nil),            // 14: gantrycd.k8s_controller.v1.GetAllsReply
+	(*GetOrgReposReply)(nil),        // 15: gantrycd.k8s_controller.v1.GetOrgReposReply
+	(*CreatePreviewReply)(nil),      // 16: gantrycd.k8s_controller.v1.CreatePreviewReply
+	(*BuildImageReply)(nil),         // 17: gantrycd.k8s_controller.v1.BuildImageReply
+	(*GetResourceReply)(nil),        // 18: gantrycd.k8s_controller.v1.GetResourceReply
+	(*GetLogsReply)(nil),            // 19: gantrycd.k8s_controller.v1.GetLogsReply
 }
 var file_proto_k8s_controller_service_v1_proto_depIdxs = []int32{
 	0,  // 0: gantrycd.k8s_controller.v1.K8sCustomController.CreateNamespace:input_type -> gantrycd.k8s_controller.v1.CreateNamespaceRequest
@@ -155,20 +163,22 @@ var file_proto_k8s_controller_service_v1_proto_depIdxs = []int32{
 	7,  // 9: gantrycd.k8s_controller.v1.K8sCustomController.DeletePreview:input_type -> gantrycd.k8s_controller.v1.DeletePreviewRequest
 	8,  // 10: gantrycd.k8s_controller.v1.K8sCustomController.BuildImage:input_type -> gantrycd.k8s_controller.v1.BuildImageRequest
 	9,  // 11: gantrycd.k8s_controller.v1.K8sCustomController.GetResource:input_type -> gantrycd.k8s_controller.v1.GetResourceRequest
-	10, // 12: gantrycd.k8s_controller.v1.K8sCustomController.CreateNamespace:output_type -> gantrycd.k8s_controller.v1.CreateNamespaceReply
-	11, // 13: gantrycd.k8s_controller.v1.K8sCustomController.ListNamespaces:output_type -> gantrycd.k8s_controller.v1.ListNamespacesReply
-	1,  // 14: gantrycd.k8s_controller.v1.K8sCustomController.DeleteNamespace:output_type -> google.protobuf.Empty
-	12, // 15: gantrycd.k8s_controller.v1.K8sCustomController.ApplyDeployment:output_type -> gantrycd.k8s_controller.v1.CreateDeploymentReply
-	1,  // 16: gantrycd.k8s_controller.v1.K8sCustomController.DeleteDeployment:output_type -> google.protobuf.Empty
-	13, // 17: gantrycd.k8s_controller.v1.K8sCustomController.GetAlls:output_type -> gantrycd.k8s_controller.v1.GetAllsReply
-	14, // 18: gantrycd.k8s_controller.v1.K8sCustomController.GetOrgRepos:output_type -> gantrycd.k8s_controller.v1.GetOrgReposReply
-	15, // 19: gantrycd.k8s_controller.v1.K8sCustomController.CreatePreview:output_type -> gantrycd.k8s_controller.v1.CreatePreviewReply
-	15, // 20: gantrycd.k8s_controller.v1.K8sCustomController.UpdatePreview:output_type -> gantrycd.k8s_controller.v1.CreatePreviewReply
-	1,  // 21: gantrycd.k8s_controller.v1.K8sCustomController.DeletePreview:output_type -> google.protobuf.Empty
-	16, // 22: gantrycd.k8s_controller.v1.K8sCustomController.BuildImage:output_type -> gantrycd.k8s_controller.v1.BuildImageReply
-	17, // 23: gantrycd.k8s_controller.v1.K8sCustomController.GetResource:output_type -> gantrycd.k8s_controller.v1.GetResourceReply
-	12, // [12:24] is the sub-list for method output_type
-	0,  // [0:12] is the sub-list for method input_type
+	10, // 12: gantrycd.k8s_controller.v1.K8sCustomController.GetLogs:input_type -> gantrycd.k8s_controller.v1.GetLogsRequest
+	11, // 13: gantrycd.k8s_controller.v1.K8sCustomController.CreateNamespace:output_type -> gantrycd.k8s_controller.v1.CreateNamespaceReply
+	12, // 14: gantrycd.k8s_controller.v1.K8sCustomController.ListNamespaces:output_type -> gantrycd.k8s_controller.v1.ListNamespacesReply
+	1,  // 15: gantrycd.k8s_controller.v1.K8sCustomController.DeleteNamespace:output_type -> google.protobuf.Empty
+	13, // 16: gantrycd.k8s_controller.v1.K8sCustomController.ApplyDeployment:output_type -> gantrycd.k8s_controller.v1.CreateDeploymentReply
+	1,  // 17: gantrycd.k8s_controller.v1.K8sCustomController.DeleteDeployment:output_type -> google.protobuf.Empty
+	14, // 18: gantrycd.k8s_controller.v1.K8sCustomController.GetAlls:output_type -> gantrycd.k8s_controller.v1.GetAllsReply
+	15, // 19: gantrycd.k8s_controller.v1.K8sCustomController.GetOrgRepos:output_type -> gantrycd.k8s_controller.v1.GetOrgReposReply
+	16, // 20: gantrycd.k8s_controller.v1.K8sCustomController.CreatePreview:output_type -> gantrycd.k8s_controller.v1.CreatePreviewReply
+	16, // 21: gantrycd.k8s_controller.v1.K8sCustomController.UpdatePreview:output_type -> gantrycd.k8s_controller.v1.CreatePreviewReply
+	1,  // 22: gantrycd.k8s_controller.v1.K8sCustomController.DeletePreview:output_type -> google.protobuf.Empty
+	17, // 23: gantrycd.k8s_controller.v1.K8sCustomController.BuildImage:output_type -> gantrycd.k8s_controller.v1.BuildImageReply
+	18, // 24: gantrycd.k8s_controller.v1.K8sCustomController.GetResource:output_type -> gantrycd.k8s_controller.v1.GetResourceReply
+	19, // 25: gantrycd.k8s_controller.v1.K8sCustomController.GetLogs:output_type -> gantrycd.k8s_controller.v1.GetLogsReply
+	13, // [13:26] is the sub-list for method output_type
+	0,  // [0:13] is the sub-list for method input_type
 	0,  // [0:0] is the sub-list for extension type_name
 	0,  // [0:0] is the sub-list for extension extendee
 	0,  // [0:0] is the sub-list for field type_name

@@ -78,3 +78,8 @@ message CreatePreviewReply {
 message BuildImageReply {
   string image = 1;
 }
+
+message GetLogsReply {
+  int32 id = 1;
+  string message = 2;
+}
