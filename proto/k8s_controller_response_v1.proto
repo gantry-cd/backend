@@ -64,6 +64,11 @@ message GetResourceReply {
   bool is_disable = 2;
 };
 
+message GetBranchInfoReply {
+  string yaml = 1;
+}
+
+
 message NodePort {
   int32 target = 1;
   int32 port = 2;

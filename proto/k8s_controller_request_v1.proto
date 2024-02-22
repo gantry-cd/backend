@@ -41,6 +41,12 @@ message GetResourceRequest {
   string repository = 2;
 };
 
+message GetBranchInfoRequest {
+  string organization = 1;
+  string repository = 2;
+  string branch = 3;
+}
+
 message DeletePreviewRequest {
   string organization = 1;
   string repository = 2;
