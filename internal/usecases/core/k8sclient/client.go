@@ -35,8 +35,10 @@ type K8SClient interface {
 	CreateNodePortService(ctx context.Context, param CreateServiceNodePortParams, opts ...Option) (*corev1.Service, error)
 	DeleteService(ctx context.Context, namespace string, opts ...Option) error
 
-	// pod
+	// replica set
+	GetReplicaSet(ctx context.Context, namespace string, prefix string) (*appsv1.ReplicaSet, error)
 
+	// pod
 	GetPods(ctx context.Context, namespace, prefix string) ([]*corev1.Pod, error)
 
 	// log

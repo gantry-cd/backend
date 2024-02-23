@@ -28,10 +28,12 @@ type GetRepoBranchesResponse struct {
 }
 
 type Branches struct {
-	Name    string `json:"name"`
-	Status  string `json:"status"`
-	Version string `json:"version"`
-	Age     string `json:"age"`
+	DeploymentName string `json:"deploymentName"`
+	Branch         string `json:"branch"`
+	PullRequestID  string `json:"pullRequestID"`
+	Status         string `json:"status"`
+	Version        string `json:"version"`
+	Age            string `json:"age"`
 }
 
 type Repositories struct {
@@ -40,8 +42,9 @@ type Repositories struct {
 }
 
 type Apps struct {
-	Name    string `json:"name"`
-	Status  string `json:"status"`
-	Version string `json:"version"`
-	Age     string `json:"age"`
+	AppName        string `json:"appName"`
+	DeploymentName string `json:"deploymentName"`
+	Status         string `json:"status"`
+	Version        string `json:"version"`
+	Age            string `json:"age"`
 }
