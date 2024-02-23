@@ -52,8 +52,8 @@ type K8SClient interface {
 	Builder(ctx context.Context, param BuilderParams, opts ...Option) (string, error)
 
 	// config map
-	CreateConfigMap(ctx context.Context, namespace string, name string, data map[string]string, opts metav1.CreateOptions) error
-	UpdateConfigMap(ctx context.Context, namespace string, name string, data map[string]string, opts metav1.UpdateOptions) error
+	CreateConfigMap(ctx context.Context, configMap corev1.ConfigMap, opts metav1.CreateOptions) error
+	UpdateConfigMap(ctx context.Context, configMap corev1.ConfigMap, opts metav1.UpdateOptions) error
 	DeleteConfigMap(ctx context.Context, namespace string, name string, opts metav1.DeleteOptions) error
 }
 

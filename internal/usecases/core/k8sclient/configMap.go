@@ -6,36 +6,13 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func (k *k8sClient) CreateConfigMap(ctx context.Context, namespace string, name string, data map[string]string, opts metav1.CreateOptions) error {
-
-	configMap := v1.ConfigMap{
-		TypeMeta: metav1.TypeMeta{
-			Kind:       "ConfigMap",
-			APIVersion: "v1",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      name,
-			Namespace: namespace,
-		},
-		Data: data,
-	}
-	_, err := k.client.CoreV1().ConfigMaps(namespace).Create(ctx, &configMap, opts)
+func (k *k8sClient) CreateConfigMap(ctx context.Context, configMap v1.ConfigMap, opts metav1.CreateOptions) error {
+	_, err := k.client.CoreV1().ConfigMaps(configMap.Namespace).Create(ctx, &configMap, opts)
 	return err
 }
 
-func (k *k8sClient) UpdateConfigMap(ctx context.Context, namespace string, name string, data map[string]string, opts metav1.UpdateOptions) error {
-	configMap := v1.ConfigMap{
-		TypeMeta: metav1.TypeMeta{
-			Kind:       "ConfigMap",
-			APIVersion: "v1",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      name,
-			Namespace: namespace,
-		},
-		Data: data,
-	}
-	_, err := k.client.CoreV1().ConfigMaps(namespace).Update(ctx, &configMap, opts)
+func (k *k8sClient) UpdateConfigMap(ctx context.Context, configMap v1.ConfigMap, opts metav1.UpdateOptions) error {
+	_, err := k.client.CoreV1().ConfigMaps(configMap.Namespace).Update(ctx, &configMap, opts)
 	return err
 }
 

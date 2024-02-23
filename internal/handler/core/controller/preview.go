@@ -11,6 +11,7 @@ import (
 	"github.com/gantrycd/backend/internal/utils/branch"
 	v1 "github.com/gantrycd/backend/proto"
 	"google.golang.org/protobuf/types/known/emptypb"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -93,8 +94,57 @@ func (c *controller) createDeployment(ctx context.Context, in *v1.CreatePreviewR
 
 	cloudflaredConfigYaml, domains := buildCloudflaredConfig(in.Organization, service.Name, baseDomain, in.ExposePorts)
 
-	if err := c.control.CreateConfigMap(ctx, in.Organization, baseDomain, map[string]string{
-		"config.yaml": cloudflaredConfigYaml,
+	configMapName := fmt.Sprintf("%s-configMap", baseDomain)
+	cloudflaredPodName := fmt.Sprintf("%s-cloudflared", baseDomain)
+
+	if err := c.control.CreateConfigMap(ctx, corev1.ConfigMap{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "ConfigMap",
+			APIVersion: "v1",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      configMapName,
+			Namespace: in.Organization,
+		},
+		Data: map[string]string{
+			"config.yaml": cloudflaredConfigYaml,
+		},
+	}, metav1.CreateOptions{}); err != nil {
+		return nil, err
+	}
+
+	if _, err := c.control.CreatePod(ctx, in.Organization, &corev1.Pod{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      cloudflaredPodName,
+			Namespace: in.Organization,
+		},
+		Spec: corev1.PodSpec{
+			Containers: []corev1.Container{
+				{
+					Name:  cloudflaredPodName,
+					Image: "cloudflare/cloudflared:latest",
+					VolumeMounts: []corev1.VolumeMount{
+						{
+							Name:      "config",
+							MountPath: "/etc/cloudflared/config/",
+						},
+					},
+					Args: []string{"tunnel", "--config", "/etc/cloudflared/config/config.yaml", "run"},
+				},
+			},
+			Volumes: []corev1.Volume{
+				{
+					Name: "config",
+					VolumeSource: corev1.VolumeSource{
+						ConfigMap: &corev1.ConfigMapVolumeSource{
+							LocalObjectReference: corev1.LocalObjectReference{
+								Name: configMapName,
+							},
+						},
+					},
+				},
+			},
+		},
 	}, metav1.CreateOptions{}); err != nil {
 		return nil, err
 	}
@@ -184,6 +234,17 @@ func (c *controller) DeletePreview(ctx context.Context, in *v1.DeletePreviewRequ
 		k8sclient.WithCreatedByLabel(k8sclient.AppIdentifier),
 		k8sclient.WithEnvirionmentLabel(k8sclient.EnvPreview),
 	); err != nil {
+		return nil, err
+	}
+
+	baseDomain := fmt.Sprintf("%s-%s-%s", in.Organization, in.Repository, in.PullRequestId)
+	configMapName := fmt.Sprintf("%s-configMap", baseDomain)
+	cloudflaredPodName := fmt.Sprintf("%s-cloudflared", baseDomain)
+
+	if err := c.control.DeleteConfigMap(ctx, in.Organization, configMapName, metav1.DeleteOptions{}); err != nil {
+		return nil, err
+	}
+	if err := c.control.DeletePod(ctx, in.Organization, cloudflaredPodName, metav1.DeleteOptions{}); err != nil {
 		return nil, err
 	}
 
