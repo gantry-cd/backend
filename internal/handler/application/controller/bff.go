@@ -38,6 +38,10 @@ func (bc *BffController) RepositoryApps(w http.ResponseWriter, r *http.Request) 
 func (bc *BffController) GetRepoBranches(w http.ResponseWriter, r *http.Request) {
 	organization := r.PathValue(models.ParamOrganization)
 	repo := r.PathValue(models.ParamRepository)
+	if organization == "" || repo == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 
 	if err := bc.interactor.GetRepoBranches(r.Context(), w, models.GetRepoBranchesRequest{
 		Organization: organization,

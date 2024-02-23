@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"errors"
+	"fmt"
 	"sort"
 	"time"
 
@@ -106,7 +107,7 @@ func (c *controller) ApplyDeployment(ctx context.Context, in *v1.CreateDeploymen
 		return &v1.CreateDeploymentReply{
 			Name:      dep.Name,
 			Namespace: dep.Namespace,
-			Version:   dep.ResourceVersion,
+			Version:   dep.GetObjectMeta().GetAnnotations()["deployment.kubernetes.io/revision"],
 		}, nil
 	}
 
@@ -128,7 +129,7 @@ func (c *controller) ApplyDeployment(ctx context.Context, in *v1.CreateDeploymen
 	return &v1.CreateDeploymentReply{
 		Name:      dep.Name,
 		Namespace: dep.Namespace,
-		Version:   dep.ResourceVersion,
+		Version:   dep.GetObjectMeta().GetAnnotations()["deployment.kubernetes.io/revision"],
 	}, nil
 }
 
@@ -144,16 +145,24 @@ func (c *controller) GetOrgRepos(ctx context.Context, in *v1.GetOrgRepoRequest) 
 	return c.getOrganization(ctx, in.Organization)
 }
 
-func (c *controller) GetResource(ctx context.Context, in *v1.GetResourceRequest) (*v1.GetResourceReply, error) {
-	resource, err := c.metric.GetLoads(ctx, in.GetOrganization(), in.GetRepository())
+func (c *controller) GetUsage(ctx context.Context, in *v1.GetUsageRequest) (*v1.GetUsageReply, error) {
+	pods, err := c.control.GetPods(ctx, in.GetOrganization(), in.GetDeploymentName())
 	if err != nil {
-		return &v1.GetResourceReply{
-			Resources: resource,
-			IsDisable: true,
-		}, nil
+		return nil, err
 	}
 
-	return &v1.GetResourceReply{
+	var resource []*v1.Resource
+
+	for _, pod := range pods {
+		metric, err := c.metric.GetLoads(ctx, in.GetOrganization(), pod.Name)
+		if err != nil {
+			return nil, err
+		}
+
+		resource = append(resource, metric)
+	}
+
+	return &v1.GetUsageReply{
 		Resources: resource,
 		IsDisable: false,
 	}, nil
@@ -202,11 +211,12 @@ func (c *controller) getOrganization(ctx context.Context, organization string) (
 
 		if !prOk && !brOk {
 			apps = append(apps, &v1.Application{
-				Name:    d.Name,
-				Status:  string(d.Status.Conditions[0].Type),
-				Version: d.Spec.Template.GetResourceVersion(),
-				Image:   d.Spec.Template.Spec.Containers[0].Image,
-				Age:     d.CreationTimestamp.Format(time.DateTime),
+				AppName:        d.Labels[k8sclient.AppLabel],
+				DeploymentName: d.Name,
+				Status:         string(d.Status.Conditions[0].Type),
+				Version:        d.GetObjectMeta().GetAnnotations()["deployment.kubernetes.io/revision"],
+				Image:          d.Spec.Template.Spec.Containers[0].Image,
+				Age:            d.CreationTimestamp.Format(time.DateTime),
 			})
 			continue
 		}
@@ -265,13 +275,21 @@ func (c *controller) GetRepoBranches(ctx context.Context, in *v1.GetRepoBranches
 	if err != nil {
 		return nil, err
 	}
+
 	var branches []*v1.Branches
 	for _, d := range dep.Items {
+		// rep, err := c.control.GetReplicaSet(ctx, d.Namespace, d.Name)
+		// if err != nil {
+		// 	return nil, err
+		// }
+
 		branches = append(branches, &v1.Branches{
-			Name:    d.Labels[k8sclient.BaseBranchLabel],
-			Status:  string(d.Status.Conditions[0].Type),
-			Version: d.Spec.Template.GetResourceVersion(),
-			Age:     d.CreationTimestamp.Format(time.DateTime),
+			DeploymentName: d.Name,
+			Branch:         d.Labels[k8sclient.BaseBranchLabel],
+			PullRequestId:  d.Labels[k8sclient.PullRequestID],
+			Status:         fmt.Sprintf("%v/%v", d.Status.AvailableReplicas, d.Status.Replicas),
+			Version:        d.GetObjectMeta().GetAnnotations()["deployment.kubernetes.io/revision"],
+			Age:            d.CreationTimestamp.Format(time.DateTime),
 		})
 	}
 	return &v1.GetRepoBranchesReply{

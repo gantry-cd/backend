@@ -86,10 +86,11 @@ func (b *bffInteractor) GetRepositoryApps(ctx context.Context, w http.ResponseWr
 	}
 	for _, app := range apps {
 		resApps = append(resApps, models.Apps{
-			Name:    app.Name,
-			Status:  app.Status,
-			Version: app.Version,
-			Age:     app.Age,
+			AppName:        app.AppName,
+			DeploymentName: app.DeploymentName,
+			Status:         app.Status,
+			Version:        app.Version,
+			Age:            app.Age,
 		})
 	}
 	if err := json.NewEncoder(w).Encode(models.GetRepositoryAppsResponse{Repositories: resRepos, Apps: resApps}); err != nil {
@@ -119,10 +120,12 @@ func (b *bffInteractor) GetRepoBranches(ctx context.Context, w http.ResponseWrit
 
 	for _, branch := range result.GetBranches() {
 		branches = append(branches, models.Branches{
-			Name:    branch.Name,
-			Status:  branch.Status,
-			Version: branch.Version,
-			Age:     branch.Age,
+			DeploymentName: branch.DeploymentName,
+			Branch:         branch.Branch,
+			PullRequestID:  branch.PullRequestId,
+			Status:         branch.Status,
+			Version:        branch.Version,
+			Age:            branch.Age,
 		})
 	}
 	if err := json.NewEncoder(w).Encode(models.GetRepoBranchesResponse{Branches: branches}); err != nil {

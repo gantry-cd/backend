@@ -8,7 +8,6 @@ require (
 	github.com/caarlos0/env v3.5.0+incompatible
 	github.com/google/go-github/v29 v29.0.3
 	github.com/joho/godotenv v1.5.1
-	google.golang.org/genproto/googleapis/api v0.0.0-20240125205218-1f4bbc51befe
 	google.golang.org/grpc v1.61.1
 	google.golang.org/protobuf v1.32.0
 	k8s.io/api v0.29.1
@@ -52,7 +51,6 @@ require (
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
-	google.golang.org/genproto v0.0.0-20240116215550-a9fa1716bcac // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240125205218-1f4bbc51befe // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
