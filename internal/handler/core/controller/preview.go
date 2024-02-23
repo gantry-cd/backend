@@ -255,7 +255,7 @@ func deleteCloudflareDNSRecord(ctx context.Context, baseDomain string) error {
 	if err != nil {
 		return err
 	}
-	re := regexp.MustCompile(fmt.Sprintf(`^%s-\d+$`, baseDomain))
+	re := regexp.MustCompile(fmt.Sprintf(`^%s-\d+\.%s$`, baseDomain, config.Config.Application.ExternalDomain))
 	for _, record := range records {
 		if re.MatchString(record.Name) {
 			err := api.DeleteDNSRecord(ctx, zone, record.ID)
