@@ -3,8 +3,10 @@ package config
 // config はアプリケーションの設定を表す構造体です。基本的には環境変数から読み込みます。
 type config struct {
 	Application struct {
-		ApplicationName string `env:"APPLICATION_NAME" envDefault:"gantrycd"`
-		ExternalDomain  string `env:"EXTERNAL_DOMAIN" envDefault:"hogehoge.com"`
+		ApplicationName     string `env:"APPLICATION_NAME" envDefault:"gantrycd"`
+		ExternalDomain      string `env:"EXTERNAL_DOMAIN" envDefault:"hogehoge.com"`
+		CloudflaredTunnelId string `env:"CLOUDFLARED_TUNNEL_ID" envDefault:""`
+		CloudflareAPIToken  string `env:"CLOUDFLARE_API_TOKEN" envDefault:""` //todo: refactor to use secret
 	}
 
 	Bff struct {

@@ -10,6 +10,7 @@ import (
 	protoV1 "github.com/gantrycd/backend/proto"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	metrics "k8s.io/metrics/pkg/client/clientset/versioned"
 )
@@ -34,7 +35,7 @@ type K8SClient interface {
 	DeleteDeployment(ctx context.Context, namespace string, opts ...Option) error
 
 	// service
-	CreateClientIPService(ctx context.Context, param CreateServiceNodePortParams, opts ...Option) (*corev1.Service, error)
+	CreateLoadBalancerService(ctx context.Context, param CreateServiceNodePortParams, opts ...Option) (*corev1.Service, error)
 	DeleteService(ctx context.Context, namespace string, opts ...Option) error
 
 	// replica set
@@ -42,6 +43,9 @@ type K8SClient interface {
 
 	// pod
 	GetPods(ctx context.Context, namespace, prefix string) ([]*corev1.Pod, error)
+	CreatePod(ctx context.Context, pod *corev1.Pod, opts metav1.CreateOptions) (*corev1.Pod, error)
+	UpdatePod(ctx context.Context, pod *corev1.Pod, opts metav1.UpdateOptions) (*corev1.Pod, error)
+	DeletePod(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error
 	GetPodUsage(ctx context.Context, namespace, podName string) (*protoV1.Pod, error)
 
 	// log
@@ -49,6 +53,11 @@ type K8SClient interface {
 
 	// builder
 	Builder(ctx context.Context, param BuilderParams, opts ...Option) (string, error)
+
+	// config map
+	CreateConfigMap(ctx context.Context, configMap corev1.ConfigMap, opts metav1.CreateOptions) error
+	UpdateConfigMap(ctx context.Context, configMap corev1.ConfigMap, opts metav1.UpdateOptions) error
+	DeleteConfigMap(ctx context.Context, namespace string, name string, opts metav1.DeleteOptions) error
 }
 
 func New(client *kubernetes.Clientset, metrics *metrics.Clientset) K8SClient {
