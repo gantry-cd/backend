@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/cloudflare/cloudflare-go"
 	"github.com/gantrycd/backend/cmd/config"
 	coreErr "github.com/gantrycd/backend/internal/error"
 	"github.com/gantrycd/backend/internal/usecases/core/k8sclient"
@@ -13,6 +14,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"regexp"
 )
 
 func (c *controller) CreatePreview(ctx context.Context, in *v1.CreatePreviewRequest) (*v1.CreatePreviewReply, error) {
@@ -105,7 +107,7 @@ func (c *controller) createDeployment(ctx context.Context, in *v1.CreatePreviewR
 
 func createCloudflared(c *controller, ctx context.Context, in *v1.CreatePreviewRequest, serviceName string) ([]string, error) {
 	baseDomain := fmt.Sprintf("%s-%s-%s", in.Organization, in.Repository, in.PullRequestId)
-	cloudflaredConfigYaml, domains := buildCloudflaredConfig(in.Organization, serviceName, baseDomain, in.ExposePorts)
+	cloudflaredConfigYaml, domains, subDomains := buildCloudflaredConfig(in.Organization, serviceName, baseDomain, in.ExposePorts)
 
 	configMapName := fmt.Sprintf("%s-config-map", baseDomain)
 	cloudflaredPodName := fmt.Sprintf("%s-cloudflared", baseDomain)
@@ -173,18 +175,24 @@ func createCloudflared(c *controller, ctx context.Context, in *v1.CreatePreviewR
 	}, metav1.CreateOptions{}); err != nil {
 		return nil, err
 	}
+	if err := createCloudflareDNSRecord(ctx, subDomains); err != nil {
+		return nil, err
+	}
 	return domains, nil
-
 }
 
-func buildCloudflaredConfig(namespace string, serviceName string, baseDomain string, ports []int32) (string, []string) {
+func buildCloudflaredConfig(namespace string, serviceName string, baseDomain string, ports []int32) (string, []string, []string) {
 	var ingress = ""
 	var domains []string
+	var subDomains []string
 	for _, port := range ports {
-		domains = append(domains, fmt.Sprintf("%s-%d.%s", baseDomain, port, config.Config.Application.ExternalDomain))
-		ingress += fmt.Sprintf(`  - hostname: %s-%d.%s
+		subDomain := fmt.Sprintf("%s-%d", baseDomain, port)
+		domain := fmt.Sprintf("%s.%s", subDomain, config.Config.Application.ExternalDomain)
+		domains = append(domains, domain)
+		subDomains = append(subDomains, subDomain)
+		ingress += fmt.Sprintf(`  - hostname: %s
     service: http://%s.%s.svc.cluster.local:%d
-`, baseDomain, port, config.Config.Application.ExternalDomain, serviceName, namespace, port)
+`, domain, serviceName, namespace, port)
 	}
 	ingress += `  - service: http_status:404
 `
@@ -193,7 +201,93 @@ credentials-file: /etc/cloudflared/credentials/credentials.json
 no-autoupdate: true
 
 ingress:
-%s`, config.Config.Application.CloudflaredTunnelId, ingress), domains
+%s`, config.Config.Application.CloudflaredTunnelId, ingress), domains, subDomains
+}
+
+func createCloudflareDNSRecord(ctx context.Context, subDomains []string) error {
+	api, err := cloudflare.NewWithAPIToken(config.Config.Application.CloudflareAPIToken)
+	if err != nil {
+		return err
+	}
+	zoneId, err := getCloudflareZoneId(ctx, api, config.Config.Application.ExternalDomain)
+	zone := cloudflare.ZoneIdentifier(zoneId)
+	records, _, err := api.ListDNSRecords(ctx, zone, cloudflare.ListDNSRecordsParams{})
+	if err != nil {
+		return err
+	}
+	cnameDomain := fmt.Sprintf("%s.cfargotunnel.com", config.Config.Application.CloudflaredTunnelId)
+	for _, subDomain := range subDomains {
+		record := getRecordByDomain(records, subDomain)
+		if record == nil {
+			_, err := api.CreateDNSRecord(ctx, zone, cloudflare.CreateDNSRecordParams{
+				Type:    "CNAME",
+				Name:    subDomain,
+				Content: cnameDomain,
+			})
+			if err != nil {
+				return err
+			}
+		} else {
+			if record.Content != cnameDomain {
+				record.Content = cnameDomain
+				_, err := api.UpdateDNSRecord(ctx, zone, cloudflare.UpdateDNSRecordParams{
+					Type:    "CNAME",
+					Name:    subDomain,
+					Content: cnameDomain,
+				})
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func deleteCloudflareDNSRecord(ctx context.Context, baseDomain string) error {
+	api, err := cloudflare.NewWithAPIToken(config.Config.Application.CloudflareAPIToken)
+	if err != nil {
+		return err
+	}
+	zoneId, err := getCloudflareZoneId(ctx, api, config.Config.Application.ExternalDomain)
+	zone := cloudflare.ZoneIdentifier(zoneId)
+	records, _, err := api.ListDNSRecords(ctx, zone, cloudflare.ListDNSRecordsParams{})
+	if err != nil {
+		return err
+	}
+	re := regexp.MustCompile(fmt.Sprintf(`^%s-\d+$`, baseDomain))
+	for _, record := range records {
+		if re.MatchString(record.Name) {
+			err := api.DeleteDNSRecord(ctx, zone, record.ID)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+
+}
+
+func getRecordByDomain(records []cloudflare.DNSRecord, domain string) *cloudflare.DNSRecord {
+	for _, record := range records {
+		if record.Name == domain {
+			return &record
+		}
+	}
+	return nil
+}
+
+func getCloudflareZoneId(ctx context.Context, api *cloudflare.API, domain string) (string, error) {
+	zones, err := api.ListZones(ctx)
+	if err != nil {
+		return "", err
+	}
+	for _, zone := range zones {
+		if zone.Name == domain {
+			return zone.ID, nil
+		}
+	}
+	return "", fmt.Errorf("zone not found: %s", domain)
 }
 
 func (c *controller) UpdatePreview(ctx context.Context, in *v1.CreatePreviewRequest) (*v1.CreatePreviewReply, error) {
@@ -275,6 +369,11 @@ func deleteCloudflared(c *controller, ctx context.Context, in *v1.DeletePreviewR
 		return err
 	}
 	if err := c.control.DeletePod(ctx, in.Organization, cloudflaredPodName, metav1.DeleteOptions{}); err != nil {
+		return err
+	}
+
+	err := deleteCloudflareDNSRecord(ctx, baseDomain)
+	if err != nil {
 		return err
 	}
 	return nil

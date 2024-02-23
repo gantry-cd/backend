@@ -6,6 +6,7 @@ type config struct {
 		ApplicationName     string `env:"APPLICATION_NAME" envDefault:"gantrycd"`
 		ExternalDomain      string `env:"EXTERNAL_DOMAIN" envDefault:"hogehoge.com"`
 		CloudflaredTunnelId string `env:"CLOUDFLARED_TUNNEL_ID" envDefault:""`
+		CloudflareAPIToken  string `env:"CLOUDFLARE_API_TOKEN" envDefault:""` //todo: refactor to use secret
 	}
 
 	Bff struct {
