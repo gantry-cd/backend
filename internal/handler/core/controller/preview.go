@@ -186,6 +186,8 @@ func buildCloudflaredConfig(namespace string, serviceName string, baseDomain str
     service: http://%s.%s.svc.cluster.local:%d
 `, baseDomain, port, config.Config.Application.ExternalDomain, serviceName, namespace, port)
 	}
+	ingress += `    - service: http_status:404
+`
 	return fmt.Sprintf(`tunnel: %s
 credentials-file: /etc/cloudflared/credentials/credentials.json
 no-autoupdate: true
