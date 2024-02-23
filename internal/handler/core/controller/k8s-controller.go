@@ -145,12 +145,20 @@ func (c *controller) GetOrgRepos(ctx context.Context, in *v1.GetOrgRepoRequest) 
 }
 
 func (c *controller) GetUsage(ctx context.Context, in *v1.GetUsageRequest) (*v1.GetUsageReply, error) {
-	resource, err := c.metric.GetLoads(ctx, in.GetOrganization(), in.GetPodName())
+	pods, err := c.control.GetPods(ctx, in.GetOrganization(), in.GetDeploymentName())
 	if err != nil {
-		return &v1.GetUsageReply{
-			Resources: resource,
-			IsDisable: true,
-		}, nil
+		return nil, err
+	}
+
+	var resource []*v1.Resource
+
+	for _, pod := range pods {
+		metric, err := c.metric.GetLoads(ctx, in.GetOrganization(), pod.Name)
+		if err != nil {
+			return nil, err
+		}
+
+		resource = append(resource, metric)
 	}
 
 	return &v1.GetUsageReply{

@@ -18,10 +18,16 @@ func New(interactor usage.ResrouceInteractor) *UsageController {
 }
 
 func (uc *UsageController) Usage(w http.ResponseWriter, r *http.Request) {
+	organization := r.PathValue(models.ParamOrganization)
+	deploymentName := r.PathValue(models.ParamDeploymentName)
+	if organization == "" || deploymentName == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 
 	if err := uc.interactor.GetResource(r.Context(), w, models.UsageRequest{
-		Organization:   r.PathValue(models.ParamOrganization),
-		DeploymentName: r.PathValue(models.ParamDeploymentName),
+		Organization:   organization,
+		DeploymentName: deploymentName,
 	}); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
