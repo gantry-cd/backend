@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	coreErr "github.com/gantrycd/backend/internal/error"
 	"github.com/gantrycd/backend/internal/usecases/core/k8sclient"
@@ -70,10 +71,10 @@ func (c *controller) createDeployment(ctx context.Context, in *v1.CreatePreviewR
 		}, nil
 	}
 
-	service, err := c.control.CreateNodePortService(ctx,
+	service, err := c.control.CreateClientIPService(ctx,
 		k8sclient.CreateServiceNodePortParams{
 			Namespace:   in.Organization,
-			ServiceName: in.Repository,
+			ServiceName: deps.Name,
 			TargetPort:  in.ExposePorts,
 		},
 		k8sclient.WithAppLabel(in.Repository),
@@ -87,13 +88,13 @@ func (c *controller) createDeployment(ctx context.Context, in *v1.CreatePreviewR
 		return nil, err
 	}
 
-	var nodePorts []*v1.NodePort
-	for _, port := range service.Spec.Ports {
-		nodePorts = append(nodePorts, &v1.NodePort{
-			Port:   port.Port,
-			Target: port.NodePort,
-		})
+	// TODO: @xpadev-net ここからcloudflareのtunnel設定をして
+	for _, port := range in.ExposePorts {
+		fmt.Printf("clusterIP: %s:%d\n", service.Name, port)
 	}
+
+	var nodePorts []string
+	// TODO: @xpadev-net ここからcloudflareのtunnelで通したURLを nodeportに変換して返す
 
 	return &v1.CreatePreviewReply{
 		Name:      deps.Name,

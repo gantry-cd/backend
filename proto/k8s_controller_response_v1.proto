@@ -75,16 +75,12 @@ message Branches{
   string age = 6; 
 }
 
-message NodePort {
-  int32 target = 1;
-  int32 port = 2;
-}
 
 message CreatePreviewReply {
   string namespace = 1;
   string name = 2;
   string version = 3;
-  repeated NodePort node_ports = 4;
+  repeated string node_ports = 4;
 }
 message BuildImageReply {
   string image = 1;

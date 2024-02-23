@@ -32,7 +32,7 @@ type K8SClient interface {
 	DeleteDeployment(ctx context.Context, namespace string, opts ...Option) error
 
 	// service
-	CreateNodePortService(ctx context.Context, param CreateServiceNodePortParams, opts ...Option) (*corev1.Service, error)
+	CreateClientIPService(ctx context.Context, param CreateServiceNodePortParams, opts ...Option) (*corev1.Service, error)
 	DeleteService(ctx context.Context, namespace string, opts ...Option) error
 
 	// replica set

@@ -79,12 +79,12 @@ func (ge *githubAppEvents) CreatePreviewEnvironment(ctx context.Context, param C
 		return err
 	}
 
-	var ports string
+	var external string
 	for _, p := range dep.NodePorts {
-		ports += fmt.Sprintf("%d:%d ", p.Port, p.Target)
+		external += fmt.Sprintf("- https://%s\n", p)
 	}
 
-	_, _, err = param.GhClient.CreateReview(ctx, meta, fmt.Sprintf("[%v] ✔️Deployment and service created\n Exposing service on port %s ", time.Now().Format(time.DateTime), ports))
+	_, _, err = param.GhClient.CreateReview(ctx, meta, fmt.Sprintf("[%v] ✔️Deployment and service created\n Exposing service on port ...\n %s", time.Now().Format(time.DateTime), external))
 	if err != nil {
 		return err
 	}
@@ -171,12 +171,12 @@ func (ge *githubAppEvents) UpdatePreviewEnvironment(ctx context.Context, param U
 		return nil
 	}
 
-	var ports string
+	var external string
 	for _, p := range dep.NodePorts {
-		ports += fmt.Sprintf("%d:%d ", p.Port, p.Target)
+		external += fmt.Sprintf("- https://%s\n", p)
 	}
 
-	_, _, err = param.GhClient.CreateReview(ctx, meta, fmt.Sprintf("[%v] ✔️Deployment and service created\n Exposing service on port %s ", time.Now().Format(time.DateTime), ports))
+	_, _, err = param.GhClient.CreateReview(ctx, meta, fmt.Sprintf("[%v] ✔️Deployment and service created\n Exposing service on port ...\n %s", time.Now().Format(time.DateTime), external))
 	if err != nil {
 		return err
 	}

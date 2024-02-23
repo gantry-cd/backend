@@ -4,6 +4,7 @@ package config
 type config struct {
 	Application struct {
 		ApplicationName string `env:"APPLICATION_NAME" envDefault:"gantrycd"`
+		ExternalDomain  string `env:"EXTERNAL_DOMAIN" envDefault:"hogehoge.com"`
 	}
 
 	Bff struct {
