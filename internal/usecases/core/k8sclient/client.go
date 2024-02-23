@@ -41,6 +41,9 @@ type K8SClient interface {
 
 	// pod
 	GetPods(ctx context.Context, namespace, prefix string) ([]*corev1.Pod, error)
+	CreatePod(ctx context.Context, namespace string, pod *corev1.Pod, opts metav1.CreateOptions) (*corev1.Pod, error)
+	UpdatePod(ctx context.Context, namespace string, pod *corev1.Pod, opts metav1.UpdateOptions) (*corev1.Pod, error)
+	DeletePod(ctx context.Context, namespace, name string, opts metav1.DeleteOptions) error
 
 	// log
 	GetLogs(namespace string, podName string, option corev1.PodLogOptions) *restclient.Request
