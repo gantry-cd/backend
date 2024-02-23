@@ -229,7 +229,7 @@
         "deploymentName": {
           "type": "string"
         },
-        "branchName": {
+        "branch": {
           "type": "string"
         },
         "pullRequestId": {
