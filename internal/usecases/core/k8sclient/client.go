@@ -7,15 +7,17 @@ import (
 
 	restclient "k8s.io/client-go/rest"
 
+	protoV1 "github.com/gantrycd/backend/proto"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
+	metrics "k8s.io/metrics/pkg/client/clientset/versioned"
 )
 
 type k8sClient struct {
-	client *kubernetes.Clientset
-
-	l *slog.Logger
+	client  *kubernetes.Clientset
+	metrics *metrics.Clientset
+	l       *slog.Logger
 }
 
 type K8SClient interface {
@@ -40,6 +42,7 @@ type K8SClient interface {
 
 	// pod
 	GetPods(ctx context.Context, namespace, prefix string) ([]*corev1.Pod, error)
+	GetPodUsage(ctx context.Context, namespace, podName string) (*protoV1.Pod, error)
 
 	// log
 	GetLogs(namespace string, podName string, option corev1.PodLogOptions) *restclient.Request
@@ -48,9 +51,10 @@ type K8SClient interface {
 	Builder(ctx context.Context, param BuilderParams, opts ...Option) (string, error)
 }
 
-func New(client *kubernetes.Clientset) K8SClient {
+func New(client *kubernetes.Clientset, metrics *metrics.Clientset) K8SClient {
 	return &k8sClient{
-		client: client,
-		l:      slog.New(slog.NewTextHandler(os.Stdout, nil)).WithGroup("k8s-client"),
+		client:  client,
+		metrics: metrics,
+		l:       slog.New(slog.NewTextHandler(os.Stdout, nil)).WithGroup("k8s-client"),
 	}
 }

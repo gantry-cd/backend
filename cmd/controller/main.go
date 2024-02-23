@@ -10,7 +10,6 @@ import (
 	"github.com/gantrycd/backend/cmd/config"
 	"github.com/gantrycd/backend/internal/driver/k8s"
 	"github.com/gantrycd/backend/internal/handler/core/controller"
-	"github.com/gantrycd/backend/internal/usecases/core/resource"
 	v1 "github.com/gantrycd/backend/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -54,7 +53,7 @@ func run() error {
 	}
 
 	// TODO: Implement the server
-	v1.RegisterK8SCustomControllerServer(grpcServer, controller.NewController(client, resource.New(metric)))
+	v1.RegisterK8SCustomControllerServer(grpcServer, controller.NewController(client, metric))
 
 	reflection.Register(grpcServer)
 
