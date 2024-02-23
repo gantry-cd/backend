@@ -253,13 +253,16 @@
           "type": "string"
         },
         "cpu": {
-          "type": "string"
+          "type": "integer",
+          "format": "int32"
         },
         "memory": {
-          "type": "string"
+          "type": "integer",
+          "format": "int32"
         },
         "storage": {
-          "type": "string"
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
