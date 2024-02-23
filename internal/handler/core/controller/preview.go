@@ -128,6 +128,10 @@ func (c *controller) createDeployment(ctx context.Context, in *v1.CreatePreviewR
 							Name:      "config",
 							MountPath: "/etc/cloudflared/config/",
 						},
+						{
+							Name:      "credentials",
+							MountPath: "/etc/cloudflared/credentials/",
+						},
 					},
 					Args: []string{"tunnel", "--config", "/etc/cloudflared/config/config.yaml", "run"},
 				},
@@ -140,6 +144,14 @@ func (c *controller) createDeployment(ctx context.Context, in *v1.CreatePreviewR
 							LocalObjectReference: corev1.LocalObjectReference{
 								Name: configMapName,
 							},
+						},
+					},
+				},
+				{
+					Name: "credentials",
+					VolumeSource: corev1.VolumeSource{
+						Secret: &corev1.SecretVolumeSource{
+							SecretName: "cloudflared-credentials",
 						},
 					},
 				},
@@ -167,7 +179,7 @@ func buildCloudflaredConfig(namespace string, serviceName string, baseDomain str
 `, baseDomain, port, config.Config.Application.ExternalDomain, serviceName, namespace, port)
 	}
 	return fmt.Sprintf(`tunnel: %s
-credentials-file: /etc/cloudflared/credentials.json
+credentials-file: /etc/cloudflared/credentials/credentials.json
 no-autoupdate: true
 
 ingress:
