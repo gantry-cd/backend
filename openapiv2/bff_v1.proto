@@ -4,12 +4,11 @@ package gantrycd.bff.v1;
 
 import "google/protobuf/empty.proto";
 import "google/api/annotations.proto";
-// import "validate/validate.Protobuf";
-// import "Protobufc-gen-openapiv2/options/annotations.Protobuf";
 
 option go_package = "github.com/gantrycd/backend/api/proto/bff/v1";
 
 service BffService {
+
   rpc GetOrg(google.protobuf.Empty) returns (HomeResponse){
     option (google.api.http) = {
       get: "/organizations"
@@ -27,22 +26,22 @@ service BffService {
   }
   rpc GetBranchInformation(GetBranchInformationRequest) returns (GetBranchInformationResponse){
     option (google.api.http) = {
-      get: "/organizations/{organization}/repositories/{repository}/pulls/{pullRequestID}"
+      get: "/organizations/{organization}/deployments/{deployment_name}"
+    };
+  }
+  rpc GetUsage(GetUsageRequest) returns (GetUsageResponse){
+    option (google.api.http) = {
+      get: "/organizations/{organization}/deployments/{deployment_name}/usage"
     };
   }
 }
 
 message HomeResponse {
-  repeated OrganizationInfos organizationInfos = 1;
+  repeated OrganizationInfos organization_infos = 1;
 }
 
 message GetRepositoryAppsRequest{
   string organization = 1;
-}
-
-message GetRepositoryAppsResponse{
-  repeated Repositories repositories = 1;
-  repeated Apps apps = 2;
 }
 
 message GetRepoBranchesRequest{
@@ -50,31 +49,51 @@ message GetRepoBranchesRequest{
   string repository = 2;
 }
 
+message GetBranchInformationRequest{
+  string organization = 1;
+  string deployment_name = 2;
+}
+
+message GetUsageRequest{
+  string organization = 1;
+  string deployment_name = 3;
+}
+
+message GetRepositoryAppsResponse{
+  repeated Repositories repositories = 1;
+  repeated Apps apps = 2;
+}
+
 message GetRepoBranchesResponse{
   repeated Branches branches = 1;
 }
 
-message Branches{
-  string name = 1;
-  string status = 2;
-  string version = 3;
-  string age = 4; 
-}
-
-message GetBranchInformationRequest{
-  string organization = 1;
-  string repository = 2;
-  int32 pullRequestID = 3;
-}
-
 message GetBranchInformationResponse {
-  string branchName = 1;
-  string gitHubLink = 2;
-  repeated Pods pods = 3;
+  string branch_name = 1;
+  string gitHub_link = 2;
+  repeated Pod pods = 3;
   string yaml = 4;
 }
 
-message Pods {
+message GetUsageResponse{
+  string organization = 1;
+  string deployment_name = 2;
+  string cpu = 3;
+  string memory = 4;
+  string storage = 5;
+}
+
+
+message Branches{
+  string deployment_name = 1;
+  string branch_name = 2;
+  string pull_request_id = 3;
+  string status = 4;
+  string version = 5;
+  string age = 6; 
+}
+
+message Pod {
   string name = 1;
   string status = 2;
   string age = 3;
@@ -85,7 +104,6 @@ message OrganizationInfos{
   string organization  = 1;
   repeated string repositories  = 2;
 }
-
 
 message Repositories{
   string repository  = 1;
