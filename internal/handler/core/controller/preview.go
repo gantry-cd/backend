@@ -107,7 +107,7 @@ func createCloudflared(c *controller, ctx context.Context, in *v1.CreatePreviewR
 	baseDomain := fmt.Sprintf("%s-%s-%s", in.Organization, in.Repository, in.PullRequestId)
 	cloudflaredConfigYaml, domains := buildCloudflaredConfig(in.Organization, serviceName, baseDomain, in.ExposePorts)
 
-	configMapName := fmt.Sprintf("%s-configMap", baseDomain)
+	configMapName := fmt.Sprintf("%s-config-map", baseDomain)
 	cloudflaredPodName := fmt.Sprintf("%s-cloudflared", baseDomain)
 
 	if err := c.control.CreateConfigMap(ctx, corev1.ConfigMap{
@@ -266,7 +266,7 @@ func (c *controller) DeletePreview(ctx context.Context, in *v1.DeletePreviewRequ
 
 func deleteCloudflared(c *controller, ctx context.Context, in *v1.DeletePreviewRequest) error {
 	baseDomain := fmt.Sprintf("%s-%s-%s", in.Organization, in.Repository, in.PullRequestId)
-	configMapName := fmt.Sprintf("%s-configMap", baseDomain)
+	configMapName := fmt.Sprintf("%s-config-map", baseDomain)
 	cloudflaredPodName := fmt.Sprintf("%s-cloudflared", baseDomain)
 
 	if err := c.control.DeleteConfigMap(ctx, in.Organization, configMapName, metav1.DeleteOptions{}); err != nil {
