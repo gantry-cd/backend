@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-
+	"github.com/gantrycd/backend/cmd/config"
 	coreErr "github.com/gantrycd/backend/internal/error"
 	"github.com/gantrycd/backend/internal/usecases/core/k8sclient"
 	"github.com/gantrycd/backend/internal/utils"
@@ -71,7 +71,9 @@ func (c *controller) createDeployment(ctx context.Context, in *v1.CreatePreviewR
 		}, nil
 	}
 
-	service, err := c.control.CreateClientIPService(ctx,
+	baseDomain := fmt.Sprintf("%s-%s-%s", in.Organization, in.Repository, in.PullRequestId)
+
+	service, err := c.control.CreateLoadBalancerService(ctx,
 		k8sclient.CreateServiceNodePortParams{
 			Namespace:   in.Organization,
 			ServiceName: deps.Name,
@@ -88,21 +90,31 @@ func (c *controller) createDeployment(ctx context.Context, in *v1.CreatePreviewR
 		return nil, err
 	}
 
-	// TODO: @xpadev-net ここからcloudflareのtunnel設定をして
-	for _, port := range in.ExposePorts {
-		fmt.Printf("clusterIP: %s:%d\n", service.Name, port)
-	}
-
-	var nodePorts []string
-	// TODO: @xpadev-net ここからcloudflareのtunnelで通したURLを nodeportに変換して返す
-	// https://hogeohge.com:30000 -> https://fugafuga.hogeohge.com/hogehoge みたいなのを nodeport
+	_, domains := buildCloudflaredConfig(in.Organization, service.Name, baseDomain, in.ExposePorts)
 
 	return &v1.CreatePreviewReply{
 		Name:      deps.Name,
 		Namespace: deps.Namespace,
 		Version:   deps.ResourceVersion,
-		External:  nodePorts,
+		External:  domains,
 	}, nil
+}
+
+func buildCloudflaredConfig(namespace string, serviceName string, baseDomain string, ports []int32) (string, []string) {
+	var ingress = ""
+	var domains []string
+	for _, port := range ports {
+		domains = append(domains, fmt.Sprintf("%s-%d.%s", baseDomain, port, config.Config.Application.ExternalDomain))
+		ingress += fmt.Sprintf(`  - hostname: %s-%d.%s
+    service: http://%s.%s.svc.cluster.local:%d
+`, baseDomain, port, config.Config.Application.ExternalDomain, serviceName, namespace, port)
+	}
+	return fmt.Sprintf(`tunnel: %s
+credentials-file: /etc/cloudflared/credentials.json
+no-autoupdate: true
+
+ingress:
+%s`, config.Config.Application.CloudflaredTunnelId, ingress), domains
 }
 
 func (c *controller) UpdatePreview(ctx context.Context, in *v1.CreatePreviewRequest) (*v1.CreatePreviewReply, error) {
