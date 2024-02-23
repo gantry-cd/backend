@@ -50,8 +50,8 @@ type K8SClient interface {
 
 	// config map
 	CreateConfigMap(ctx context.Context, namespace string, name string, data map[string]string, opts metav1.CreateOptions) error
-	UpdateConfigMap(ctx context.Context, namespace string, name string, data map[string]string, opts metav1.UpdateOptions)
-	DeleteConfigMap(ctx context.Context, namespace string, name string, opts metav1.DeleteOptions)
+	UpdateConfigMap(ctx context.Context, namespace string, name string, data map[string]string, opts metav1.UpdateOptions) error
+	DeleteConfigMap(ctx context.Context, namespace string, name string, opts metav1.DeleteOptions) error
 }
 
 func New(client *kubernetes.Clientset) K8SClient {
