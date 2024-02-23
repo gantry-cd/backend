@@ -246,6 +246,23 @@
         }
       }
     },
+    "v1Deployment": {
+      "type": "object",
+      "properties": {
+        "podName": {
+          "type": "string"
+        },
+        "cpu": {
+          "type": "string"
+        },
+        "memory": {
+          "type": "string"
+        },
+        "storage": {
+          "type": "string"
+        }
+      }
+    },
     "v1GetBranchInformationResponse": {
       "type": "object",
       "properties": {
@@ -307,14 +324,11 @@
         "deploymentName": {
           "type": "string"
         },
-        "cpu": {
-          "type": "string"
+        "isDisable": {
+          "type": "boolean"
         },
-        "memory": {
-          "type": "string"
-        },
-        "storage": {
-          "type": "string"
+        "deployments": {
+          "$ref": "#/definitions/v1Deployment"
         }
       }
     },

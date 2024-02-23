@@ -78,11 +78,17 @@ message GetBranchInformationResponse {
 message GetUsageResponse{
   string organization = 1;
   string deployment_name = 2;
-  string cpu = 3;
-  string memory = 4;
-  string storage = 5;
+  bool is_disable = 3;
+  Deployment deployments = 4;
 }
 
+
+message Deployment{
+  string pod_name = 1;
+  string cpu = 2;
+  string memory = 3;
+  string storage = 4;
+}
 
 message Branches{
   string deployment_name = 1;
