@@ -9,6 +9,7 @@ import (
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 )
 
@@ -46,6 +47,11 @@ type K8SClient interface {
 
 	// builder
 	Builder(ctx context.Context, param BuilderParams, opts ...Option) (string, error)
+
+	// config map
+	CreateConfigMap(ctx context.Context, namespace string, name string, data map[string]string, opts metav1.CreateOptions) error
+	UpdateConfigMap(ctx context.Context, namespace string, name string, data map[string]string, opts metav1.UpdateOptions)
+	DeleteConfigMap(ctx context.Context, namespace string, name string, opts metav1.DeleteOptions)
 }
 
 func New(client *kubernetes.Clientset) K8SClient {
