@@ -11,6 +11,7 @@ import (
 	"github.com/gantrycd/backend/internal/utils/branch"
 	v1 "github.com/gantrycd/backend/proto"
 	"google.golang.org/protobuf/types/known/emptypb"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func (c *controller) CreatePreview(ctx context.Context, in *v1.CreatePreviewRequest) (*v1.CreatePreviewReply, error) {
@@ -90,7 +91,13 @@ func (c *controller) createDeployment(ctx context.Context, in *v1.CreatePreviewR
 		return nil, err
 	}
 
-	_, domains := buildCloudflaredConfig(in.Organization, service.Name, baseDomain, in.ExposePorts)
+	cloudflaredConfigYaml, domains := buildCloudflaredConfig(in.Organization, service.Name, baseDomain, in.ExposePorts)
+
+	if err := c.control.CreateConfigMap(ctx, in.Organization, baseDomain, map[string]string{
+		"config.yaml": cloudflaredConfigYaml,
+	}, metav1.CreateOptions{}); err != nil {
+		return nil, err
+	}
 
 	return &v1.CreatePreviewReply{
 		Name:      deps.Name,
