@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/gantrycd/backend/internal/models"
@@ -39,7 +38,6 @@ func (r *resrouceInteractor) GetResource(ctx context.Context, w http.ResponseWri
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	log.Println(result)
 	// Prometheusとかない場合
 	if result.GetIsDisable() {
 		resp.IsDisable = true
@@ -49,22 +47,23 @@ func (r *resrouceInteractor) GetResource(ctx context.Context, w http.ResponseWri
 		return nil
 	}
 
-	resource := result.GetResources()
-	var podUsage = make([]models.Usage, len(resource))
-	for i, metric := range resource {
-		for _, containerUsage := range metric.Usages {
+	resource := result.GetUsages()
+	var podUsage = make([]models.Usage, len(resource.Pods))
+	for i, metric := range resource.Pods {
+		cntainers := metric.GetContainers()
+		for _, containerUsage := range cntainers {
 			podUsage[i] = models.Usage{
-				CPU:     podUsage[i].CPU + int64(containerUsage.Cpu),
-				MEM:     podUsage[i].MEM + int64(containerUsage.Mem),
-				Storage: podUsage[i].Storage + int64(containerUsage.Storage),
+				CPU:     podUsage[i].CPU + int64(containerUsage.Resource.Cpu.Usage),
+				MEM:     podUsage[i].MEM + int64(containerUsage.Resource.Memory.Request),
+				Storage: podUsage[i].Storage + int64(containerUsage.Resource.Storage.Request),
 			}
 		}
 
 		podUsage[i] = models.Usage{
-			PodName: metric.PodName,
-			CPU:     podUsage[i].CPU / int64(len(metric.Usages)),
-			MEM:     podUsage[i].MEM / int64(len(metric.Usages)),
-			Storage: podUsage[i].Storage / int64(len(metric.Usages)),
+			PodName: metric.Name,
+			CPU:     podUsage[i].CPU / int64(len(cntainers)),
+			MEM:     podUsage[i].MEM / int64(len(cntainers)),
+			Storage: podUsage[i].Storage / int64(len(cntainers)),
 		}
 	}
 

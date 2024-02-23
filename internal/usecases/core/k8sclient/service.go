@@ -15,7 +15,7 @@ type CreateServiceNodePortParams struct {
 	TargetPort  []int32
 }
 
-func (k *k8sClient) CreateNodePortService(ctx context.Context, param CreateServiceNodePortParams, opts ...Option) (*corev1.Service, error) {
+func (k *k8sClient) CreateLoadBalancerService(ctx context.Context, param CreateServiceNodePortParams, opts ...Option) (*corev1.Service, error) {
 	o := newOption()
 	for _, opt := range opts {
 		opt(o)
@@ -30,7 +30,6 @@ func (k *k8sClient) CreateNodePortService(ctx context.Context, param CreateServi
 			Name: fmt.Sprintf("port-%d", port),
 			Port: port,
 		})
-
 	}
 
 	return k.client.CoreV1().Services(param.Namespace).Create(ctx, &corev1.Service{
@@ -41,7 +40,7 @@ func (k *k8sClient) CreateNodePortService(ctx context.Context, param CreateServi
 		Spec: corev1.ServiceSpec{
 			Ports:    expose,
 			Selector: o.labelSelector,
-			Type:     corev1.ServiceTypeNodePort,
+			Type:     corev1.ServiceTypeLoadBalancer,
 		},
 	}, metav1.CreateOptions{})
 }

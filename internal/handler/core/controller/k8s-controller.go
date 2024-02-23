@@ -12,7 +12,6 @@ import (
 
 	coreErr "github.com/gantrycd/backend/internal/error"
 	"github.com/gantrycd/backend/internal/usecases/core/k8sclient"
-	"github.com/gantrycd/backend/internal/usecases/core/resource"
 	"github.com/gantrycd/backend/internal/utils"
 	"github.com/gantrycd/backend/internal/utils/branch"
 	v1 "github.com/gantrycd/backend/proto"
@@ -20,6 +19,7 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"k8s.io/client-go/kubernetes"
+	metrics "k8s.io/metrics/pkg/client/clientset/versioned"
 )
 
 const (
@@ -32,17 +32,20 @@ type controller struct {
 	v1.UnimplementedK8SCustomControllerServer
 	client  *kubernetes.Clientset
 	control k8sclient.K8SClient
-	metric  resource.Resource
+	metric  *metrics.Clientset
 }
 
 func NewController(
 	client *kubernetes.Clientset,
-	metric resource.Resource,
+	metric *metrics.Clientset,
 ) v1.K8SCustomControllerServer {
 	return &controller{
-		client:  client,
-		control: k8sclient.New(client),
-		metric:  metric,
+		client: client,
+		control: k8sclient.New(
+			client,
+			metric,
+		),
+		metric: metric,
 	}
 }
 
@@ -151,19 +154,19 @@ func (c *controller) GetUsage(ctx context.Context, in *v1.GetUsageRequest) (*v1.
 		return nil, err
 	}
 
-	var resource []*v1.Resource
+	usages := new(v1.Usage)
 
 	for _, pod := range pods {
-		metric, err := c.metric.GetLoads(ctx, in.GetOrganization(), pod.Name)
+		podUsage, err := c.control.GetPodUsage(ctx, in.GetOrganization(), pod.Name)
 		if err != nil {
 			return nil, err
 		}
 
-		resource = append(resource, metric)
+		usages.Pods = append(usages.Pods, podUsage)
 	}
 
 	return &v1.GetUsageReply{
-		Resources: resource,
+		Usages:    usages,
 		IsDisable: false,
 	}, nil
 }
