@@ -95,12 +95,13 @@ func (c *controller) createDeployment(ctx context.Context, in *v1.CreatePreviewR
 
 	var nodePorts []string
 	// TODO: @xpadev-net ここからcloudflareのtunnelで通したURLを nodeportに変換して返す
+	// https://hogeohge.com:30000 -> https://fugafuga.hogeohge.com/hogehoge みたいなのを nodeport
 
 	return &v1.CreatePreviewReply{
 		Name:      deps.Name,
 		Namespace: deps.Namespace,
 		Version:   deps.ResourceVersion,
-		NodePorts: nodePorts,
+		External:  nodePorts,
 	}, nil
 }
 

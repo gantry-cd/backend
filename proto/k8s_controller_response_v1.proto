@@ -75,13 +75,13 @@ message Branches{
   string age = 6; 
 }
 
-
 message CreatePreviewReply {
   string namespace = 1;
   string name = 2;
   string version = 3;
-  repeated string node_ports = 4;
+  repeated string external = 4;
 }
+
 message BuildImageReply {
   string image = 1;
 }

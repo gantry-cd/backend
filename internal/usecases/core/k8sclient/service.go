@@ -30,7 +30,6 @@ func (k *k8sClient) CreateClientIPService(ctx context.Context, param CreateServi
 			Name: fmt.Sprintf("port-%d", port),
 			Port: port,
 		})
-
 	}
 
 	return k.client.CoreV1().Services(param.Namespace).Create(ctx, &corev1.Service{
