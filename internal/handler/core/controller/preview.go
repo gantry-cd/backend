@@ -73,8 +73,6 @@ func (c *controller) createDeployment(ctx context.Context, in *v1.CreatePreviewR
 		}, nil
 	}
 
-	baseDomain := fmt.Sprintf("%s-%s-%s", in.Organization, in.Repository, in.PullRequestId)
-
 	service, err := c.control.CreateLoadBalancerService(ctx,
 		k8sclient.CreateServiceNodePortParams{
 			Namespace:   in.Organization,
@@ -92,7 +90,22 @@ func (c *controller) createDeployment(ctx context.Context, in *v1.CreatePreviewR
 		return nil, err
 	}
 
-	cloudflaredConfigYaml, domains := buildCloudflaredConfig(in.Organization, service.Name, baseDomain, in.ExposePorts)
+	domains, err := createCloudflared(c, ctx, in, service.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	return &v1.CreatePreviewReply{
+		Name:      deps.Name,
+		Namespace: deps.Namespace,
+		Version:   deps.ResourceVersion,
+		External:  domains,
+	}, nil
+}
+
+func createCloudflared(c *controller, ctx context.Context, in *v1.CreatePreviewRequest, serviceName string) ([]string, error) {
+	baseDomain := fmt.Sprintf("%s-%s-%s", in.Organization, in.Repository, in.PullRequestId)
+	cloudflaredConfigYaml, domains := buildCloudflaredConfig(in.Organization, serviceName, baseDomain, in.ExposePorts)
 
 	configMapName := fmt.Sprintf("%s-configMap", baseDomain)
 	cloudflaredPodName := fmt.Sprintf("%s-cloudflared", baseDomain)
@@ -160,13 +173,8 @@ func (c *controller) createDeployment(ctx context.Context, in *v1.CreatePreviewR
 	}, metav1.CreateOptions{}); err != nil {
 		return nil, err
 	}
+	return domains, nil
 
-	return &v1.CreatePreviewReply{
-		Name:      deps.Name,
-		Namespace: deps.Namespace,
-		Version:   deps.ResourceVersion,
-		External:  domains,
-	}, nil
 }
 
 func buildCloudflaredConfig(namespace string, serviceName string, baseDomain string, ports []int32) (string, []string) {
@@ -249,16 +257,23 @@ func (c *controller) DeletePreview(ctx context.Context, in *v1.DeletePreviewRequ
 		return nil, err
 	}
 
+	if err := deleteCloudflared(c, ctx, in); err != nil {
+		return nil, err
+	}
+
+	return new(emptypb.Empty), nil
+}
+
+func deleteCloudflared(c *controller, ctx context.Context, in *v1.DeletePreviewRequest) error {
 	baseDomain := fmt.Sprintf("%s-%s-%s", in.Organization, in.Repository, in.PullRequestId)
 	configMapName := fmt.Sprintf("%s-configMap", baseDomain)
 	cloudflaredPodName := fmt.Sprintf("%s-cloudflared", baseDomain)
 
 	if err := c.control.DeleteConfigMap(ctx, in.Organization, configMapName, metav1.DeleteOptions{}); err != nil {
-		return nil, err
+		return err
 	}
 	if err := c.control.DeletePod(ctx, in.Organization, cloudflaredPodName, metav1.DeleteOptions{}); err != nil {
-		return nil, err
+		return err
 	}
-
-	return new(emptypb.Empty), nil
+	return nil
 }
