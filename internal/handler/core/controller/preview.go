@@ -113,7 +113,7 @@ func (c *controller) createDeployment(ctx context.Context, in *v1.CreatePreviewR
 		return nil, err
 	}
 
-	if _, err := c.control.CreatePod(ctx, in.Organization, &corev1.Pod{
+	if _, err := c.control.CreatePod(ctx, &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      cloudflaredPodName,
 			Namespace: in.Organization,
