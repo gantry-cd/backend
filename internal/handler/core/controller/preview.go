@@ -223,6 +223,7 @@ func createCloudflareDNSRecord(ctx context.Context, subDomains []string) error {
 				Type:    "CNAME",
 				Name:    subDomain,
 				Content: cnameDomain,
+				Proxied: cloudflare.BoolPtr(true),
 			})
 			if err != nil {
 				return err
@@ -234,6 +235,7 @@ func createCloudflareDNSRecord(ctx context.Context, subDomains []string) error {
 					Type:    "CNAME",
 					Name:    subDomain,
 					Content: cnameDomain,
+					Proxied: cloudflare.BoolPtr(true),
 				})
 				if err != nil {
 					return err
