@@ -38,7 +38,7 @@ type K8SCustomControllerClient interface {
 	UpdatePreview(ctx context.Context, in *CreatePreviewRequest, opts ...grpc.CallOption) (*CreatePreviewReply, error)
 	DeletePreview(ctx context.Context, in *DeletePreviewRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	BuildImage(ctx context.Context, in *BuildImageRequest, opts ...grpc.CallOption) (*BuildImageReply, error)
-	GetResource(ctx context.Context, in *GetResourceRequest, opts ...grpc.CallOption) (*GetResourceReply, error)
+	GetUsage(ctx context.Context, in *GetUsageRequest, opts ...grpc.CallOption) (*GetUsageReply, error)
 	GetLogs(ctx context.Context, in *GetLogsRequest, opts ...grpc.CallOption) (K8SCustomController_GetLogsClient, error)
 }
 
@@ -158,9 +158,9 @@ func (c *k8SCustomControllerClient) BuildImage(ctx context.Context, in *BuildIma
 	return out, nil
 }
 
-func (c *k8SCustomControllerClient) GetResource(ctx context.Context, in *GetResourceRequest, opts ...grpc.CallOption) (*GetResourceReply, error) {
-	out := new(GetResourceReply)
-	err := c.cc.Invoke(ctx, "/gantrycd.k8s_controller.v1.K8sCustomController/GetResource", in, out, opts...)
+func (c *k8SCustomControllerClient) GetUsage(ctx context.Context, in *GetUsageRequest, opts ...grpc.CallOption) (*GetUsageReply, error) {
+	out := new(GetUsageReply)
+	err := c.cc.Invoke(ctx, "/gantrycd.k8s_controller.v1.K8sCustomController/GetUsage", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -218,7 +218,7 @@ type K8SCustomControllerServer interface {
 	UpdatePreview(context.Context, *CreatePreviewRequest) (*CreatePreviewReply, error)
 	DeletePreview(context.Context, *DeletePreviewRequest) (*emptypb.Empty, error)
 	BuildImage(context.Context, *BuildImageRequest) (*BuildImageReply, error)
-	GetResource(context.Context, *GetResourceRequest) (*GetResourceReply, error)
+	GetUsage(context.Context, *GetUsageRequest) (*GetUsageReply, error)
 	GetLogs(*GetLogsRequest, K8SCustomController_GetLogsServer) error
 	mustEmbedUnimplementedK8SCustomControllerServer()
 }
@@ -263,8 +263,8 @@ func (UnimplementedK8SCustomControllerServer) DeletePreview(context.Context, *De
 func (UnimplementedK8SCustomControllerServer) BuildImage(context.Context, *BuildImageRequest) (*BuildImageReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method BuildImage not implemented")
 }
-func (UnimplementedK8SCustomControllerServer) GetResource(context.Context, *GetResourceRequest) (*GetResourceReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetResource not implemented")
+func (UnimplementedK8SCustomControllerServer) GetUsage(context.Context, *GetUsageRequest) (*GetUsageReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUsage not implemented")
 }
 func (UnimplementedK8SCustomControllerServer) GetLogs(*GetLogsRequest, K8SCustomController_GetLogsServer) error {
 	return status.Errorf(codes.Unimplemented, "method GetLogs not implemented")
@@ -498,20 +498,20 @@ func _K8SCustomController_BuildImage_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
-func _K8SCustomController_GetResource_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetResourceRequest)
+func _K8SCustomController_GetUsage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUsageRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(K8SCustomControllerServer).GetResource(ctx, in)
+		return srv.(K8SCustomControllerServer).GetUsage(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/gantrycd.k8s_controller.v1.K8sCustomController/GetResource",
+		FullMethod: "/gantrycd.k8s_controller.v1.K8sCustomController/GetUsage",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(K8SCustomControllerServer).GetResource(ctx, req.(*GetResourceRequest))
+		return srv.(K8SCustomControllerServer).GetUsage(ctx, req.(*GetUsageRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -593,8 +593,8 @@ var K8SCustomController_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _K8SCustomController_BuildImage_Handler,
 		},
 		{
-			MethodName: "GetResource",
-			Handler:    _K8SCustomController_GetResource_Handler,
+			MethodName: "GetUsage",
+			Handler:    _K8SCustomController_GetUsage_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

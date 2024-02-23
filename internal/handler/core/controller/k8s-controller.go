@@ -144,16 +144,16 @@ func (c *controller) GetOrgRepos(ctx context.Context, in *v1.GetOrgRepoRequest) 
 	return c.getOrganization(ctx, in.Organization)
 }
 
-func (c *controller) GetResource(ctx context.Context, in *v1.GetResourceRequest) (*v1.GetResourceReply, error) {
-	resource, err := c.metric.GetLoads(ctx, in.GetOrganization(), in.GetRepository())
+func (c *controller) GetUsage(ctx context.Context, in *v1.GetUsageRequest) (*v1.GetUsageReply, error) {
+	resource, err := c.metric.GetLoads(ctx, in.GetOrganization(), in.GetPodName())
 	if err != nil {
-		return &v1.GetResourceReply{
+		return &v1.GetUsageReply{
 			Resources: resource,
 			IsDisable: true,
 		}, nil
 	}
 
-	return &v1.GetResourceReply{
+	return &v1.GetUsageReply{
 		Resources: resource,
 		IsDisable: false,
 	}, nil

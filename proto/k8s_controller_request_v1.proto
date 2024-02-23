@@ -36,9 +36,9 @@ message GetOrgRepoRequest {
   string organization = 1;
 }
 
-message GetResourceRequest {
+message GetUsageRequest {
   string organization = 1;
-  string repository = 2;
+  string deployment_name = 2;
 };
 
 message GetRepoBranchesRequest{

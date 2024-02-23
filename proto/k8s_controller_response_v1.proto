@@ -59,8 +59,8 @@ message Resource {
   repeated Usage usages = 5;
 };
 
-message GetResourceReply {
-  repeated Resource resources = 1;
+message GetUsageReply {
+  Resource resources = 1;
   bool is_disable = 2;
 };
 

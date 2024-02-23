@@ -20,8 +20,8 @@ func New(interactor usage.ResrouceInteractor) *UsageController {
 func (uc *UsageController) Usage(w http.ResponseWriter, r *http.Request) {
 
 	if err := uc.interactor.GetResource(r.Context(), w, models.UsageRequest{
-		Organization: r.PathValue(models.ParamOrganization),
-		Pod:          r.PathValue(models.ParamPod),
+		Organization:   r.PathValue(models.ParamOrganization),
+		DeploymentName: r.PathValue(models.ParamDeploymentName),
 	}); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
