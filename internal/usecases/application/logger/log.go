@@ -3,13 +3,14 @@ package logger
 import (
 	"context"
 	"fmt"
-	"github.com/gantrycd/backend/internal/models"
-	v1 "github.com/gantrycd/backend/proto"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	"io"
 	"log"
 	"net/http"
+
+	"github.com/aura-cd/backend/internal/models"
+	v1 "github.com/aura-cd/backend/proto"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type logInteractor struct {

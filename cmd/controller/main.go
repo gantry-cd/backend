@@ -7,10 +7,10 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/gantrycd/backend/cmd/config"
-	"github.com/gantrycd/backend/internal/driver/k8s"
-	"github.com/gantrycd/backend/internal/handler/core/controller"
-	v1 "github.com/gantrycd/backend/proto"
+	"github.com/aura-cd/backend/cmd/config"
+	"github.com/aura-cd/backend/internal/driver/k8s"
+	"github.com/aura-cd/backend/internal/handler/core/controller"
+	v1 "github.com/aura-cd/backend/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )

@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/gantrycd/backend/cmd/config"
-	"github.com/gantrycd/backend/internal/models"
-	"github.com/gantrycd/backend/internal/usecases/application/github"
-	v1 "github.com/gantrycd/backend/proto"
+	"github.com/aura-cd/backend/cmd/config"
+	"github.com/aura-cd/backend/internal/models"
+	"github.com/aura-cd/backend/internal/usecases/application/github"
+	v1 "github.com/aura-cd/backend/proto"
 )
 
 // CreatePreviewEnvironmentParams はプレビュー環境を作成するためのパラメータです。

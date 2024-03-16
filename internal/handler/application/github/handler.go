@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/gantrycd/backend/internal/usecases/application/controller"
+	"github.com/aura-cd/backend/internal/usecases/application/controller"
 	"github.com/google/go-github/v29/github"
 )
 

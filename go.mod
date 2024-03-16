@@ -1,4 +1,4 @@
-module github.com/gantrycd/backend
+module github.com/aura-cd/backend
 
 go 1.22.0
 

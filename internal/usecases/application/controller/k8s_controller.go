@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	v1 "github.com/gantrycd/backend/proto"
+	v1 "github.com/aura-cd/backend/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"

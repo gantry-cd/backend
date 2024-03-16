@@ -3,8 +3,8 @@ package controller
 import (
 	"context"
 
-	"github.com/gantrycd/backend/internal/usecases/core/k8sclient"
-	v1 "github.com/gantrycd/backend/proto"
+	"github.com/aura-cd/backend/internal/usecases/core/k8sclient"
+	v1 "github.com/aura-cd/backend/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

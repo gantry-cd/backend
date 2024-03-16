@@ -3,7 +3,7 @@ package k8sclient
 import (
 	"context"
 
-	v1 "github.com/gantrycd/backend/proto"
+	v1 "github.com/aura-cd/backend/proto"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 

@@ -3,9 +3,9 @@ package router
 import (
 	"net/http"
 
-	"github.com/gantrycd/backend/internal/handler/application/controller"
-	"github.com/gantrycd/backend/internal/router/middleware"
-	"github.com/gantrycd/backend/internal/usecases/bff"
+	"github.com/aura-cd/backend/internal/handler/application/controller"
+	"github.com/aura-cd/backend/internal/router/middleware"
+	"github.com/aura-cd/backend/internal/usecases/bff"
 )
 
 func (r *router) page() {
