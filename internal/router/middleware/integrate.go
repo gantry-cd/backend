@@ -3,7 +3,7 @@ package middleware
 import (
 	"net/http"
 
-	"github.com/gantrycd/backend/cmd/config"
+	"github.com/aura-cd/backend/cmd/config"
 )
 
 func (m *middleware) Integrate(h http.HandlerFunc) http.Handler {

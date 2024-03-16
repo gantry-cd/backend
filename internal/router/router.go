@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/gantrycd/backend/internal/router/middleware"
-	v1 "github.com/gantrycd/backend/proto"
+	"github.com/aura-cd/backend/internal/router/middleware"
+	v1 "github.com/aura-cd/backend/proto"
 )
 
 type router struct {

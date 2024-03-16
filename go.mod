@@ -1,4 +1,4 @@
-module github.com/gantrycd/backend
+module github.com/aura-cd/backend
 
 go 1.22.0
 
@@ -6,6 +6,7 @@ require (
 	github.com/Nerzal/gocloak/v13 v13.9.0
 	github.com/bradleyfalzon/ghinstallation v1.1.1
 	github.com/caarlos0/env v3.5.0+incompatible
+	github.com/cloudflare/cloudflare-go v0.88.0
 	github.com/google/go-github/v29 v29.0.3
 	github.com/joho/godotenv v1.5.1
 	google.golang.org/grpc v1.61.1
@@ -17,7 +18,6 @@ require (
 )
 
 require (
-	github.com/cloudflare/cloudflare-go v0.88.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/emicklei/go-restful/v3 v3.11.0 // indirect

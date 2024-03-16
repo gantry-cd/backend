@@ -10,11 +10,11 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 
-	coreErr "github.com/gantrycd/backend/internal/error"
-	"github.com/gantrycd/backend/internal/usecases/core/k8sclient"
-	"github.com/gantrycd/backend/internal/utils"
-	"github.com/gantrycd/backend/internal/utils/branch"
-	v1 "github.com/gantrycd/backend/proto"
+	coreErr "github.com/aura-cd/backend/internal/error"
+	"github.com/aura-cd/backend/internal/usecases/core/k8sclient"
+	"github.com/aura-cd/backend/internal/utils"
+	"github.com/aura-cd/backend/internal/utils/branch"
+	v1 "github.com/aura-cd/backend/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"

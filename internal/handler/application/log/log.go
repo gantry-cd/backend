@@ -3,8 +3,8 @@ package log
 import (
 	"net/http"
 
-	"github.com/gantrycd/backend/internal/models"
-	"github.com/gantrycd/backend/internal/usecases/application/logger"
+	"github.com/aura-cd/backend/internal/models"
+	"github.com/aura-cd/backend/internal/usecases/application/logger"
 )
 
 type Controller struct {

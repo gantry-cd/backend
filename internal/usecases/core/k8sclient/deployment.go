@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	coreErr "github.com/gantrycd/backend/internal/error"
-	pbv1 "github.com/gantrycd/backend/proto"
+	coreErr "github.com/aura-cd/backend/internal/error"
+	pbv1 "github.com/aura-cd/backend/proto"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

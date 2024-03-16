@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/gantrycd/backend/internal/models"
-	v1 "github.com/gantrycd/backend/proto"
+	"github.com/aura-cd/backend/internal/models"
+	v1 "github.com/aura-cd/backend/proto"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 

@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/aura-cd/backend/cmd/config"
 	"github.com/bradleyfalzon/ghinstallation"
-	"github.com/gantrycd/backend/cmd/config"
 )
 
 func (c *gitHubClientInteractor) GetToken(ctx context.Context, installID int64) (string, error) {

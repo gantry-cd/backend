@@ -3,8 +3,8 @@ package usage
 import (
 	"net/http"
 
-	"github.com/gantrycd/backend/internal/models"
-	"github.com/gantrycd/backend/internal/usecases/application/usage"
+	"github.com/aura-cd/backend/internal/models"
+	"github.com/aura-cd/backend/internal/usecases/application/usage"
 )
 
 type UsageController struct {

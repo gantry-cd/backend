@@ -3,9 +3,9 @@ package router
 import (
 	"net/http"
 
-	"github.com/gantrycd/backend/internal/handler/application/log"
-	"github.com/gantrycd/backend/internal/router/middleware"
-	"github.com/gantrycd/backend/internal/usecases/application/logger"
+	"github.com/aura-cd/backend/internal/handler/application/log"
+	"github.com/aura-cd/backend/internal/router/middleware"
+	"github.com/aura-cd/backend/internal/usecases/application/logger"
 )
 
 func (r *router) Log() {

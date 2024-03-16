@@ -7,7 +7,7 @@ import (
 
 	restclient "k8s.io/client-go/rest"
 
-	protoV1 "github.com/gantrycd/backend/proto"
+	protoV1 "github.com/aura-cd/backend/proto"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

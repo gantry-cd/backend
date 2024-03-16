@@ -3,8 +3,8 @@ package controller
 import (
 	"net/http"
 
-	"github.com/gantrycd/backend/internal/models"
-	"github.com/gantrycd/backend/internal/usecases/bff"
+	"github.com/aura-cd/backend/internal/models"
+	"github.com/aura-cd/backend/internal/usecases/bff"
 )
 
 type BffController struct {

@@ -7,9 +7,9 @@ import (
 	"strings"
 
 	"github.com/Nerzal/gocloak/v13"
-	"github.com/gantrycd/backend/cmd/config"
-	"github.com/gantrycd/backend/internal/driver/keycloak"
-	"github.com/gantrycd/backend/internal/utils/random"
+	"github.com/aura-cd/backend/cmd/config"
+	"github.com/aura-cd/backend/internal/driver/keycloak"
+	"github.com/aura-cd/backend/internal/utils/random"
 )
 
 func init() {

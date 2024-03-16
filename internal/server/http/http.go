@@ -9,7 +9,7 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/gantrycd/backend/internal/server"
+	"github.com/aura-cd/backend/internal/server"
 )
 
 type httpServer struct {

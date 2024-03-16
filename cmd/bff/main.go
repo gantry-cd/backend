@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/gantrycd/backend/cmd/config"
-	"github.com/gantrycd/backend/internal/driver/pbclient"
-	"github.com/gantrycd/backend/internal/router"
-	"github.com/gantrycd/backend/internal/server/http"
-	v1 "github.com/gantrycd/backend/proto"
+	"github.com/aura-cd/backend/cmd/config"
+	"github.com/aura-cd/backend/internal/driver/pbclient"
+	"github.com/aura-cd/backend/internal/router"
+	"github.com/aura-cd/backend/internal/server/http"
+	v1 "github.com/aura-cd/backend/proto"
 )
 
 func init() {

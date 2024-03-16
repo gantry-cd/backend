@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/gantrycd/backend/cmd/config"
-	ghconn "github.com/gantrycd/backend/internal/driver/github"
-	"github.com/gantrycd/backend/internal/models"
-	"github.com/gantrycd/backend/internal/usecases/application/controller"
-	ghInteractor "github.com/gantrycd/backend/internal/usecases/application/github"
-	"github.com/gantrycd/backend/internal/utils/conf"
+	"github.com/aura-cd/backend/cmd/config"
+	ghconn "github.com/aura-cd/backend/internal/driver/github"
+	"github.com/aura-cd/backend/internal/models"
+	"github.com/aura-cd/backend/internal/usecases/application/controller"
+	ghInteractor "github.com/aura-cd/backend/internal/usecases/application/github"
+	"github.com/aura-cd/backend/internal/utils/conf"
 	"github.com/google/go-github/v29/github"
 )
 

@@ -3,9 +3,9 @@ package router
 import (
 	"net/http"
 
-	controller "github.com/gantrycd/backend/internal/handler/application/usage"
-	"github.com/gantrycd/backend/internal/router/middleware"
-	usecase "github.com/gantrycd/backend/internal/usecases/application/usage"
+	controller "github.com/aura-cd/backend/internal/handler/application/usage"
+	"github.com/aura-cd/backend/internal/router/middleware"
+	usecase "github.com/aura-cd/backend/internal/usecases/application/usage"
 )
 
 func (r *router) Usage() {
