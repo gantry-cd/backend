@@ -3,7 +3,7 @@ package router
 import (
 	"net/http"
 
-	"github.com/aura-cd/backend/internal/handler/application/github"
+	"github.com/aura-cd/backend/internal/adapters/controllers/application/github"
 	"github.com/aura-cd/backend/internal/usecases/application/controller"
 )
 

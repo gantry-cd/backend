@@ -1,4 +1,4 @@
-package controller
+package api
 
 import (
 	"net/http"
@@ -11,7 +11,7 @@ type BffController struct {
 	interactor bff.BffInteractor
 }
 
-func NewBff(interactor bff.BffInteractor) *BffController {
+func New(interactor bff.BffInteractor) *BffController {
 	return &BffController{
 		interactor: interactor,
 	}

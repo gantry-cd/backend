@@ -3,13 +3,13 @@ package router
 import (
 	"net/http"
 
-	controller "github.com/aura-cd/backend/internal/handler/application/usage"
+	usage "github.com/aura-cd/backend/internal/adapters/controllers/application/usage"
 	"github.com/aura-cd/backend/internal/router/middleware"
 	usecase "github.com/aura-cd/backend/internal/usecases/application/usage"
 )
 
 func (r *router) Usage() {
-	uc := controller.New(
+	uc := usage.New(
 		usecase.New(r.controllerConn),
 	)
 

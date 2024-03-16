@@ -8,8 +8,8 @@ import (
 	"os/signal"
 
 	"github.com/aura-cd/backend/cmd/config"
+	"github.com/aura-cd/backend/internal/adapters/controllers/core"
 	"github.com/aura-cd/backend/internal/driver/k8s"
-	"github.com/aura-cd/backend/internal/handler/core/controller"
 	v1 "github.com/aura-cd/backend/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -53,7 +53,7 @@ func run() error {
 	}
 
 	// TODO: Implement the server
-	v1.RegisterK8SCustomControllerServer(grpcServer, controller.NewController(client, metric))
+	v1.RegisterK8SCustomControllerServer(grpcServer, core.NewController(client, metric))
 
 	reflection.Register(grpcServer)
 
