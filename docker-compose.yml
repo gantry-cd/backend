@@ -2,7 +2,7 @@ version: "3"
 
 services:
   keycloak:
-    build: keycloak/
+    build: .docker/keycloak/
     container_name: keycloak
     tty: true
     stdin_open: true
