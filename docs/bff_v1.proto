@@ -1,0 +1,112 @@
+syntax = "proto3";
+
+package gantrycd.bff.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/gantrycd/backend/api/proto/bff/v1";
+
+service BffService {
+  rpc GetOrg(google.protobuf.Empty) returns (HomeResponse) {
+    option (google.api.http) = {get: "/organizations"};
+  }
+  rpc GetRepositoryApps(GetRepositoryAppsRequest) returns (GetRepositoryAppsResponse) {
+    option (google.api.http) = {get: "/organizations/{organization}/repositories"};
+  }
+  rpc GetRepoBranches(GetRepoBranchesRequest) returns (GetRepoBranchesResponse) {
+    option (google.api.http) = {get: "/organizations/{organization}/repositories/{repository}/branches"};
+  }
+  rpc GetBranchInformation(GetBranchInformationRequest) returns (GetBranchInformationResponse) {
+    option (google.api.http) = {get: "/organizations/{organization}/deployments/{deployment_name}"};
+  }
+  rpc GetUsage(GetUsageRequest) returns (GetUsageResponse) {
+    option (google.api.http) = {get: "/organizations/{organization}/deployments/{deployment_name}/usage"};
+  }
+}
+
+message HomeResponse {
+  repeated OrganizationInfos organization_infos = 1;
+}
+
+message GetRepositoryAppsRequest {
+  string organization = 1;
+}
+
+message GetRepoBranchesRequest {
+  string organization = 1;
+  string repository = 2;
+}
+
+message GetBranchInformationRequest {
+  string organization = 1;
+  string deployment_name = 2;
+}
+
+message GetUsageRequest {
+  string organization = 1;
+  string deployment_name = 3;
+}
+
+message GetRepositoryAppsResponse {
+  repeated Repositories repositories = 1;
+  repeated Apps apps = 2;
+}
+
+message GetRepoBranchesResponse {
+  repeated Branches branches = 1;
+}
+
+message GetBranchInformationResponse {
+  string branch_name = 1;
+  string gitHub_link = 2;
+  repeated Pod pods = 3;
+  string yaml = 4;
+}
+
+message GetUsageResponse {
+  string organization = 1;
+  string deployment_name = 2;
+  bool is_disable = 3;
+  Deployment deployments = 4;
+}
+
+message Deployment {
+  string pod_name = 1;
+  int32 cpu = 2;
+  int32 memory = 3;
+  int32 storage = 4;
+}
+
+message Branches {
+  string deployment_name = 1;
+  string branch = 2;
+  string pull_request_id = 3;
+  string status = 4;
+  string version = 5;
+  string age = 6;
+}
+
+message Pod {
+  string name = 1;
+  string status = 2;
+  string age = 3;
+  string image = 4;
+}
+
+message OrganizationInfos {
+  string organization = 1;
+  repeated string repositories = 2;
+}
+
+message Repositories {
+  string repository = 1;
+  int32 deployments = 2;
+}
+
+message Apps {
+  string name = 1;
+  string status = 2;
+  string version = 3;
+  string age = 4;
+}
