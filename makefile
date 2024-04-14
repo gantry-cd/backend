@@ -32,10 +32,10 @@ genrestproto:
 	protoc -I . --grpc-gateway_out . \
     --grpc-gateway_opt paths=source_relative \
     --grpc-gateway_opt generate_unbound_methods=true \
-    proto/bff*.proto
+    proto/api*.proto
 
 genswag:
-	protoc -I . --openapiv2_out ./openapiv2 --openapiv2_opt=allow_merge=true docs/bff_v1.proto
+	protoc -I . --openapiv2_out ./openapiv2 --openapiv2_opt=allow_merge=true docs/api_v1.proto
 lintproto:
 	protolint lint proto/*.proto
 

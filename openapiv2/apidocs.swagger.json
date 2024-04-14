@@ -1,0 +1,552 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "docs/api_v1.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "ApiService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/projects": {
+      "get": {
+        "summary": "Get all projects",
+        "description": "Get all projects",
+        "operationId": "ApiService_GetProjects",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetProjectsResponse"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {},
+            "examples": {
+              "application/json": {
+                "status:": 1,
+                "title": "titleExample",
+                "detail": "detailExample"
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "Projects"
+        ]
+      }
+    },
+    "/{projectId}/dashboards": {
+      "get": {
+        "summary": "Get all dashboards",
+        "description": "Get all dashboards",
+        "operationId": "ApiService_GetDashboards",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetDashboardsResponse"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {},
+            "examples": {
+              "application/json": {
+                "status:": 1,
+                "title": "titleExample",
+                "detail": "detailExample"
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Dashboards"
+        ]
+      }
+    },
+    "/{projectId}/deployments": {
+      "get": {
+        "summary": "Get all deployments",
+        "description": "Get all deployments",
+        "operationId": "ApiService_GetDeployments",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetDeploymentsResponse"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {},
+            "examples": {
+              "application/json": {
+                "status:": 1,
+                "title": "titleExample",
+                "detail": "detailExample"
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Deployments"
+        ]
+      }
+    },
+    "/{projectId}/settings": {
+      "get": {
+        "summary": "Get all settings",
+        "description": "Get all settings",
+        "operationId": "ApiService_GetSettings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetSettingsResponse"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {},
+            "examples": {
+              "application/json": {
+                "status:": 1,
+                "title": "titleExample",
+                "detail": "detailExample"
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Settings"
+        ]
+      }
+    },
+    "/{projectId}/usages": {
+      "get": {
+        "summary": "Get all usages",
+        "description": "Get all usages",
+        "operationId": "ApiService_GetUsage",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetUsageResponse"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {},
+            "examples": {
+              "application/json": {
+                "status:": 1,
+                "title": "titleExample",
+                "detail": "detailExample"
+              }
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Usage"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1Actions": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "branch": {
+          "type": "string"
+        },
+        "hash": {
+          "type": "string"
+        },
+        "user": {
+          "type": "string"
+        },
+        "icon": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Average": {
+      "type": "object",
+      "properties": {
+        "cpu": {
+          "type": "string"
+        },
+        "memory": {
+          "type": "string"
+        },
+        "storage": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Containers": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "cpu": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "storage": {
+          "type": "string"
+        },
+        "memory": {
+          "type": "string"
+        },
+        "age": {
+          "type": "string"
+        }
+      }
+    },
+    "v1DockerBuild": {
+      "type": "object",
+      "properties": {
+        "context": {
+          "type": "string"
+        },
+        "dockerfile": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Environment": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        },
+        "isSensitive": {
+          "type": "boolean"
+        },
+        "stage": {
+          "$ref": "#/definitions/v1Stage"
+        }
+      }
+    },
+    "v1General": {
+      "type": "object",
+      "properties": {
+        "projectName": {
+          "type": "string"
+        },
+        "dockerBuild": {
+          "$ref": "#/definitions/v1DockerBuild"
+        },
+        "registry": {
+          "$ref": "#/definitions/v1Registry"
+        }
+      }
+    },
+    "v1GetDashboardsResponse": {
+      "type": "object",
+      "properties": {
+        "productionInfos": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ProductionInfos"
+          }
+        }
+      }
+    },
+    "v1GetDeploymentsResponse": {
+      "type": "object",
+      "properties": {
+        "a": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Actions"
+          }
+        }
+      }
+    },
+    "v1GetProjectsResponse": {
+      "type": "object",
+      "properties": {
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Project"
+          }
+        }
+      }
+    },
+    "v1GetSettingsResponse": {
+      "type": "object",
+      "properties": {
+        "settings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Settings"
+          }
+        }
+      }
+    },
+    "v1GetUsageResponse": {
+      "type": "object",
+      "properties": {
+        "average": {
+          "$ref": "#/definitions/v1Average"
+        },
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Nodes"
+          }
+        },
+        "containers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Containers"
+          }
+        }
+      }
+    },
+    "v1Github": {
+      "type": "object",
+      "properties": {
+        "production": {
+          "$ref": "#/definitions/v1Production"
+        },
+        "stagingBranch": {
+          "type": "string"
+        },
+        "previewBranch": {
+          "type": "string"
+        },
+        "repository": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Nodes": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "age": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Production": {
+      "type": "object",
+      "properties": {
+        "branch": {
+          "type": "string"
+        },
+        "isBuild": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1ProductionInfos": {
+      "type": "object",
+      "properties": {
+        "productId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "repository": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Project": {
+      "type": "object",
+      "properties": {
+        "projectId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Registry": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        },
+        "isSensitive": {
+          "type": "boolean"
+        },
+        "stage": {
+          "$ref": "#/definitions/v1Stage"
+        }
+      }
+    },
+    "v1Settings": {
+      "type": "object",
+      "properties": {
+        "general": {
+          "$ref": "#/definitions/v1General"
+        },
+        "environment": {
+          "$ref": "#/definitions/v1Environment"
+        },
+        "github": {
+          "$ref": "#/definitions/v1Github"
+        }
+      }
+    },
+    "v1Stage": {
+      "type": "string",
+      "enum": [
+        "preview",
+        "staging",
+        "production"
+      ],
+      "default": "preview"
+    }
+  }
+}

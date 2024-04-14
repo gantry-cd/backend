@@ -1,0 +1,212 @@
+syntax = "proto3";
+
+package auracd.api.v1;
+
+import "google/protobuf/empty.proto";
+import "third_party/google/api/annotations.proto";
+import "third_party/grpc/openapiv2/options/annotations.proto";
+
+option go_package = "github.com/gantrycd/backend/api/proto/bff/v1";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  responses: {
+    key: "500";
+    value: {
+      description: "Internal Server Error";
+      examples: {
+        key: "application/json"
+        value: "{\"status:\": 1, \"title\": \"titleExample\", \"detail\": \"detailExample\"}"
+      }
+    }
+    
+  }
+};
+
+service ApiService {
+
+  rpc GetProjects(google.protobuf.Empty) returns (GetProjectsResponse){
+    option (google.api.http) = {
+      get: "/projects"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Projects"]
+      summary: "Get all projects"
+      description: "Get all projects"
+    };
+  }
+
+  rpc GetDeployments(GetDeploymentsRequest) returns (GetDeploymentsResponse){
+    option (google.api.http) = {
+      get: "/{project_id}/deployments"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Deployments"]
+      summary: "Get all deployments"
+      description: "Get all deployments"
+    };
+  }
+  
+  rpc GetDashboards(GetDashboardsRequest) returns (GetDashboardsResponse){
+    option (google.api.http) = {
+      get: "/{project_id}/dashboards"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Dashboards"]
+      summary: "Get all dashboards"
+      description: "Get all dashboards"
+    };
+  }
+  rpc GetUsage(GetUsageRequest) returns (GetUsageResponse){
+    option (google.api.http) = {
+      get: "/{project_id}/usages"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Usage"]
+      summary: "Get all usages"
+      description: "Get all usages"
+    };
+  }
+
+  rpc GetSettings(GetSettingsRequest) returns (GetSettingsResponse){
+    option (google.api.http) = {
+      get: "/{project_id}/settings"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Settings"]
+      summary: "Get all settings"
+      description: "Get all settings"
+    };
+  }
+}
+
+
+message GetDeploymentsRequest{
+  string project_id = 1;
+}
+
+message GetDashboardsRequest{
+  string project_id = 1;
+}
+
+message GetUsageRequest{
+  string project_id = 1;
+}
+
+message GetSettingsRequest{
+  string project_id = 1;
+}
+
+message GetProjectsResponse {
+  repeated Project projects = 1;
+}
+message Project {
+  string project_id = 1;
+  string name = 2;
+}
+
+message GetDeploymentsResponse{
+  repeated Actions a  = 1;
+}
+message Actions{
+  string name = 1;
+  string status = 2;
+  string branch = 3;
+  string hash = 4;
+  string user = 5;
+  string icon = 6;
+  string updated_at = 7;
+}
+message GetDashboardsResponse{
+  repeated ProductionInfos production_infos = 1;
+}
+
+message GetUsageResponse{
+  Average average = 1;
+  repeated Nodes nodes = 2;
+  repeated Containers containers = 3;
+}
+
+message Average{
+  string cpu = 1;
+  string memory = 2;
+  string storage = 3;
+}
+
+
+message GetSettingsResponse{
+  repeated Settings settings = 1;
+}
+
+
+message ProductionInfos{
+  string product_id = 1;
+  string name = 2;
+  string url = 3;
+  string repository = 4;
+  string status = 5;
+  string updated_at = 6;
+}
+
+message Nodes{
+  string name = 1;
+  string status = 2;
+  string version = 3;
+  string age = 4;
+}
+
+message Containers{
+  string name = 1;
+  string status = 2;
+  int32 cpu = 3;
+  string storage = 4;
+  string memory = 5;
+  string age = 6;
+}
+
+message Settings{
+  General general = 1;
+  Environment environment = 2;
+  Github github = 3;
+}
+
+message Environment{
+  string key = 1;
+  string value = 2;
+  bool is_sensitive = 3;
+  Stage stage = 4;
+}
+
+message Github{
+  Production production = 1;
+  string stagingBranch = 2;
+  string previewBranch = 3;
+  string repository = 4;
+}
+
+message Production{
+  string branch = 1;
+  bool is_build = 2;
+}
+message General{
+  string project_name = 1;
+  DockerBuild docker_build = 2;
+  Registry registry = 3;
+}
+
+message DockerBuild{
+  string context = 1;
+  string dockerfile = 2;
+}
+
+message Registry{
+  string key = 1;
+  string value = 2;
+  bool is_sensitive = 3;
+  Stage stage = 4;
+}
+
+enum Stage {
+  preview = 0;
+  staging = 1;
+  production = 2;
+}
