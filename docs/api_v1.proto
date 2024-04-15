@@ -6,7 +6,7 @@ import "google/protobuf/empty.proto";
 import "third_party/google/api/annotations.proto";
 import "third_party/grpc/openapiv2/options/annotations.proto";
 
-option go_package = "github.com/gantrycd/backend/api/proto/bff/v1";
+option go_package = "proto/api/v1";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   responses: {
@@ -78,7 +78,20 @@ service ApiService {
     };
   }
 }
-
+enum Stage {
+  preview = 0;
+  staging = 1;
+  production = 2;
+}
+enum Status {
+  success = 0;
+  error = 1;
+  running = 2;
+}
+enum Health {
+  ok = 0;
+  ng = 1;
+}
 
 message GetDeploymentsRequest{
   string project_id = 1;
@@ -105,17 +118,19 @@ message Project {
 }
 
 message GetDeploymentsResponse{
-  repeated Actions a  = 1;
+  repeated DemploymentInfos deployment_infos  = 1;
 }
-message Actions{
-  string name = 1;
-  string status = 2;
-  string branch = 3;
-  string hash = 4;
-  string user = 5;
-  string icon = 6;
-  string updated_at = 7;
+message DemploymentInfos{
+  string deployment_id = 1;
+  string name = 2;
+  Status status = 3; // 0: success, 1: error?
+  string branch = 4;
+  string hash = 5;
+  string user = 6;
+  string icon = 7;
+  string updated_at = 8;
 }
+
 message GetDashboardsResponse{
   repeated ProductionInfos production_infos = 1;
 }
@@ -140,7 +155,7 @@ message GetSettingsResponse{
 
 message ProductionInfos{
   string product_id = 1;
-  string name = 2;
+  string environment = 2;
   string url = 3;
   string repository = 4;
   string status = 5;
@@ -149,24 +164,47 @@ message ProductionInfos{
 
 message Nodes{
   string name = 1;
-  string status = 2;
-  string version = 3;
-  string age = 4;
+  string agent_version = 2;
+  string cpu_usage = 3;
+  string memory_usage = 4;
+  string storage_usage = 5;
+  string network_usage = 6;
 }
 
 message Containers{
   string name = 1;
-  string status = 2;
-  int32 cpu = 3;
-  string storage = 4;
-  string memory = 5;
-  string age = 6;
+  string container_status = 2;
+  int32 cpu_usage = 3;
+  string cpu_utilization = 4;
+  string storage_usage = 5;
+  string memory_usage = 6;
+  string network_usage = 7;
 }
 
 message Settings{
   General general = 1;
   Environment environment = 2;
   Github github = 3;
+}
+
+message General{
+  string project_name = 1;
+  DockerBuild docker_build = 2;
+  Registry registry = 3;
+  string advanced = 4;
+}
+
+message DockerBuild{
+  string context = 1;
+  string dockerfile = 2;
+}
+
+message Registry{
+  string repository = 1;
+  string host = 2;
+  string email= 3;
+  string username = 4;
+  string password = 5;
 }
 
 message Environment{
@@ -186,27 +224,4 @@ message Github{
 message Production{
   string branch = 1;
   bool is_build = 2;
-}
-message General{
-  string project_name = 1;
-  DockerBuild docker_build = 2;
-  Registry registry = 3;
-}
-
-message DockerBuild{
-  string context = 1;
-  string dockerfile = 2;
-}
-
-message Registry{
-  string key = 1;
-  string value = 2;
-  bool is_sensitive = 3;
-  Stage stage = 4;
-}
-
-enum Stage {
-  preview = 0;
-  staging = 1;
-  production = 2;
 }

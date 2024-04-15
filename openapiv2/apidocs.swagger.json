@@ -42,7 +42,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "#/definitions/rpcStatus"
+              "$ref": "#/definitions/googlerpcStatus"
             }
           }
         },
@@ -77,7 +77,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "#/definitions/rpcStatus"
+              "$ref": "#/definitions/googlerpcStatus"
             }
           }
         },
@@ -120,7 +120,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "#/definitions/rpcStatus"
+              "$ref": "#/definitions/googlerpcStatus"
             }
           }
         },
@@ -163,7 +163,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "#/definitions/rpcStatus"
+              "$ref": "#/definitions/googlerpcStatus"
             }
           }
         },
@@ -206,7 +206,7 @@
           "default": {
             "description": "An unexpected error response.",
             "schema": {
-              "$ref": "#/definitions/rpcStatus"
+              "$ref": "#/definitions/googlerpcStatus"
             }
           }
         },
@@ -225,16 +225,16 @@
     }
   },
   "definitions": {
-    "protobufAny": {
-      "type": "object",
-      "properties": {
-        "@type": {
-          "type": "string"
-        }
-      },
-      "additionalProperties": {}
+    "apiv1Status": {
+      "type": "string",
+      "enum": [
+        "success",
+        "error",
+        "running"
+      ],
+      "default": "success"
     },
-    "rpcStatus": {
+    "googlerpcStatus": {
       "type": "object",
       "properties": {
         "code": {
@@ -253,31 +253,14 @@
         }
       }
     },
-    "v1Actions": {
+    "protobufAny": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string"
-        },
-        "status": {
-          "type": "string"
-        },
-        "branch": {
-          "type": "string"
-        },
-        "hash": {
-          "type": "string"
-        },
-        "user": {
-          "type": "string"
-        },
-        "icon": {
-          "type": "string"
-        },
-        "updatedAt": {
+        "@type": {
           "type": "string"
         }
-      }
+      },
+      "additionalProperties": {}
     },
     "v1Average": {
       "type": "object",
@@ -299,20 +282,53 @@
         "name": {
           "type": "string"
         },
-        "status": {
+        "containerStatus": {
           "type": "string"
         },
-        "cpu": {
+        "cpuUsage": {
           "type": "integer",
           "format": "int32"
         },
-        "storage": {
+        "cpuUtilization": {
           "type": "string"
         },
-        "memory": {
+        "storageUsage": {
           "type": "string"
         },
-        "age": {
+        "memoryUsage": {
+          "type": "string"
+        },
+        "networkUsage": {
+          "type": "string"
+        }
+      }
+    },
+    "v1DemploymentInfos": {
+      "type": "object",
+      "properties": {
+        "deploymentId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/apiv1Status",
+          "title": "0: success, 1: error?"
+        },
+        "branch": {
+          "type": "string"
+        },
+        "hash": {
+          "type": "string"
+        },
+        "user": {
+          "type": "string"
+        },
+        "icon": {
+          "type": "string"
+        },
+        "updatedAt": {
           "type": "string"
         }
       }
@@ -356,6 +372,9 @@
         },
         "registry": {
           "$ref": "#/definitions/v1Registry"
+        },
+        "advanced": {
+          "type": "string"
         }
       }
     },
@@ -374,11 +393,11 @@
     "v1GetDeploymentsResponse": {
       "type": "object",
       "properties": {
-        "a": {
+        "deploymentInfos": {
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/v1Actions"
+            "$ref": "#/definitions/v1DemploymentInfos"
           }
         }
       }
@@ -452,13 +471,19 @@
         "name": {
           "type": "string"
         },
-        "status": {
+        "agentVersion": {
           "type": "string"
         },
-        "version": {
+        "cpuUsage": {
           "type": "string"
         },
-        "age": {
+        "memoryUsage": {
+          "type": "string"
+        },
+        "storageUsage": {
+          "type": "string"
+        },
+        "networkUsage": {
           "type": "string"
         }
       }
@@ -480,7 +505,7 @@
         "productId": {
           "type": "string"
         },
-        "name": {
+        "environment": {
           "type": "string"
         },
         "url": {
@@ -511,17 +536,20 @@
     "v1Registry": {
       "type": "object",
       "properties": {
-        "key": {
+        "repository": {
           "type": "string"
         },
-        "value": {
+        "host": {
           "type": "string"
         },
-        "isSensitive": {
-          "type": "boolean"
+        "email": {
+          "type": "string"
         },
-        "stage": {
-          "$ref": "#/definitions/v1Stage"
+        "username": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
         }
       }
     },
